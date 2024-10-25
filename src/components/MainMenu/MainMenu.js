@@ -16,7 +16,7 @@ const MainMenu = ({ setCurrentSection }) => {
   return (
     <nav className="main-menu">
       <div className="logo-container" onClick={resetPage}>
-        <img src="/images/octopus.jpeg" alt="Logo" className="logo" />
+        <img src="/images/octopus_bw.png" alt="Logo" className="logo" />
         <span className="logo-text">
           JackMusajo<span className="blinking-cursor">|</span>
         </span>

@@ -5,9 +5,8 @@ const HeroSection = ({ setCurrentSection }) => (
   <div className="hero-container">
     <img src="images/octopus_bw.png" alt="Octopus logo" className="hero-image" />
     <div className="hero-content">
-      <h1 className="hero-title">Jack Musajo</h1>
+      <h1 className="hero-title">JACK MUSAJO</h1>
       <p className="hero-subtitle">Software Engineer & Creative Technologist</p>
-      {/* Update the onClick to switch to the 'projects' section */}
       <button onClick={() => setCurrentSection('projects')} className="cta-button">View My Work</button>
     </div>
   </div>

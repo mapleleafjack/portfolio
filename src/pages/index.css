@@ -24,6 +24,8 @@
     padding: 40px;
     margin: -10px;
     background-color: transparent; /* Ensure content background is transparent */
+    font-family: 'oxanium';
+
   }
   
   .header {

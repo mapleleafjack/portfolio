@@ -6,6 +6,7 @@
   /* background-color: #000; */
   height: 65vh; 
   padding: 20px; 
+  overflow: hidden;
 }
 
 .hero-image {
@@ -17,16 +18,7 @@
   left: 50%; 
   transform: translate(-50%, -50%);
   z-index: 1; 
-  opacity: 0.4; 
-}
-.hero-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 65vh; 
-  padding: 20px; 
-  overflow: hidden; /* Ensure no overflow issues */
+  opacity: 1; 
 }
 
 .hero-image {
@@ -34,11 +26,11 @@
   max-height: 50vh;
   object-fit: contain; 
   position: absolute; 
-  top: 50%; 
+  top: 35%; 
   left: 50%; 
   transform: translate(-50%, -50%);
   z-index: 1; /* Ensure the image is above the background */
-  opacity: 0.8; /* Adjust opacity for better visibility */
+  opacity: 1; /* Adjust opacity for better visibility */
 }
 
 .hero-content {
@@ -54,6 +46,7 @@
   font-weight: bold;
   margin-bottom: 0.2em;
   animation: fadeInDown 1s ease-out;
+  margin-bottom: 125px;
 }
 
 .hero-subtitle {
