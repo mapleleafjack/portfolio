@@ -2,12 +2,14 @@
   position: relative;
   display: flex;
   align-items: center;
+  flex-direction: column; /* Stack the elements vertically */
   justify-content: center;
   /* background-color: #000; */
   height: 65vh; 
   padding: 20px; 
   overflow: hidden;
 }
+
 
 .hero-image {
   max-width: 100%; 
@@ -42,7 +44,7 @@
 
 
 .hero-title {
-  font-size: 4em;
+  font-size: 7em;
   font-weight: bold;
   margin-bottom: 0.2em;
   animation: fadeInDown 1s ease-out;
@@ -68,4 +70,43 @@
   background-color: #fff;
   color: #000;
   transform: scale(1.1);
+}
+
+
+@media (max-width: 768px) {
+  .hero-container {
+    height: 50vh;
+    padding: 10px;
+  }
+
+  .hero-title {
+    font-size: 4em; /* Smaller font size for mobile */
+    margin-bottom: 50px;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2em; /* Smaller subtitle */
+  }
+
+  .cta-button {
+    font-size: 1em;
+    padding: 8px 15px; /* Smaller button */
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.5em; /* Even smaller font for very small screens */
+  }
+
+  .cta-button {
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-image {
+    max-width: 80%; /* Reduce the image size */
+    max-height: 40vh; /* Adjust height for smaller screens */
+  }
 }

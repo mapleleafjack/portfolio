@@ -3,16 +3,20 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: transparent;
-  padding: 5px 0;
+  background-color: rgba(17, 17, 17, 0.8); /* Match Three.js background (0x111111) with 80% opacity */
   text-align: center;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  pointer-events: auto; /* Ensure pointer events are enabled */
+  padding: 10px 0;
+  transition: background-color 0.3s ease;
 }
 
+/* On scroll, keep the same background but make it more solid */
+.main-menu.scrolled {
+  background-color: rgba(17, 17, 17, 0.95); /* Dark grey background with slightly less transparency */
+}
 
 .logo-container {
   cursor:pointer;
@@ -70,4 +74,22 @@
 .main-menu ul li a.active {
   color: #00ff00;
   border-bottom: 3px solid #00ff00;
+}
+
+@media (max-width: 768px) {
+  .main-menu {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+  }
+
+  .main-menu ul {
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+  }
+
+  .main-menu ul li {
+    margin: 10px 0;
+  }
 }
