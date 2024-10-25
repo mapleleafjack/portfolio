@@ -1,0 +1,48 @@
+.project-card {
+    background-color: #111; /* Dark background for the cards */
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%; /* Take up 80% of the container width */
+    max-width: 800px; /* Limit the max width for larger screens */
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    color: #fff; /* Default text color */
+    cursor: pointer; /* Make it look clickable */
+    text-decoration: none; /* Remove default link underlines */
+  }
+  
+  .project-card:hover {
+    transform: translateY(-10px); /* Subtle hover lift */
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.6);
+    background-color: #222; /* Darken the background on hover */
+  }
+  
+  .project-title {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: inherit; /* Allows dynamic color from the prop */
+  }
+  
+  .project-description {
+    font-size: 1.2em;
+    margin-top: 10px;
+    color: #ccc; /* Light color for description */
+  }
+  
+  .project-card:hover .project-title {
+    text-decoration: underline; /* Underline the title on hover to indicate clickability */
+  }
+  
+    .project-skills {
+    margin-top: 10px;
+  }
+  
+  .project-skill {
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 5px;
+    font-size: 0.9em;
+  }
+  

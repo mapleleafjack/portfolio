@@ -8,13 +8,5 @@
  * @type {import('gatsby').GatsbyConfig}
  */
 module.exports = {
-  siteMetadata: {
-    siteUrl: "https://www.jackmusajo.it", // Your site URL
-  },
-  plugins: [{
-    resolve: `gatsby-plugin-s3`,
-    options: {
-      bucketName: "www.jackmusajo.it", // Your S3 bucket name
-    },
-  }],
+  plugins: [],
 }

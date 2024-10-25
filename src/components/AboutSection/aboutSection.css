@@ -1,0 +1,21 @@
+/* Styles for terminal effect */
+.terminal-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.2em;
+    white-space: pre-wrap;
+  }
+  
+  .cursor {
+    display: inline-block;
+    background-color: #00ff00;
+    width: 10px;
+    height: 20px;
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+  }
+  
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  
