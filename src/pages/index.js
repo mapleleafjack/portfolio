@@ -15,8 +15,6 @@ const IndexPage = () => {
         return <AboutSection setCurrentSection={setCurrentSection} />;
       case 'projects':
         return <ProjectsSection />;
-      case 'contact':
-        return <ContactSection />;
       default:
         return <AboutSection setCurrentSection={setCurrentSection} />;
     }
