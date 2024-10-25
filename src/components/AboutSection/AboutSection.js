@@ -22,7 +22,6 @@ const AboutSection = () => {
     <>
       <HeroSection />
       <section id="about" className="section">
-        <h2 className="sectionTitle">About Me</h2>
         <p className="terminal-text">
           {displayedText}
           <span className="cursor">|</span>

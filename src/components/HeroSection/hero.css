@@ -19,23 +19,35 @@
   z-index: 1; 
   opacity: 0.4; 
 }
+.hero-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 65vh; 
+  padding: 20px; 
+  overflow: hidden; /* Ensure no overflow issues */
+}
 
-.hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  /* background-color: rgba(0, 0, 0, 0.5); */
-  z-index: 2;
+.hero-image {
+  max-width: 100%; 
+  max-height: 50vh;
+  object-fit: contain; 
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%);
+  z-index: 1; /* Ensure the image is above the background */
+  opacity: 0.8; /* Adjust opacity for better visibility */
 }
 
 .hero-content {
   position: relative;
-  z-index: 3;
+  z-index: 2; /* Ensure content is above the background */
   text-align: center;
   color: #fff;
 }
+
 
 .hero-title {
   font-size: 4em;

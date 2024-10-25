@@ -3,7 +3,8 @@ import MainMenu from '../components/MainMenu/MainMenu';
 import AboutSection from '../components/AboutSection/AboutSection';
 import ProjectsSection from '../components/ProjectsSection/ProjectsSection';
 import ContactSection from '../components/ContactSection/ContactSection';
-import CustomCursor from '../components/CustomCursor/CustomCursor';  // Import the new custom cursor
+import CustomCursor from '../components/CustomCursor/CustomCursor';
+import ThreeBackground from '../components/ThreeBackground/ThreeBackground';
 import './index.css';
 
 const IndexPage = () => {
@@ -24,7 +25,8 @@ const IndexPage = () => {
 
   return (
     <main className="main">
-      <CustomCursor />  {/* Add the custom cursor */}
+      <ThreeBackground />  {/* The background will be displayed everywhere */}
+      <CustomCursor />  
       <MainMenu setCurrentSection={setCurrentSection} />
       {renderSection()}
     </main>
