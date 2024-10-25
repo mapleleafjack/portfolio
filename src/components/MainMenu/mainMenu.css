@@ -1,0 +1,35 @@
+.main-menu {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Ensure it's always on top */
+    background-color: #000; /* Match the background */
+    padding: 5px 0;
+    text-align: center; /* Center the menu items horizontally */
+    width: 100%;
+  }
+  
+  .main-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 10px 10px 10px 0;
+    display: flex;
+  }
+  
+  .main-menu ul li {
+    margin: 10px 10px 10px 0;
+  }
+  
+  .main-menu ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1em;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+  
+  .main-menu ul li a:hover,
+  .main-menu ul li a.active {
+    color: #00ff00;
+    border-bottom: 3px solid #00ff00; /* Highlight active or hovered item */
+  }
+  

@@ -3,6 +3,7 @@
   "private": true,
   "description": "A simplified bare-bones starter for Gatsby",
   "version": "0.1.0",
+  "homepage": "https://mapleleafjack.github.io/portfolio",
   "license": "0BSD",
   "scripts": {
     "build": "gatsby build",
@@ -15,9 +16,13 @@
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
   },
   "dependencies": {
+    "dd": "^0.26.0",
     "gatsby": "^5.13.7",
+    "gatsby-omni-font-loader": "^2.0.2",
+    "gatsby-plugin-s3": "^0.4.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0"
   },
   "repository": {
     "type": "git",
