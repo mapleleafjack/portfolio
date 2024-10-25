@@ -1,8 +1,14 @@
-/* Styles for terminal effect */
+/* components/AboutSection/aboutSection.css */
+
 .terminal-text {
     font-family: 'Courier New', Courier, monospace;
     font-size: 1.2em;
     white-space: pre-wrap;
+    transition: opacity 1s ease; /* Transition for smooth appearance */
+  }
+  
+  .smooth-fill {
+    opacity: 1;
   }
   
   .cursor {
