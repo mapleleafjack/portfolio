@@ -1,3 +1,4 @@
+/* components/MainMenu/mainMenu.css */
 .main-menu {
   position: sticky;
   top: 0;
@@ -6,8 +7,45 @@
   padding: 5px 0;
   text-align: center;
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: auto; /* Ensure pointer events are enabled */
 }
 
+
+.logo-container {
+  cursor:pointer;
+  display: flex;
+  align-items: center;
+  margin-left: 20px; /* Add some left margin */
+}
+
+.logo {
+  height: 40px; /* Adjust the logo size */
+  margin-right: 10px; /* Spacing between logo and text */
+}
+
+.logo-text {
+  color: #fff;
+  font-size: 1.5em;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.blinking-cursor {
+  font-weight: normal;  /* Reduce boldness */
+  font-size: 1em;       /* Make it smaller */
+  color: #fff;
+  margin-left: 5px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  from, to { color: #fff; }
+  50% { color: #000; }
+}
 .main-menu ul {
   list-style: none;
   margin: 0;
