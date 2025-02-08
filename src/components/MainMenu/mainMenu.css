@@ -28,6 +28,7 @@
 .logo {
   height: 40px; /* Adjust the logo size */
   margin-right: 10px; /* Spacing between logo and text */
+  opacity: 1;
 }
 
 .logo-text {
