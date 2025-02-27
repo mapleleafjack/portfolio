@@ -7,7 +7,7 @@ const HeroSection = ({ setCurrentSection }) => (
     <div className="hero-content">
       <h1 className="hero-title">JACK MUSAJO</h1>
       <p className="hero-subtitle">Software Engineer & Creative Technologist</p>
-      <button onClick={() => setCurrentSection('projects')} className="cta-button">View My Work</button>
+      {/* <button onClick={() => setCurrentSection('projects')} className="cta-button">View My Work</button> */}
     </div>
   </div>
 );

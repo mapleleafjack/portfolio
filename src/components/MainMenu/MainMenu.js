@@ -23,7 +23,6 @@ const MainMenu = ({ setCurrentSection }) => {
       </div>
       <ul>
         <li><a href="#about" onClick={resetPage}>// About</a></li> {/* Add onClick to reset */}
-        <li><a href="#projects" onClick={() => setCurrentSection('projects')}>// Projects</a></li>
         <li><a href="#contact" onClick={() => setCurrentSection('contact')}>// Contact</a></li>
       </ul>
     </nav>
