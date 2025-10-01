@@ -9,6 +9,16 @@ import './AnimatedRoutes.css';
 const AnimatedRoutes = () => {
   const location = useLocation();
 
+  if (typeof window === 'undefined') {
+    return (
+      <Routes>
+        <Route path="/" element={<AboutSection />} />
+        <Route path="/projects" element={<ProjectsSection />} />
+        <Route path="/contact" element={<ContactSection />} />
+      </Routes>
+    );
+  }
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
