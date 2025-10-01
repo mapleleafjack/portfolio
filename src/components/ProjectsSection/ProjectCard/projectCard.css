@@ -1,48 +1,165 @@
+
 .project-card {
-    background-color: #111; /* Dark background for the cards */
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%; /* Take up 80% of the container width */
-    max-width: 800px; /* Limit the max width for larger screens */
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    color: #fff; /* Default text color */
-    cursor: pointer; /* Make it look clickable */
-    text-decoration: none; /* Remove default link underlines */
+  background: rgba(28, 32, 38, 0.82);
+  backdrop-filter: blur(10px) saturate(120%);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18), 0 1.5px 6px 0 rgba(60,60,60,0.04);
+  border: 1.5px solid rgba(120,120,120,0.10);
+  padding: 0;
+  width: 100%;
+  max-width: 420px;
+  min-height: 220px;
+  color: #f5f5f5;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.22s cubic-bezier(.4,2,.6,1), box-shadow 0.22s, border 0.22s, background 0.22s;
+  display: flex;
+  align-items: stretch;
+}
+
+ .project-card:hover {
+  transform: translateY(-8px) scale(1.025);
+  box-shadow: 0 16px 40px 0 rgba(60,60,60,0.13), 0 2px 12px 0 rgba(0,0,0,0.32);
+  border: 1.5px solid #90caf9;
+  background: rgba(36, 40, 48, 0.92);
+}
+
+.project-card-inner {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  padding: 24px 28px;
+  gap: 24px;
+  min-height: 180px;
+  height: 100%;
+}
+
+.project-image-wrapper {
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  width: 64px;
+  background: rgba(0,0,0,0.18);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.10);
+}
+
+.project-image {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+}
+
+.project-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #222 60%, #333 100%);
+  border-radius: 8px;
+}
+
+.project-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
+  min-height: 120px;
+  height: 100%;
+}
+
+.project-title {
+  font-size: 1.35em;
+  font-weight: 700;
+  margin: 0 0 0.25em 0;
+  color: inherit;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  transition: color 0.2s;
+}
+
+.project-card:hover .project-title {
+  text-decoration: underline;
+  color: var(--accent-color, #00ff99);
+}
+
+.project-description {
+  font-size: 1.05em;
+  margin: 0 0 0.7em 0;
+  color: #cfd8dc;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  line-clamp: 3;
+}
+
+.project-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-top: 0.2em;
+}
+
+.project-skill {
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 0.92em;
+  letter-spacing: 0.01em;
+  border: none;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.06);
+  margin-bottom: 2px;
+  background: #23272f;
+  color: #e0e0e0;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+/* Professional category colors */
+.project-skill--software {
+  background: #e3eafc;
+  color: #1a237e;
+  border: 1.5px solid #90caf9;
+}
+.project-skill--hardware {
+  background: #e8f5e9;
+  color: #256029;
+  border: 1.5px solid #81c784;
+}
+.project-skill--cloud {
+  background: #f3e5f5;
+  color: #6a1b9a;
+  border: 1.5px solid #ba68c8;
+}
+.project-skill--other {
+  background: #fffde7;
+  color: #795548;
+  border: 1.5px solid #ffe082;
+}
+
+.project-card:hover .project-skill {
+  box-shadow: 0 2px 8px 0 rgba(60,60,60,0.10);
+  filter: brightness(1.04);
+}
+
+@media (max-width: 600px) {
+  .project-card-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px 12px;
+    gap: 14px;
   }
-  
-  .project-card:hover {
-    transform: translateY(-10px); /* Subtle hover lift */
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.6);
-    background-color: #222; /* Darken the background on hover */
+  .project-image-wrapper {
+    margin-bottom: 6px;
   }
-  
-  .project-title {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: inherit; /* Allows dynamic color from the prop */
-  }
-  
-  .project-description {
-    font-size: 1.2em;
-    margin-top: 10px;
-    color: #ccc; /* Light color for description */
-  }
-  
-  .project-card:hover .project-title {
-    text-decoration: underline; /* Underline the title on hover to indicate clickability */
-  }
-  
-    .project-skills {
-    margin-top: 10px;
-  }
-  
-  .project-skill {
-    background-color: #333;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    margin-right: 5px;
-    font-size: 0.9em;
-  }
+}
   
