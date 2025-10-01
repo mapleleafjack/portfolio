@@ -79,6 +79,8 @@ const AnimatedRoutes = ({ location }) => {
 
   // Scroll wheel navigation effect
   useEffect(() => {
+    // Disable scroll wheel navigation on /portfolio so user can scroll the page
+    if (normalizedPath === '/portfolio') return;
     const handleWheel = (e) => {
       if (modalOpenRef.current) return; // Disable scroll nav when modal is open
       const now = Date.now();
@@ -130,6 +132,7 @@ const AnimatedRoutes = ({ location }) => {
 
   // Use different animation for index (About) page
   const isIndex = normalizedPath === '/';
+  const isPortfolio = normalizedPath === '/portfolio';
   return (
     <>
       <BlurryBackground opacity={blurOpacity} />
@@ -141,7 +144,7 @@ const AnimatedRoutes = ({ location }) => {
           exit="exit"
           variants={isIndex ? indexVariants : pageVariants}
           transition={pageTransition}
-          className="route-content"
+          className={`route-content${isPortfolio ? ' portfolio-route' : ''}`}
         >
           {renderComponent()}
         </motion.div>

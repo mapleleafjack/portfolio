@@ -13,6 +13,6 @@ export function getNextRoute(currentPath) {
 export function getPrevRoute(currentPath) {
   const idx = orderedRoutes.indexOf(currentPath);
   if (idx === -1) return orderedRoutes[0];
-  if (idx === 0) return currentPath; // at start, don't loop
+  if (idx === 0) return orderedRoutes[orderedRoutes.length - 1]; // loop to last route
   return orderedRoutes[idx - 1];
 }

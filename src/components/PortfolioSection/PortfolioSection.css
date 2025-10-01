@@ -1,23 +1,172 @@
+
 .portfolio-section {
   padding: 2rem;
-  max-width: 800px;
+  max-width: 1100px;
   margin: 0 auto;
+  background: transparent;
+  color: #fff;
 }
 .portfolio-section h2 {
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
+  color: #fff;
+  letter-spacing: 0.02em;
 }
-.cv-entry {
-  background: #f7f7f7;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
+
+/* Category filter chips */
+.category-filter {
+  display: flex;
+  gap: 0.7em;
+  margin-bottom: 1.5em;
+  flex-wrap: wrap;
 }
+.filter-chip {
+  border: 2px solid;
+  border-radius: 999px;
+  padding: 0.5em 1.2em;
+  font-size: 1.05em;
+  font-weight: 500;
+  background: rgba(40,40,40,0.7);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  outline: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.10);
+}
+.filter-chip.selected {
+  color: #fff;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.18);
+}
+.chip-icon {
+  font-size: 1.2em;
+}
+
+/* Portfolio categories layout */
+.portfolio-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem 2rem;
+  justify-content: flex-start;
+  margin-bottom: 2rem;
+}
+.portfolio-category-box {
+  flex: 1 1 320px;
+  min-width: 320px;
+  max-width: 370px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 18px;
+  border: 2.5px solid;
+  padding: 1.2rem 1.1rem 1.5rem 1.1rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.13);
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.portfolio-category-box:hover {
+  transform: translateY(-6px) scale(1.025);
+  box-shadow: 0 6px 24px 0 rgba(0,0,0,0.22);
+}
+.category-header {
+  font-size: 1.25em;
+  font-weight: 700;
+  margin-bottom: 0.7em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  letter-spacing: 0.01em;
+}
+.category-icon {
+  font-size: 1.3em;
+}
+.category-companies {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+}
+
+/* Company card */
+.company-card {
+  background: rgba(20, 20, 20, 0.97);
+  border-radius: 12px;
+  border: 2px solid;
+  padding: 1.1em 1em 1.1em 1em;
+  box-shadow: 0 1px 8px 0 rgba(0,0,0,0.13);
+  margin-bottom: 0.2em;
+  transition: box-shadow 0.18s, transform 0.18s;
+  position: relative;
+}
+.company-card:hover {
+  box-shadow: 0 4px 18px 0 rgba(0,0,0,0.22);
+  transform: scale(1.025);
+  z-index: 2;
+}
+.company-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+.company-name {
+  font-size: 1.13em;
+  font-weight: 600;
+  color: #ffb347;
+}
+.company-years {
+  font-size: 0.98em;
+  color: #bbb;
+  font-weight: 400;
+}
+.company-highlights {
+  margin: 0 0 0.5em 0;
+  padding-left: 1.2em;
+  font-size: 1em;
+}
+.company-highlights li {
+  margin-bottom: 0.4em;
+  line-height: 1.6;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+}
+.company-highlights li .tooltip-container {
+  margin-left: 0;
+  margin-right: 0.3em;
+}
+.company-techstack {
+  margin-top: 0.2em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+}
+.tech-pill {
+  background: rgba(255,255,255,0.09);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.18em 0.85em;
+  font-size: 0.93em;
+  font-weight: 500;
+  border: 1.2px solid #444;
+  margin-right: 0.1em;
+  margin-bottom: 0.1em;
+  letter-spacing: 0.01em;
+  transition: background 0.18s, color 0.18s;
+}
+.tech-pill:hover {
+  background: #fff;
+  color: #222;
+}
+
+/* Tooltip */
 .tooltip-container {
   position: relative;
   display: inline-block;
   cursor: pointer;
-  margin-left: 0.4em;
+  margin-left: 0.2em;
 }
 .tooltip-text {
   visibility: hidden;
@@ -36,45 +185,23 @@
   transition: opacity 0.2s;
   font-size: 0.95em;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  pointer-events: none;
 }
-  .portfolio-section {
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
-    background: transparent;
-    color: #fff;
-  }
-  .portfolio-section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-    color: #fff;
-  }
-  .cv-entry {
-    background: rgba(20, 20, 20, 0.95);
-    border-radius: 12px;
-    padding: 1.5rem 1.2rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.25);
-    border: 1px solid #222;
-  }
-  .cv-entry h3 {
-    color: #ffb347;
-    margin-bottom: 0.7rem;
-  }
-  .cv-entry ul {
-    margin: 0;
-    padding-left: 1.2em;
-  }
-  .cv-entry li {
-    margin-bottom: 0.5em;
-    line-height: 1.6;
-  }
-  .chart-placeholder {
-    background: rgba(40, 40, 40, 0.95);
-    border-radius: 8px;
-    padding: 2rem;
-    text-align: center;
-    color: #bbb;
-    margin-bottom: 2rem;
-    border: 1px solid #222;
-  }
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Chart placeholder */
+.chart-placeholder {
+  background: rgba(40, 40, 40, 0.95);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  color: #bbb;
+  margin-bottom: 2rem;
+  border: 1px solid #222;
+  font-size: 1.1em;
+  letter-spacing: 0.01em;
+}

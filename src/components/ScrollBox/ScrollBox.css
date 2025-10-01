@@ -1,0 +1,25 @@
+.scroll-box {
+  overflow-y: auto;
+  overflow-x: visible;
+  background: rgba(30, 30, 30, 0.92);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.18);
+  padding: 2rem 1.5rem;
+  margin: 0 auto 2rem auto;
+  width: 100%;
+  /* Hide default scrollbar for Webkit browsers */
+  scrollbar-width: thin;
+  scrollbar-color: #888 #222;
+}
+
+.scroll-box::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-box::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+}
+.scroll-box::-webkit-scrollbar-track {
+  background: #222;
+  border-radius: 8px;
+}
