@@ -1,5 +1,5 @@
-// components/ProjectsSection/ProjectsSection.js
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import ProjectCard from './ProjectCard/ProjectCard';
 import './projectsSection.css';
 
@@ -43,42 +43,86 @@ const ProjectsSection = () => {
   );
 
   return (
-    <section id="projects" className="section">
-      <h2 className="sectionTitle">Projects</h2>
+    <motion.div 
+      className="projects-overlay"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div 
+        className="projects-content"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <motion.h2 
+          className="sectionTitle"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          Projects
+        </motion.h2>
 
-      {/* Skills Section (Now part of ProjectsSection) */}
-      <div className="skills-filter">
-        <ul className="skillList">
-          {skills.map((skill) => (
-            <li
-              key={skill}
-              className={`skillItem ${selectedSkills.includes(skill) ? 'selected' : ''}`}
-              onClick={() => toggleSkill(skill)}
+        <motion.div 
+          className="skills-filter"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <ul className="skillList">
+            {skills.map((skill, index) => (
+              <motion.li
+                key={skill}
+                className={`skillItem ${selectedSkills.includes(skill) ? 'selected' : ''}`}
+                onClick={() => toggleSkill(skill)}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 + index * 0.1 }}
+              >
+                {skill}
+              </motion.li>
+            ))}
+          </ul>
+        </motion.div>
+
+        <motion.div 
+          className="project-grid"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          {filteredProjects.length ? (
+            filteredProjects.map((project, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 + index * 0.1 }}
+              >
+                <ProjectCard
+                  title={project.title}
+                  description={project.description}
+                  link={project.link}
+                  textColor={project.textColor}
+                  skills={project.skills}
+                />
+              </motion.div>
+            ))
+          ) : (
+            <motion.p 
+              className="no-projects"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
             >
-              {skill}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Projects Section */}
-      <div className="project-grid">
-        {filteredProjects.length ? (
-          filteredProjects.map((project, index) => (
-            <ProjectCard
-              key={index}
-              title={project.title}
-              description={project.description}
-              link={project.link}
-              textColor={project.textColor}
-              skills={project.skills}
-            />
-          ))
-        ) : (
-          <p>No projects match the selected skills.</p>
-        )}
-      </div>
-    </section>
+              No projects match the selected skills.
+            </motion.p>
+          )}
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 

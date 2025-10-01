@@ -1,26 +1,53 @@
 /* components/ProjectsSection/projectsSection.css */
-.section {
-  padding: 40px;
-  /* background-color: #000; */
+.projects-overlay {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 60px);
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.projects-content {
+  width: 90%;
+  max-width: 1200px;
+  height: 90vh;
+  overflow-y: auto;
+  padding: 2rem;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.8);
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) rgba(0, 0, 0, 0.2);
+}
+
+.projects-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.projects-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.projects-content::-webkit-scrollbar-thumb {
+  background-color: #00ff00;
+  border-radius: 4px;
 }
 
 .sectionTitle {
+  text-align: center;
+  color: var(--accent-color);
   font-size: 2.5em;
-  text-align: center;
-  color: #ffffff;
-  margin-bottom: 30px;
+  margin-bottom: 2rem;
 }
 
-/* Skills Filter Section */
 .skills-filter {
-  margin-bottom: 40px;
+  margin-bottom: 2rem;
   text-align: center;
-}
-
-.skillsTitle {
-  font-size: 1.5em;
-  color: #00ff00;
-  margin-bottom: 20px;
 }
 
 .skillList {
@@ -29,38 +56,60 @@
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 1rem;
+  margin: 0;
 }
 
 .skillItem {
-  padding: 10px 20px;
-  background-color: #222;
+  padding: 0.5rem 1rem;
+  background-color: var(--accent-color-transparent);
+  border: 1px solid var(--accent-color);
   border-radius: 20px;
-  color: #fff;
-  border: 2px solid #444;
   cursor: pointer;
-  transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
 }
 
 .skillItem.selected {
-  background-color: #00ff00;
-  color: #000;
+  background-color: var(--accent-color);
+  color: var(--bg-primary);
 }
 
 .skillItem:hover {
-  background-color: #00ff00;
-  color: #000;
+  background-color: rgba(0, 255, 0, 0.2);
+  transform: translateY(-2px);
 }
 
-/* Projects Grid */
 .project-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
 }
 
-.project-card {
-  width: 80%;
-  max-width: 800px;
+.no-projects {
+  text-align: center;
+  grid-column: 1 / -1;
+  color: #00ff00;
+  font-size: 1.2em;
+}
+
+@media (max-width: 768px) {
+  .projects-content {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .sectionTitle {
+    font-size: 2em;
+  }
+
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skillItem {
+    font-size: 0.9em;
+    padding: 0.4rem 0.8rem;
+  }
 }

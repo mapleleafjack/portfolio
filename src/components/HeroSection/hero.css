@@ -1,60 +1,57 @@
 .hero-container {
   position: relative;
   display: flex;
-  align-items: center;
-  flex-direction: column; /* Stack the elements vertically */
   justify-content: center;
-  /* background-color: #000; */
-  height: 65vh; 
-  padding: 20px; 
+  align-items: center;
+  height: calc(100vh - 60px);
+  width: 100vw;
+  padding: 0;
   overflow: hidden;
 }
 
-
 .hero-image {
-  max-width: 100%; 
-  max-height: 50vh;
-  object-fit: contain; 
-  position: absolute; 
-  top: 50%; 
-  left: 50%; 
+  position: absolute;
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  z-index: 1;
+  opacity: 0.8;
+  top: calc(50% - 15px);
+  left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1; 
-  opacity: 1; 
-}
-
-.hero-image {
-  max-width: 100%; 
-  max-height: 50vh;
-  object-fit: contain; 
-  position: absolute; 
-  top: 35%; 
-  left: 50%; 
-  transform: translate(-50%, -50%);
-  z-index: 1; /* Ensure the image is above the background */
-  opacity: 1; /* Adjust opacity for better visibility */
 }
 
 .hero-content {
   position: relative;
-  z-index: 2; /* Ensure content is above the background */
   text-align: center;
   color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-
 .hero-title {
+  position: absolute;
   font-size: 7em;
   font-weight: bold;
-  margin-bottom: 0.2em;
   animation: fadeInDown 1s ease-out;
-  margin-bottom: 125px;
+  margin: 0;
+  line-height: 1;
+  z-index: 2;
+  top: calc(50% + 15px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
 }
 
 .hero-subtitle {
+  position: relative;
   font-size: 1.5em;
-  margin-bottom: 1em;
+  margin-top: calc(50vh - 60px);
   animation: fadeInUp 1s ease-out;
+  opacity: 0.8;
+  width: 100%;
+  text-align: center;
 }
 
 .cta-button {

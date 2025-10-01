@@ -1,16 +1,16 @@
-// components/MainMenu/MainMenu.js
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './mainMenu.css';
 
-const MainMenu = ({ setCurrentSection }) => {
-  // Function to scroll to the top of the page and reset the animation
+const MainMenu = () => {
+  const navigate = useNavigate();
+
   const resetPage = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
     });
-    setCurrentSection('about'); // Reset to the about section
-    window.location.reload(); // Reload the page to restart animations
+    navigate('/');
   };
 
   return (
@@ -22,8 +22,9 @@ const MainMenu = ({ setCurrentSection }) => {
         </span>
       </div>
       <ul>
-        <li><a href="#about" onClick={resetPage}>// About</a></li> {/* Add onClick to reset */}
-        <li><a href="#contact" onClick={() => setCurrentSection('contact')}>// Contact</a></li>
+        <li><Link to="/">// Home</Link></li>
+        <li><Link to="/projects">// Projects</Link></li>
+        <li><Link to="/contact">// Contact</Link></li>
       </ul>
     </nav>
   );

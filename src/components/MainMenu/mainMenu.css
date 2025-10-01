@@ -1,9 +1,10 @@
 /* components/MainMenu/mainMenu.css */
 .main-menu {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   z-index: 1000;
-  background-color: rgba(17, 17, 17, 0.8); /* Match Three.js background (0x111111) with 80% opacity */
+  background-color: rgba(17, 17, 17, 0.95);
   text-align: center;
   width: 100%;
   display: flex;
@@ -35,6 +36,7 @@
   color: #fff;
   font-size: 1.5em;
   font-weight: bold;
+  font-family: 'Oxanium', sans-serif;
   display: flex;
   align-items: center;
 }
@@ -49,7 +51,7 @@
 
 @keyframes blink {
   from, to { color: #fff; }
-  50% { color: #000; }
+  50% { color: rgba(255, 255, 255, 0.3); }
 }
 .main-menu ul {
   list-style: none;
@@ -67,14 +69,16 @@
   color: #fff;
   text-decoration: none;
   font-size: 1em;
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 500;
   border-bottom: 3px solid transparent;
   transition: border-color 0.3s ease;
 }
 
 .main-menu ul li a:hover,
 .main-menu ul li a.active {
-  color: #00ff00;
-  border-bottom: 3px solid #00ff00;
+  color: var(--accent-color);
+  border-bottom: 3px solid var(--accent-color);
 }
 
 @media (max-width: 768px) {

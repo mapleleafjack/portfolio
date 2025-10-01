@@ -1,4 +1,4 @@
-/* components/AboutSection/aboutSection.css */
+/* components/ScrollingText/scrollingText.css */
 
 .terminal-container {
     position: fixed;
@@ -7,6 +7,7 @@
     width: 100%;
     padding: 20px;
     background: linear-gradient(to bottom, transparent, rgba(17,17,17,0.9));
+    z-index: 1000; /* Ensure it stays above other content */
 }
 
 .terminal-text {
@@ -28,20 +29,7 @@
     animation: blink 1s step-end infinite;
 }
   
-  .smooth-fill {
-    opacity: 1;
-  }
-  
-  .cursor {
-    display: inline-block;
-    background-color: #00ff00;
-    width: 10px;
-    height: 20px;
-    margin-left: 2px;
-    animation: blink 1s step-end infinite;
-  }
-  
-  @keyframes blink {
+@keyframes blink {
     from, to { 
       background-color: var(--accent-color);
       opacity: 1;
@@ -50,5 +38,4 @@
       background-color: var(--accent-color-transparent);
       opacity: 0.5;
     }
-  }
-  
+}

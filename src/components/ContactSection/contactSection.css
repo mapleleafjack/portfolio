@@ -23,7 +23,7 @@
   }
   
   .contactLink {
-    color: #00ff00;
+    color: var(--accent-color);
     text-decoration: none;
     border-bottom: 2px solid transparent;
     transition: border-color 0.3s ease, color 0.3s ease;
