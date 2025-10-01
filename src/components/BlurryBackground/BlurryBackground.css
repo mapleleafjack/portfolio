@@ -1,0 +1,11 @@
+.blurry-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.2); /* fallback color */
+  transition: opacity 0.3s;
+  z-index: 0;
+}
