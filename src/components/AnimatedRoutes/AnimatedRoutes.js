@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { navigate } from 'gatsby';
+
 import AboutSection from '../AboutSection/AboutSection';
 import ProjectsSection from '../ProjectsSection/ProjectsSection';
 import ContactSection from '../ContactSection/ContactSection';
+import PortfolioSection from '../PortfolioSection/PortfolioSection';
 import BlurryBackground from '../BlurryBackground';
 import './AnimatedRoutes.css';
 import { orderedRoutes, getNextRoute, getPrevRoute } from './scrollNav';
@@ -51,6 +53,7 @@ const BLUR_OPACITY_MAP = {
   '/': 0.1, // About
   '/projects': 0.7,
   '/contact': 0.8,
+  '/portfolio': 0.6,
 };
 
 
@@ -64,13 +67,36 @@ const AnimatedRoutes = ({ location }) => {
   const scrollTimeout = useRef(null);
   const lastScrollTime = useRef(0);
 
+  // Track modal state from ProjectsSection
+  const modalOpenRef = useRef(false);
+  useEffect(() => {
+    const onModalState = (e) => {
+      modalOpenRef.current = !!(e.detail && e.detail.open);
+    };
+    window.addEventListener('project-modal-state', onModalState);
+    return () => window.removeEventListener('project-modal-state', onModalState);
+  }, []);
+
   // Scroll wheel navigation effect
   useEffect(() => {
     const handleWheel = (e) => {
+      if (modalOpenRef.current) return; // Disable scroll nav when modal is open
       const now = Date.now();
-      if (now - lastScrollTime.current < 350) return; // debounce 350ms (was 900)
+      if (now - lastScrollTime.current < 350) return; // debounce 350ms
+      if (Math.abs(e.deltaY) < 2) return; // threshold 2
+
+      // Only trigger navigation if at top (scroll up) or bottom (scroll down)
+      const scrollY = window.scrollY || window.pageYOffset;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const atTop = scrollY <= 0;
+      const atBottom = scrollY + windowHeight >= docHeight - 2;
+
+      // Only allow scroll nav if at top (up) or bottom (down)
+      if (e.deltaY < 0 && !atTop) return;
+      if (e.deltaY > 0 && !atBottom) return;
+
       lastScrollTime.current = now;
-      if (Math.abs(e.deltaY) < 2) return; // threshold 2 (was 10)
       let nextPath;
       if (e.deltaY > 0) {
         nextPath = getNextRoute(normalizedPath);
@@ -93,6 +119,8 @@ const AnimatedRoutes = ({ location }) => {
         return <ProjectsSection />;
       case '/contact':
         return <ContactSection />;
+      case '/portfolio':
+        return <PortfolioSection />;
       case '/':
         return <AboutSection />;
       default:

@@ -28,6 +28,7 @@ const MainMenu = () => {
       <ul>
         <li><Link to="/" className={normalizedPath === '/' ? 'active' : ''}>// Home</Link></li>
         <li><Link to="/projects" className={normalizedPath === '/projects' ? 'active' : ''}>// Projects</Link></li>
+        <li><Link to="/portfolio" className={normalizedPath === '/portfolio' ? 'active' : ''}>// Portfolio</Link></li>
         <li><Link to="/contact" className={normalizedPath === '/contact' ? 'active' : ''}>// Contact</Link></li>
       </ul>
     </nav>

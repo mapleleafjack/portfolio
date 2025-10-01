@@ -1,0 +1,80 @@
+.portfolio-section {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.portfolio-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+.cv-entry {
+  background: #f7f7f7;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  margin-left: 0.4em;
+}
+.tooltip-text {
+  visibility: hidden;
+  width: 260px;
+  background-color: #222;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 0.7em 1em;
+  position: absolute;
+  z-index: 10;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.95em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+  .portfolio-section {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    background: transparent;
+    color: #fff;
+  }
+  .portfolio-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+  }
+  .cv-entry {
+    background: rgba(20, 20, 20, 0.95);
+    border-radius: 12px;
+    padding: 1.5rem 1.2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.25);
+    border: 1px solid #222;
+  }
+  .cv-entry h3 {
+    color: #ffb347;
+    margin-bottom: 0.7rem;
+  }
+  .cv-entry ul {
+    margin: 0;
+    padding-left: 1.2em;
+  }
+  .cv-entry li {
+    margin-bottom: 0.5em;
+    line-height: 1.6;
+  }
+  .chart-placeholder {
+    background: rgba(40, 40, 40, 0.95);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    color: #bbb;
+    margin-bottom: 2rem;
+    border: 1px solid #222;
+  }

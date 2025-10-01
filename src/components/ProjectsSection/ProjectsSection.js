@@ -31,9 +31,16 @@ const projects = [
 
 
 
+
 const ProjectsSection = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalProject, setModalProject] = useState(null);
+
+  // Notify parent (AnimatedRoutes) about modal state
+  React.useEffect(() => {
+    const event = new CustomEvent('project-modal-state', { detail: { open: modalOpen } });
+    window.dispatchEvent(event);
+  }, [modalOpen]);
 
   const handleCardClick = (project) => {
     setModalProject(project);
