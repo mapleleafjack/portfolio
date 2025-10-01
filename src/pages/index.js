@@ -1,16 +1,13 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
 import Layout from '../components/Layout/Layout';
 import AnimatedRoutes from '../components/AnimatedRoutes/AnimatedRoutes';
 import './index.css';
 
-const IndexPage = () => {
+const IndexPage = ({ location }) => {
   return (
-    <Router>
-      <Layout>
-        <AnimatedRoutes />
-      </Layout>
-    </Router>
+    <Layout>
+      <AnimatedRoutes location={location} />
+    </Layout>
   );
 };
 

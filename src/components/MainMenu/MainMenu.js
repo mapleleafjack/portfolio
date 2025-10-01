@@ -1,10 +1,8 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, navigate } from 'gatsby';
 import './mainMenu.css';
 
 const MainMenu = () => {
-  const navigate = useNavigate();
-
   const resetPage = () => {
     window.scrollTo({
       top: 0,
