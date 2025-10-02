@@ -2,12 +2,7 @@ import React, { useState } from 'react';
 import './PortfolioSection.css';
 import ScrollBox from '../ScrollBox/ScrollBox';
 
-const Tooltip = ({ text, children }) => (
-  <span className="tooltip-container">
-    {children}
-    <span className="tooltip-text">{text}</span>
-  </span>
-);
+
 
 const THEMES = [
   { key: 'innovation', label: 'AI Innovations', color: '#4f6bed', icon: '💡' },
@@ -133,60 +128,114 @@ const themeHighlights = [
   },
 ];
 
+
 const PortfolioSection = () => {
+  const [selectedTheme, setSelectedTheme] = useState(null);
+
+  // Find the highlights for the selected theme
+  const selectedHighlights = selectedTheme
+    ? themeHighlights.find((t) => t.theme === selectedTheme)?.highlights || []
+    : [];
+
+  // For connector line: get the position of the selected icon and panel
+  const iconRowRef = React.useRef(null);
+  const panelRef = React.useRef(null);
+  const [connectorStyle, setConnectorStyle] = useState(null);
+
+  React.useEffect(() => {
+    if (!selectedTheme) {
+      setConnectorStyle(null);
+      return;
+    }
+    // Find the selected icon button and the panel
+    const iconRow = iconRowRef.current;
+    const panel = panelRef.current;
+    if (!iconRow || !panel) return;
+    const iconBtns = iconRow.querySelectorAll('.icon-btn');
+    const selectedIdx = THEMES.findIndex(t => t.key === selectedTheme);
+    if (selectedIdx === -1) return;
+    const iconBtn = iconBtns[selectedIdx];
+    if (!iconBtn) return;
+    // Get bounding rects
+    const iconRect = iconBtn.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const containerRect = iconRow.parentNode.getBoundingClientRect();
+    // Calculate start (icon center bottom) and end (panel top center) relative to container
+    const startX = iconRect.left + iconRect.width / 2 - containerRect.left;
+    const startY = iconRect.bottom - containerRect.top;
+    const endY = panelRect.top - containerRect.top;
+    setConnectorStyle({
+      left: startX - 1.5, // center the 3px line
+      top: startY,
+      width: 3,
+      height: Math.max(10, endY - startY),
+      color: THEMES[selectedIdx]?.color || '#fff',
+    });
+  }, [selectedTheme]);
+
   return (
     <section className="portfolio-section">
-      <h2>Portfolio Analysis</h2>
-      <ScrollBox>
-        <div className="portfolio-analysis">
-          <div className="common-skills">
-            <h3>Common Skills & Technologies</h3>
-            <div className="common-elements">
-              {Array.from(new Set(
-                themeHighlights.flatMap((theme) =>
-                  theme.highlights.flatMap((hl) => hl.tech)
-                )
-              )).map((tech) => (
-                <span className="tech-pill common" key={tech}>{tech}</span>
-              ))}
-            </div>
-          </div>
-
-          <div className="category-mix">
-            <h3>Mixed Categories</h3>
-            {THEMES.map((theme) => (
-              <div
-                className="theme-box"
-                key={theme.key}
-                style={{ borderColor: theme.color, background: theme.color + '22' }}
-              >
-                <div className="theme-header" style={{ color: theme.color }}>
-                  <span className="theme-icon">{theme.icon}</span> {theme.label}
-                </div>
-                <ul className="theme-highlights">
-                  {themeHighlights
-                    .flatMap((t) => t.highlights)
-                    .filter((hl) => hl.tech.some((tech) => themeHighlights
-                      .find((th) => th.theme === theme.key)?.highlights
-                      .flatMap((h) => h.tech)
-                      .includes(tech)))
-                    .map((hl, i) => (
-                      <li key={i}>
-                        <strong>{hl.text}</strong>
-                        {hl.tooltip ? <Tooltip text={hl.tooltip}>🛈</Tooltip> : null}
-                        <div className="highlight-techstack">
-                          {hl.tech.map((tech) => (
-                            <span className="tech-pill" key={tech}>{tech}</span>
-                          ))}
-                        </div>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+      <div className="icon-row-wrapper">
+        <div className="icon-row" ref={iconRowRef}>
+          {THEMES.map((theme) => (
+            <button
+              key={theme.key}
+              className={`icon-btn${selectedTheme === theme.key ? ' selected' : ''}`}
+              style={{ borderColor: theme.color, color: theme.color }}
+              onMouseEnter={() => setSelectedTheme(theme.key)}
+              onMouseLeave={() => setSelectedTheme(null)}
+              aria-label={theme.label}
+            >
+              <span className="icon-emoji" style={{ color: theme.color }}>{theme.icon}</span>
+            </button>
+          ))}
         </div>
-      </ScrollBox>
+        {selectedTheme && connectorStyle && (
+          <div
+            className="connector-line"
+            style={{
+              left: connectorStyle.left,
+              top: connectorStyle.top,
+              width: connectorStyle.width,
+              height: connectorStyle.height,
+            }}
+          >
+            <svg width={connectorStyle.width} height={connectorStyle.height} style={{ display: 'block' }}>
+              <line
+                x1={connectorStyle.width / 2}
+                y1={0}
+                x2={connectorStyle.width / 2}
+                y2={connectorStyle.height}
+                stroke={connectorStyle.color}
+                strokeWidth="3"
+                strokeLinecap="round"
+                style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.18))' }}
+              />
+            </svg>
+          </div>
+        )}
+      </div>
+
+      {selectedTheme && (
+        <div className="category-panel fade-in" ref={panelRef} style={{ borderColor: THEMES.find(t => t.key === selectedTheme)?.color }}>
+          <div className="panel-header" style={{ color: THEMES.find(t => t.key === selectedTheme)?.color }}>
+            <span className="icon-emoji">{THEMES.find(t => t.key === selectedTheme)?.icon}</span>
+            <span className="panel-title">{THEMES.find(t => t.key === selectedTheme)?.label}</span>
+          </div>
+          <ul className="panel-highlights">
+            {selectedHighlights.map((hl, i) => (
+              <li key={i}>
+                <strong>{hl.text}</strong>
+                <div className="highlight-techstack">
+                  {hl.tech.map((tech) => (
+                    <span className="tech-pill" key={tech}>{tech}</span>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 };

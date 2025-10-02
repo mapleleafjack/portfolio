@@ -1,10 +1,122 @@
+/* Fade-in animation for panel */
+.fade-in {
+  animation: fadeInPanel 0.25s;
+}
+
+/* Fancy icon row */
+.icon-row-wrapper {
+  position: relative;
+  margin-top: 4.5rem; /* Push down from menu/header */
+  margin-bottom: 2.5rem;
+  min-height: 90px;
+}
+.icon-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.2rem;
+  z-index: 2;
+  position: relative;
+}
+
+/* Connector line from icon to panel */
+.connector-line {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+.icon-btn {
+  background: rgba(30,30,30,0.85);
+  border: 2.5px solid;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.1rem;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s, background 0.18s;
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,0.13);
+  outline: none;
+  position: relative;
+}
+.icon-btn.selected, .icon-btn:focus {
+  background: rgba(255,255,255,0.10);
+  box-shadow: 0 4px 18px 0 rgba(0,0,0,0.22);
+  transform: scale(1.08);
+}
+.icon-btn:hover {
+  background: rgba(255,255,255,0.07);
+  transform: scale(1.06);
+}
+.icon-emoji {
+  font-size: 2.1rem;
+  pointer-events: none;
+}
+
+/* Category panel */
+ .category-panel {
+  margin: 0 auto 2.5rem auto;
+  max-width: 600px;
+  background: rgba(30,30,30,0.97);
+  border-radius: 18px;
+  border: 2.5px solid;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.13);
+  padding: 2.2rem 2.1rem 2.5rem 2.1rem;
+  animation: fadeInPanel 0.25s;
+  position: relative;
+  z-index: 3;
+}
+@keyframes fadeInPanel {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+.panel-title {
+  flex: 1;
+}
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 0 0.3em;
+  transition: color 0.18s;
+}
+.close-btn:hover {
+  color: #ff5c5c;
+}
+.panel-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.panel-highlights li {
+  margin-bottom: 1.1em;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
 
 .portfolio-section {
-  padding: 2rem;
+  padding: 2rem 1rem 2rem 1rem;
   max-width: 1100px;
   margin: 0 auto;
   background: transparent;
   color: #fff;
+  position: relative;
+  box-sizing: border-box;
 }
 .portfolio-section h2 {
   font-size: 2.5rem;
