@@ -129,8 +129,22 @@ const themeHighlights = [
 ];
 
 
-const PortfolioSection = () => {
-  const [selectedTheme, setSelectedTheme] = useState(null);
+
+// Accept controlled panel index and change handler
+const PortfolioSection = ({ selectedPanelIndex, onPanelIndexChange }) => {
+  // If controlled, use prop; else, use local state
+  const isControlled = typeof selectedPanelIndex === 'number';
+  const [uncontrolledIndex, setUncontrolledIndex] = useState(null);
+  const panelIndex = isControlled ? selectedPanelIndex : uncontrolledIndex;
+  const setPanelIndex = (idx) => {
+    if (isControlled) {
+      onPanelIndexChange && onPanelIndexChange(idx);
+    } else {
+      setUncontrolledIndex(idx);
+    }
+  };
+
+  const selectedTheme = panelIndex != null ? THEMES[panelIndex]?.key : null;
 
   // Find the highlights for the selected theme
   const selectedHighlights = selectedTheme
@@ -173,17 +187,18 @@ const PortfolioSection = () => {
     });
   }, [selectedTheme]);
 
+
   return (
     <section className="portfolio-section">
       <div className="icon-row-wrapper">
         <div className="icon-row" ref={iconRowRef}>
-          {THEMES.map((theme) => (
+          {THEMES.map((theme, idx) => (
             <button
               key={theme.key}
               className={`icon-btn${selectedTheme === theme.key ? ' selected' : ''}`}
               style={{ borderColor: theme.color, color: theme.color }}
-              onMouseEnter={() => setSelectedTheme(theme.key)}
-              onMouseLeave={() => setSelectedTheme(null)}
+              onMouseEnter={() => setPanelIndex(idx)}
+              onMouseLeave={() => setPanelIndex(null)}
               aria-label={theme.label}
             >
               <span className="icon-emoji" style={{ color: theme.color }}>{theme.icon}</span>
@@ -217,10 +232,10 @@ const PortfolioSection = () => {
       </div>
 
       {selectedTheme && (
-        <div className="category-panel fade-in" ref={panelRef} style={{ borderColor: THEMES.find(t => t.key === selectedTheme)?.color }}>
-          <div className="panel-header" style={{ color: THEMES.find(t => t.key === selectedTheme)?.color }}>
-            <span className="icon-emoji">{THEMES.find(t => t.key === selectedTheme)?.icon}</span>
-            <span className="panel-title">{THEMES.find(t => t.key === selectedTheme)?.label}</span>
+        <div className="category-panel fade-in" ref={panelRef} style={{ borderColor: THEMES[panelIndex]?.color }}>
+          <div className="panel-header" style={{ color: THEMES[panelIndex]?.color }}>
+            <span className="icon-emoji">{THEMES[panelIndex]?.icon}</span>
+            <span className="panel-title">{THEMES[panelIndex]?.label}</span>
           </div>
           <ul className="panel-highlights">
             {selectedHighlights.map((hl, i) => (

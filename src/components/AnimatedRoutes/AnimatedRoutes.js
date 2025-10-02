@@ -67,6 +67,10 @@ const AnimatedRoutes = ({ location }) => {
   const scrollTimeout = useRef(null);
   const lastScrollTime = useRef(0);
 
+  // Panel index state for PortfolioSection
+  const [portfolioPanelIndex, setPortfolioPanelIndex] = React.useState(0);
+  const THEMES_COUNT = 5; // Keep in sync with PortfolioSection THEMES.length
+
   // Track modal state from ProjectsSection
   const modalOpenRef = useRef(false);
   useEffect(() => {
@@ -79,41 +83,79 @@ const AnimatedRoutes = ({ location }) => {
 
   // Scroll wheel navigation effect
   useEffect(() => {
-    // Disable scroll wheel navigation on /portfolio so user can scroll the page
-    if (normalizedPath === '/portfolio') return;
-    const handleWheel = (e) => {
-      if (modalOpenRef.current) return; // Disable scroll nav when modal is open
-      const now = Date.now();
-      if (now - lastScrollTime.current < 350) return; // debounce 350ms
-      if (Math.abs(e.deltaY) < 2) return; // threshold 2
+    // Custom scroll handling for /portfolio
+    if (normalizedPath !== '/portfolio') {
+      // Default scroll nav for other pages
+      const handleWheel = (e) => {
+        if (modalOpenRef.current) return;
+        const now = Date.now();
+        if (now - lastScrollTime.current < 350) return;
+        if (Math.abs(e.deltaY) < 2) return;
+        const scrollY = window.scrollY || window.pageYOffset;
+        const windowHeight = window.innerHeight;
+        const docHeight = document.documentElement.scrollHeight;
+        const atTop = scrollY <= 0;
+        const atBottom = scrollY + windowHeight >= docHeight - 2;
+        if (e.deltaY < 0 && !atTop) return;
+        if (e.deltaY > 0 && !atBottom) return;
+        lastScrollTime.current = now;
+        let nextPath;
+        if (e.deltaY > 0) {
+          nextPath = getNextRoute(normalizedPath);
+        } else {
+          nextPath = getPrevRoute(normalizedPath);
+        }
+        if (nextPath !== normalizedPath) {
+          navigate(nextPath);
+        }
+      };
+      window.addEventListener('wheel', handleWheel, { passive: false });
+      return () => {
+        window.removeEventListener('wheel', handleWheel);
+      };
+    } else {
+      // Custom scroll for /portfolio
+      const handleWheel = (e) => {
+        if (modalOpenRef.current) return;
+        const now = Date.now();
+        if (now - lastScrollTime.current < 350) return;
+        if (Math.abs(e.deltaY) < 2) return;
+        // Only trigger at top or bottom
+        const scrollY = window.scrollY || window.pageYOffset;
+        const windowHeight = window.innerHeight;
+        const docHeight = document.documentElement.scrollHeight;
+        const atTop = scrollY <= 0;
+        const atBottom = scrollY + windowHeight >= docHeight - 2;
+        // Only allow scroll nav if at top (up) or bottom (down)
+        if (e.deltaY < 0 && !atTop) return;
+        if (e.deltaY > 0 && !atBottom) return;
+        lastScrollTime.current = now;
+        // Panel navigation logic
+        if (e.deltaY > 0) {
+          // Scroll down
+          if (portfolioPanelIndex < THEMES_COUNT - 1) {
+            setPortfolioPanelIndex(portfolioPanelIndex + 1);
+          } else {
+            // At last panel, go to next route
+            navigate(getNextRoute('/portfolio'));
+          }
+        } else {
+          // Scroll up
+          if (portfolioPanelIndex > 0) {
+            setPortfolioPanelIndex(portfolioPanelIndex - 1);
+          } else {
+            // At first panel, go to previous route
+            navigate(getPrevRoute('/portfolio'));
+          }
+        }
+      };
+      window.addEventListener('wheel', handleWheel, { passive: false });
+      return () => {
+        window.removeEventListener('wheel', handleWheel);
+      };
+    }
+  }, [normalizedPath, portfolioPanelIndex]);
 
-      // Only trigger navigation if at top (scroll up) or bottom (scroll down)
-      const scrollY = window.scrollY || window.pageYOffset;
-      const windowHeight = window.innerHeight;
-      const docHeight = document.documentElement.scrollHeight;
-      const atTop = scrollY <= 0;
-      const atBottom = scrollY + windowHeight >= docHeight - 2;
-
-      // Only allow scroll nav if at top (up) or bottom (down)
-      if (e.deltaY < 0 && !atTop) return;
-      if (e.deltaY > 0 && !atBottom) return;
-
-      lastScrollTime.current = now;
-      let nextPath;
-      if (e.deltaY > 0) {
-        nextPath = getNextRoute(normalizedPath);
-      } else {
-        nextPath = getPrevRoute(normalizedPath);
-      }
-      if (nextPath !== normalizedPath) {
-        navigate(nextPath);
-      }
-    };
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-    };
-  }, [normalizedPath]);
 
   const renderComponent = () => {
     switch (normalizedPath) {
@@ -122,7 +164,12 @@ const AnimatedRoutes = ({ location }) => {
       case '/contact':
         return <ContactSection />;
       case '/portfolio':
-        return <PortfolioSection />;
+        return (
+          <PortfolioSection
+            selectedPanelIndex={portfolioPanelIndex}
+            onPanelIndexChange={setPortfolioPanelIndex}
+          />
+        );
       case '/':
         return <AboutSection />;
       default:
