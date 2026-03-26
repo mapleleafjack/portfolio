@@ -1,64 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import './workHistorySection.css';
-
-const EXPERIENCE = [
-  {
-    company: 'BlackRock',
-    role: 'Software Engineer',
-    current: true,
-    tint: '79, 107, 237',
-    bullets: [
-      'Developed an LPA Extractor solution using LLM (RAG Chain) \u2014 reduced extraction time from 6 hours to 1 hour per LPA for lawyers',
-      'Migrated software solutions from PowerBI to React/Python (Term Intelligence) with focus on clean code and tests \u2014 polished end-user product replacing a temporary solution',
-      'Active participation in team dynamics, deciding technology and code guidelines',
-    ],
-  },
-  {
-    company: 'Sano Genetics',
-    role: 'Software Engineer',
-    tint: '46, 204, 64',
-    bullets: [
-      'Designed and expanded a bioengineering backend to support healthcare research results publishing \u2014 enabled users to access data from their DNA sample analyses',
-      'Developed synchronisation scripts for data flow between lab results and bio pipelines, leveraging AWS bucket triggers and NextFlow pipelines',
-      'Created and maintained GitHub Actions workflows to automate code quality checks',
-      'Expanded and optimised the platform infrastructure using Terraform',
-    ],
-  },
-  {
-    company: 'Made Tech',
-    role: 'Software Engineer / Tech Lead',
-    tint: '255, 152, 0',
-    bullets: [
-      'Built and launched the company\u2019s first SaaS solution (Housing Repairs for local councils) \u2014 removed the barrier between service suppliers and council house tenants',
-      'Restored the Hackney Social Care service after a cyberattack \u2014 part of the squad that rebuilt the application from backups',
-      'Led the development of the Gov.UK Housing Repairs and Hackney Social Care system',
-      'Managed a team of junior engineers, delegated tasks based on expertise, ensuring efficient project delivery',
-      'Provided mentorship for professional growth',
-    ],
-  },
-  {
-    company: 'Engage Hub',
-    role: 'Software Engineer',
-    tint: '162, 89, 230',
-    bullets: [
-      'Developed and expanded the communication automation software \u201cDragon\u201d \u2014 streamlined comms for Bank of Ireland, Hermes, and other clients',
-      'Designed and implemented an email drag & drop designer for Bank of Ireland',
-      'Implemented a permission management system for loading different application modules',
-      'Wrote a white-labelling engine for branding the application for resale',
-    ],
-  },
-  {
-    company: 'Sixs',
-    role: 'Software Engineer',
-    tint: '0, 191, 174',
-    bullets: [
-      'Developed and maintained a Social Care solution for accountancy purposes',
-      'Designed and developed Android and Windows Phone app companions with the Social Care API',
-      'Integrated NFC capabilities for time tracking',
-    ],
-  },
-];
 
 const FOCUS_AREAS = [
   {
@@ -99,26 +41,71 @@ const FOCUS_AREAS = [
   },
 ];
 
+const brandLogo = (domain) => `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+
 const BRANDS = [
-  { name: 'Gov.UK', context: 'Housing Repairs digital service' },
-  { name: 'BlackRock', context: 'Aladdin platform \u2014 LPA extraction & Term Intelligence' },
-  { name: 'Hackney Council', context: 'Social Care system restoration after cyberattack' },
-  { name: 'Camden Council', context: 'Housing Repairs SaaS rollout' },
-  { name: 'Bank of Ireland', context: 'Communication automation & email designer' },
-  { name: 'Hermes', context: 'Parcel tracking communications' },
-  { name: 'Sano Genetics', context: 'Bioengineering research platform' },
-  { name: 'Engage Hub', context: 'Enterprise communication platform (Dragon)' },
-  { name: 'Sixs', context: 'Social Care accountancy solution' },
+  { name: 'BlackRock', url: 'https://www.blackrock.com/', logo: brandLogo('blackrock.com') },
+  { name: 'Made Tech', url: 'https://www.madetech.com/', logo: brandLogo('madetech.com') },
+  { name: 'Sano Genetics', url: 'https://www.sanogenetics.com/', logo: brandLogo('sanogenetics.com') },
+  { name: 'Engage Hub', url: 'https://www.engagehub.com/', logo: brandLogo('engagehub.com') },
+  { name: 'Sixs', url: 'https://sixs.it/', logo: brandLogo('sixs.it') },
+  { name: 'Gov.UK', url: 'https://www.gov.uk/', logo: brandLogo('gov.uk') },
+  { name: 'Hackney Council', url: 'https://hackney.gov.uk/', logo: brandLogo('hackney.gov.uk') },
+  { name: 'Camden Council', url: 'https://www.camden.gov.uk/', logo: brandLogo('camden.gov.uk') },
+  { name: 'Bank of Ireland', url: 'https://www.bankofireland.com/', logo: brandLogo('bankofireland.com') },
+  { name: 'Hermes', url: 'https://www.evri.com/', logo: brandLogo('evri.com') },
 ];
 
-const IMPACT = [
-  { what: 'LPA Extractor', where: 'BlackRock', result: '6 hours \u2192 1 hour per document for lawyers' },
-  { what: 'Term Intelligence', where: 'BlackRock', result: 'Replaced temporary PowerBI solution with polished React/Python product' },
-  { what: 'Housing Repairs SaaS', where: 'Made Tech', result: 'First SaaS product \u2014 removed barriers between suppliers and tenants' },
-  { what: 'Hackney Social Care', where: 'Made Tech', result: 'Rebuilt critical public service after cyberattack' },
-  { what: 'Bio Pipeline Automation', where: 'Sano', result: 'Replaced manual local scripts with automated cloud workflows' },
-  { what: 'Dragon Platform', where: 'Engage Hub', result: 'Streamlined comms for Bank of Ireland, Hermes, and others' },
+const KEY_PROJECTS = [
+  {
+    company: 'BlackRock',
+    tint: '79, 107, 237',
+    projects: [
+      { name: 'LPA Extractor', tech: ['Python', 'LLM', 'RAG Chain'], description: 'AI-powered legal document extraction', impact: '6h → 1h per document for lawyers' },
+      { name: 'Term Intelligence', tech: ['React', 'Python', 'GraphQL', 'Snowflake'], description: 'Fund term analysis product', impact: 'Replaced temporary PowerBI solution with polished product' },
+      { name: 'Saved Search', tech: ['FastAPI', 'GraphQL', 'PostgreSQL'], description: 'Reusable backend feature for persisting user queries \u2014 cross-team adoption' },
+      { name: 'Contact Sync System', tech: ['C#', '.NET', 'SharePoint'], description: 'Enterprise contact sync across 5 environments with credential rotation' },
+      { name: 'Observability & Telemetry', tech: ['Apollo', 'Heap Analytics'], description: 'GraphQL telemetry for proactive issue detection post-deploy' },
+      { name: 'CI Coverage Pipeline', tech: ['CI/CD', 'Python'], description: 'Repo-level test coverage in CI and review flow' },
+      { name: 'AI Dev Workflows', tech: ['Node.js', 'AI/LLM'], description: 'Reusable AI-assisted workflows for Jira, Bitbucket, Confluence' },
+    ],
+  },
+  {
+    company: 'Made Tech',
+    tint: '255, 152, 0',
+    projects: [
+      { name: 'Housing Repairs SaaS', tech: ['React', 'Ruby on Rails', 'GOV.UK'], description: 'First SaaS product for local councils', impact: 'Removed barriers between suppliers and tenants' },
+      { name: 'Hackney Social Care', tech: ['React', '.NET', 'PostgreSQL'], description: 'Rebuilt critical public service after cyberattack', impact: 'Restored essential social care system from backups' },
+    ],
+  },
+  {
+    company: 'Engage Hub',
+    tint: '162, 89, 230',
+    projects: [
+      { name: 'Dragon Platform', tech: ['React', '.NET', 'SQL Server'], description: 'Enterprise comms automation', impact: 'Streamlined comms for Bank of Ireland, Hermes, and others' },
+      { name: 'Email Designer', tech: ['React', '.NET'], description: 'Drag & drop email template builder for Bank of Ireland' },
+      { name: 'White-Label Engine', tech: ['React', 'SCSS'], description: 'Dynamic branding system for reselling the platform to enterprise clients' },
+    ],
+  },
+  {
+    company: 'Sano Genetics',
+    tint: '46, 204, 64',
+    projects: [
+      { name: 'Bio Pipeline Automation', tech: ['Python', 'AWS', 'NextFlow'], description: 'Automated cloud workflows for bioengineering research', impact: 'Replaced manual local scripts with hosted pipelines' },
+      { name: 'Infrastructure & CI', tech: ['Terraform', 'GitHub Actions'], description: 'Platform infrastructure and automated code quality pipelines' },
+    ],
+  },
+  {
+    company: 'Sixs',
+    tint: '0, 191, 174',
+    projects: [
+      { name: 'Social Care Management System', tech: ['C#', '.NET', 'SQL Server'], description: 'Full gestionale for social care cooperatives \u2014 accountancy, scheduling, reporting' },
+      { name: 'Companion Apps', tech: ['Android', 'Windows Phone', 'REST API'], description: 'Mobile apps with NFC time tracking for field social care workers' },
+      { name: 'DB Migration System', tech: ['.NET', 'SQL Server'], description: 'Database migration tooling for evolving the production schema safely' },
+    ],
+  },
 ];
+
 
 const SKILLS = {
   languages: ['Python', 'JavaScript / TypeScript', 'C#', 'C++', 'Java'],
@@ -132,21 +119,34 @@ const PROJECTS = [
   {
     name: 'Glypho',
     url: 'https://www.glypho.xyz/',
-    description: 'Creative web project',
+    description: 'Creative web experiment exploring generative art and typography',
   },
   {
     name: 'SlimeChan',
     url: 'https://www.slimechan.xyz/',
     github: 'https://github.com/mapleleafjack/slime-chan',
-    description: 'Uses LLM to interact with a group of slimes \u2014 a fun, creative AI project',
+    description: 'LLM-powered interactive slime colony \u2014 each slime has its own personality and responds to conversation',
   },
   {
-    name: 'LED Juggling Prop',
-    description: 'Custom hardware project \u2014 designed PCB schematic for LED juggling props',
+    name: 'EsPoi',
+    description: 'Custom ESP32-based LED poi with full PCB design \u2014 BQ24074 power management, component standardisation, designed for home SMD assembly',
+  },
+  {
+    name: 'BMO',
+    github: 'https://github.com/mapleleafjack/BMO',
+    description: 'ESP32 companion robot with OLED display \u2014 custom GPIO mapping, inspired by Adventure Time',
+  },
+  {
+    name: 'Reactive Bus Installation',
+    description: 'People-tracking AV installation across 4 zones \u2014 PIR sensors, addressable LEDs, generative audio, Raspberry Pi + Arduino',
   },
   {
     name: 'ESP Visualiser',
-    description: 'ESP32-based audio/visual project',
+    description: 'ESP32-based audio-reactive LED visualiser \u2014 real-time frequency analysis driving addressable LED patterns',
+  },
+  {
+    name: 'Festival Tech Tent',
+    description: 'LED juggling prop sync station for Burning Mountain \u2014 centralised configuration for performer props using FlowToys protocol',
   },
 ];
 
@@ -171,59 +171,7 @@ const Section = ({ title, tint, children }) => (
   </motion.div>
 );
 
-const drawerVariants = {
-  hidden: { x: '100%', opacity: 0 },
-  visible: { x: 0, opacity: 1, transition: { type: 'tween', duration: 0.3, ease: 'easeOut' } },
-  exit: { x: '100%', opacity: 0, transition: { type: 'tween', duration: 0.2, ease: 'easeIn' } },
-};
-
-const overlayVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.2 } },
-  exit: { opacity: 0, transition: { duration: 0.2 } },
-};
-
-const Drawer = ({ job, onClose }) => {
-  useEffect(() => {
-    const handleKey = (e) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [onClose]);
-
-  return (
-    <>
-      <motion.div
-        className="wh-drawer-overlay"
-        variants={overlayVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={onClose}
-      />
-      <motion.aside
-        className="wh-drawer"
-        variants={drawerVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        style={{ '--tint': job.tint }}
-      >
-        <button className="wh-drawer-close" onClick={onClose}>&times;</button>
-        <h2 className="wh-drawer-title">{job.company}</h2>
-        <p className="wh-drawer-role">{job.role}{job.current ? ' \u2014 Current' : ''}</p>
-        <ul className="wh-drawer-bullets">
-          {job.bullets.map((b, i) => (
-            <li key={i}>{b}</li>
-          ))}
-        </ul>
-      </motion.aside>
-    </>
-  );
-};
-
 const WorkHistorySection = () => {
-  const [activeJob, setActiveJob] = useState(null);
-  const closeDrawer = useCallback(() => setActiveJob(null), []);
 
   return (
     <motion.section
@@ -243,10 +191,17 @@ const WorkHistorySection = () => {
         <Section title="Brands I've Worked With" tint="255, 152, 0">
           <div className="wh-brands-grid">
             {BRANDS.map((brand) => (
-              <motion.div key={brand.name} variants={fadeUp} className="wh-brand-card">
+              <motion.a
+                key={brand.name}
+                variants={fadeUp}
+                className="wh-brand-card"
+                href={brand.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src={brand.logo} alt={brand.name} className="wh-brand-logo" />
                 <h4 className="wh-brand-name">{brand.name}</h4>
-                <p className="wh-brand-context">{brand.context}</p>
-              </motion.div>
+              </motion.a>
             ))}
           </div>
         </Section>
@@ -271,41 +226,32 @@ const WorkHistorySection = () => {
           </div>
         </Section>
 
-        <Section title="Key Impact" tint="230, 69, 69">
-          <div className="wh-impact-grid">
-            {IMPACT.map((item) => (
-              <motion.div key={item.what} variants={fadeUp} className="wh-impact-card">
-                <h4 className="wh-impact-what">{item.what}</h4>
-                <span className="wh-impact-where">{item.where}</span>
-                <p className="wh-impact-result">{item.result}</p>
+        <Section title="Key Projects" tint="79, 107, 237">
+          <div className="wh-keyprojects-list">
+            {KEY_PROJECTS.map((group) => (
+              <motion.div key={group.company} variants={fadeUp} className="wh-keyprojects-group" style={{ '--tint': group.tint }}>
+                <h3 className="wh-keyprojects-company">{group.company}</h3>
+                <div className="wh-keyprojects-items">
+                  {group.projects.map((project) => (
+                    <div key={project.name} className="wh-keyproject-row">
+                      <div className="wh-keyproject-header">
+                        <h4 className="wh-keyproject-name">{project.name}</h4>
+                        <div className="wh-keyproject-tech">
+                          {project.tech.map((t) => (
+                            <span key={t} className="wh-keyproject-tag">{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="wh-keyproject-desc">{project.description}</p>
+                      {project.impact && <p className="wh-keyproject-impact">{project.impact}</p>}
+                    </div>
+                  ))}
+                </div>
               </motion.div>
             ))}
           </div>
         </Section>
 
-        <Section title="Career Timeline" tint="79, 107, 237">
-          <div className="wh-timeline">
-            {EXPERIENCE.map((job) => (
-              <motion.button
-                key={job.company}
-                variants={fadeUp}
-                className="wh-timeline-item"
-                onClick={() => setActiveJob(job)}
-                style={{ '--tint': job.tint }}
-              >
-                <span className="wh-timeline-dot" />
-                <div className="wh-timeline-content">
-                  <span className="wh-timeline-company">
-                    {job.company}
-                    {job.current && <span className="wh-timeline-badge">Current</span>}
-                  </span>
-                  <span className="wh-timeline-role">{job.role}</span>
-                </div>
-                <span className="wh-timeline-arrow">&rsaquo;</span>
-              </motion.button>
-            ))}
-          </div>
-        </Section>
 
         <Section title="Technical Skills" tint="46, 204, 64">
           <div className="wh-skills-grid">
@@ -350,10 +296,6 @@ const WorkHistorySection = () => {
           <a href="https://www.linkedin.com/in/jackmusajo" target="_blank" rel="noopener noreferrer" className="wh-footer-link">LinkedIn</a>
         </motion.footer>
       </div>
-
-      <AnimatePresence>
-        {activeJob && <Drawer job={activeJob} onClose={closeDrawer} />}
-      </AnimatePresence>
     </motion.section>
   );
 };

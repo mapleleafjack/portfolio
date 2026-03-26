@@ -290,6 +290,91 @@
   color: rgba(var(--tint, 255, 255, 255), 0.4);
 }
 
+/* Key Projects — grouped by company */
+.wh-keyprojects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.wh-keyprojects-group {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(var(--tint, 255, 255, 255), 0.08);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  transition: border-color 0.2s;
+}
+
+.wh-keyprojects-group:hover {
+  border-color: rgba(var(--tint, 255, 255, 255), 0.16);
+}
+
+.wh-keyprojects-company {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(var(--tint, 200, 200, 200), 0.8);
+  margin: 0 0 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(var(--tint, 255, 255, 255), 0.06);
+}
+
+.wh-keyprojects-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wh-keyproject-row {
+  padding: 0.4rem 0;
+}
+
+.wh-keyproject-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.wh-keyproject-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ddd;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.wh-keyproject-desc {
+  font-size: 0.78rem;
+  color: #999;
+  margin: 0.15rem 0 0;
+  line-height: 1.45;
+}
+
+.wh-keyproject-impact {
+  font-size: 0.72rem;
+  color: rgba(var(--tint, 200, 200, 200), 0.7);
+  margin: 0.15rem 0 0;
+  font-style: italic;
+}
+
+.wh-keyproject-tech {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.wh-keyproject-tag {
+  font-size: 0.62rem;
+  padding: 0.12rem 0.4rem;
+  border-radius: 10px;
+  background: rgba(var(--tint, 255, 255, 255), 0.07);
+  border: 1px solid rgba(var(--tint, 255, 255, 255), 0.1);
+  color: rgba(var(--tint, 200, 200, 200), 0.7);
+}
+
 /* Impact grid */
 .wh-impact-grid {
   display: grid;
@@ -390,6 +475,71 @@
 .wh-brand-card:hover {
   border-color: rgba(var(--tint, 255, 255, 255), 0.18);
   background: rgba(var(--tint, 255, 255, 255), 0.06);
+}
+
+.wh-brand-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  filter: brightness(0.9);
+  transition: filter 0.2s;
+}
+
+.wh-brand-card:hover .wh-brand-logo {
+  filter: brightness(1.1);
+}
+
+.wh-brand-initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(var(--tint, 255, 255, 255), 0.1);
+  color: rgba(var(--tint, 255, 255, 255), 0.7);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+a.wh-brand-card {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.wh-brand-card--clickable {
+  cursor: pointer;
+  border-color: rgba(var(--tint, 255, 255, 255), 0.1);
+}
+
+.wh-brand-card--clickable:hover {
+  border-color: rgba(var(--tint, 255, 255, 255), 0.22);
+  background: rgba(var(--tint, 255, 255, 255), 0.06);
+}
+
+.wh-brand-role {
+  display: block;
+  font-size: 0.72rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+
+.wh-brand-expand {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.72rem;
+  color: rgba(var(--tint, 200, 200, 200), 0.5);
+  transition: color 0.2s;
+}
+
+.wh-brand-card--clickable:hover .wh-brand-expand {
+  color: rgba(var(--tint, 255, 255, 255), 0.8);
 }
 
 .wh-brand-name {
