@@ -27,6 +27,7 @@ const MainMenu = () => {
       <ul>
         <li><a href="/" onClick={(e) => goTo(e, '/')} className={normalizedPath === '/' ? 'active' : ''}>// Home</a></li>
         <li><a href="/how-i-work" onClick={(e) => goTo(e, '/how-i-work')} className={normalizedPath === '/how-i-work' ? 'active' : ''}>// How I Work</a></li>
+        <li><a href="/experience" onClick={(e) => goTo(e, '/experience')} className={normalizedPath === '/experience' ? 'active' : ''}>// Experience</a></li>
         <li><a href="/contact" onClick={(e) => goTo(e, '/contact')} className={normalizedPath === '/contact' ? 'active' : ''}>// Contact</a></li>
       </ul>
     </nav>

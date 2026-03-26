@@ -1,7 +1,7 @@
 // This file enables scroll wheel navigation between pages in order.
 // Import and use in AnimatedRoutes.js
 
-export const orderedRoutes = ['/', '/how-i-work', '/contact'];
+export const orderedRoutes = ['/', '/how-i-work', '/experience', '/contact'];
 
 export function getNextRoute(currentPath) {
   const idx = orderedRoutes.indexOf(currentPath);

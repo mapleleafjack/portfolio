@@ -5,6 +5,7 @@ import { navigate } from 'gatsby';
 import AboutSection from '../AboutSection/AboutSection';
 import ContactSection from '../ContactSection/ContactSection';
 import HowIWorkSection from '../HowIWorkSection/HowIWorkSection';
+import WorkHistorySection from '../WorkHistorySection/WorkHistorySection';
 import BlurryBackground from '../BlurryBackground';
 import './AnimatedRoutes.css';
 import { orderedRoutes, getNextRoute, getPrevRoute } from './scrollNav';
@@ -52,11 +53,13 @@ const BLUR_OPACITY_MAP = {
   '/': 0.1,
   '/contact': 0.8,
   '/how-i-work': 0.75,
+  '/experience': 0.75,
 };
 
 const BG_COLOR_MAP = {
   '/': '10, 12, 14',
   '/how-i-work': '12, 10, 18',
+  '/experience': '10, 12, 18',
   '/contact': '10, 14, 16',
 };
 
@@ -134,6 +137,8 @@ const AnimatedRoutes = ({ location }) => {
         return <ContactSection />;
       case '/how-i-work':
         return <HowIWorkSection />;
+      case '/experience':
+        return <WorkHistorySection />;
       case '/':
         return <AboutSection />;
       default:
