@@ -2,6 +2,7 @@ import React from 'react';
 import MainMenu from '../MainMenu/MainMenu';
 import ThreeBackground from '../ThreeBackground/ThreeBackground';
 import ScrollingText from '../ScrollingText/ScrollingText';
+import AudioControl from '../AudioControl/AudioControl';
 
 const Layout = ({ children }) => {
   return (
@@ -12,6 +13,7 @@ const Layout = ({ children }) => {
         {children}
         <ScrollingText />
       </main>
+      <AudioControl />
     </>
   );
 };

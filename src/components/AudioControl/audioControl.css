@@ -1,0 +1,134 @@
+.audio-control {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 12px 16px;
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+  opacity: 0.7;
+}
+
+.audio-control:hover {
+  opacity: 1;
+}
+
+.track-title {
+  color: #9eb8a2;
+  font-size: 11px;
+  font-family: monospace;
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.5px;
+}
+
+.audio-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.audio-toggle {
+  background: transparent;
+  border: 2px solid #9eb8a2;
+  color: #9eb8a2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.audio-toggle:hover {
+  background: #9eb8a2;
+  color: #0a0c0e;
+  transform: scale(1.1);
+}
+
+.audio-nav-btn {
+  background: transparent;
+  border: none;
+  color: rgba(158, 184, 162, 0.6);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-nav-btn:hover {
+  color: #9eb8a2;
+  transform: scale(1.15);
+}
+
+.volume-slider {
+  width: 100%;
+  height: 3px;
+  background: rgba(158, 184, 162, 0.2);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #9eb8a2;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #9eb8a2;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.2s ease;
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+  .audio-control {
+    bottom: 10px;
+    right: 10px;
+    padding: 8px 10px;
+  }
+
+  .track-title {
+    max-width: 120px;
+    font-size: 10px;
+  }
+
+  .audio-toggle {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+}

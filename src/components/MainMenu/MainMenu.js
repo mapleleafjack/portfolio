@@ -6,7 +6,6 @@ import './mainMenu.css';
 const MainMenu = () => {
   const location = useLocation();
   const path = location?.pathname || '/';
-  // Remove trailing slash unless root
   const normalizedPath = path === '/' ? path : path.replace(/\/$/, '');
 
   const goTo = (e, to) => {
@@ -15,6 +14,17 @@ const MainMenu = () => {
     if (mainEl) mainEl.scrollTop = 0;
     navigate(to);
   };
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.navigate = navigate;
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete window.navigate;
+      }
+    };
+  }, []);
 
   return (
     <nav className="main-menu">
