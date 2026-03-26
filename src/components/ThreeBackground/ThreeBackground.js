@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useLocation } from '@reach/router';
 import * as THREE from 'three';
 import CubeGroup from './CubeGroup';
@@ -8,6 +8,7 @@ import CameraController from './CameraController';
 import ThreeSceneManager from './utils/ThreeSceneManager';
 import ThreeEventManager from './utils/ThreeEventManager';
 import ThreeAnimator from './utils/ThreeAnimator';
+import audioManager from '../../utils/AudioManager';
 
 
 const ThreeBackground = () => {
@@ -38,8 +39,27 @@ const ThreeBackground = () => {
       lastPointer.current.y = y;
     };
 
-    const onPointerClick = () => {
+    const onPointerClick = (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      if (e.ctrlKey || e.metaKey) return;
       raycaster.current.setFromCamera(lastPointer.current, sceneManager.current.camera);
+
+      const songCubes = cubeGroup.current.getSongCubes();
+      if (songCubes.length > 0) {
+        const songHits = raycaster.current.intersectObjects(songCubes, true);
+        for (const hit of songHits) {
+          let obj = hit.object;
+          if (obj.userData._songParent) obj = obj.userData._songParent;
+          if (obj.userData.isSongCube && typeof obj.userData.songTrackIndex === 'number') {
+            cameraController.current.focusOnPosition(obj.position);
+            window.dispatchEvent(new CustomEvent('song-cube-click', {
+              detail: { trackIndex: obj.userData.songTrackIndex }
+            }));
+            return;
+          }
+        }
+      }
+
       const portalMeshes = navigationPortals.current.getPortalMeshes();
       const intersects = raycaster.current.intersectObjects(portalMeshes);
       
@@ -53,19 +73,66 @@ const ThreeBackground = () => {
       }
     };
 
+    const onTrackChange = (e) => {
+      if (cubeGroup.current && e.detail && typeof e.detail.trackIndex === 'number') {
+        cubeGroup.current.setTrackIndex(e.detail.trackIndex);
+        const bg = cubeGroup.current.getTrackBackground();
+        sceneManager.current._targetBg = new THREE.Color(bg);
+        if (navigationPortals.current) {
+          navigationPortals.current.setAccentColor(cubeGroup.current.targetColorScheme.accent);
+        }
+        const songCube = cubeGroup.current.getSongCubeForTrack(e.detail.trackIndex);
+        if (songCube) {
+          cameraController.current.focusOnPosition(songCube.position);
+        }
+      }
+    };
+
+    const onCyclePreset = () => {
+      if (cubeGroup.current) {
+        const name = cubeGroup.current.cyclePreset();
+        window.dispatchEvent(new CustomEvent('preset-changed', { detail: { name } }));
+      }
+    };
+
+    const onStopPlayback = () => {
+      if (cubeGroup.current) {
+        cubeGroup.current.resetToDefault();
+        const bg = cubeGroup.current.getTrackBackground();
+        sceneManager.current._targetBg = new THREE.Color(bg);
+        if (navigationPortals.current) {
+          navigationPortals.current.setAccentColor(0xcccccc);
+        }
+      }
+      cameraController.current.resetToDefault();
+    };
+
     eventManager.current = new ThreeEventManager(sceneManager.current, onPointerMove);
     
     if (typeof window !== 'undefined') {
-      window.addEventListener('click', onPointerClick);
+      window.addEventListener('pointerdown', onPointerClick);
+      window.addEventListener('track-change', onTrackChange);
+      window.addEventListener('cycle-preset', onCyclePreset);
+      window.addEventListener('stop-playback', onStopPlayback);
     }
 
     animator.current = new ThreeAnimator({
       animate: (t, dt) => {
+        const fft = audioManager.getFrequencyData();
+        cubeGroup.current.setFFTData(fft);
+
         raycaster.current.setFromCamera(lastPointer.current, sceneManager.current.camera);
         
-        const cubeMeshes = cubeGroup.current.getMeshes();
-        const cubeIntersects = raycaster.current.intersectObjects(cubeMeshes);
-        let newHoveredCube = cubeIntersects.length > 0 ? cubeIntersects[0].object : null;
+        let newHoveredCube = null;
+        const songCubes = cubeGroup.current.getSongCubes();
+        if (songCubes.length > 0) {
+          const songHits = raycaster.current.intersectObjects(songCubes, true);
+          for (const hit of songHits) {
+            let obj = hit.object;
+            if (obj.userData._songParent) obj = obj.userData._songParent;
+            if (obj.userData.isSongCube) { newHoveredCube = obj; break; }
+          }
+        }
         if (cubeGroup.current.hoveredCube !== newHoveredCube) {
           cubeGroup.current.setHoveredCube(newHoveredCube);
         }
@@ -92,7 +159,10 @@ const ThreeBackground = () => {
 
     return () => {
       if (typeof window !== 'undefined') {
-        window.removeEventListener('click', onPointerClick);
+        window.removeEventListener('pointerdown', onPointerClick);
+        window.removeEventListener('track-change', onTrackChange);
+        window.removeEventListener('cycle-preset', onCyclePreset);
+        window.removeEventListener('stop-playback', onStopPlayback);
       }
       animator.current.stop();
       eventManager.current.dispose();

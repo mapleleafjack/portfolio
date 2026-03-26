@@ -155,6 +155,23 @@ const CreativeSection = () => (
           ))}
         </div>
       </Section>
+
+      <Section title="Games" tint="120, 200, 80">
+        <p className="cr-section-intro">
+          SlimeChan &mdash; a browser game built and deployed as a side project.
+        </p>
+        <motion.div variants={fadeUp} className="cr-game-embed">
+          <iframe
+            src="http://slimechan.xyz"
+            width="100%"
+            height="600"
+            frameBorder="0"
+            title="SlimeChan"
+            className="cr-game-iframe"
+            allow="fullscreen"
+          />
+        </motion.div>
+      </Section>
     </div>
   </motion.section>
 );

@@ -1,13 +1,12 @@
 import * as THREE from 'three';
 
-const ACCENT_COLOR = 0x9eb8a2;
-
 export default class NavigationPortals {
   constructor(scene) {
     this.scene = scene;
     this.portals = [];
     this.labels = [];
     this.currentRoute = '/';
+    this.accentColor = new THREE.Color(0xcccccc);
     
     this.routes = [
       { path: '/', label: 'Home', position: { x: 0, y: 4.5, z: -10 } },
@@ -26,7 +25,7 @@ export default class NavigationPortals {
       
       const geometry = new THREE.RingGeometry(0.3, 0.4, 32);
       const material = new THREE.MeshBasicMaterial({
-        color: ACCENT_COLOR,
+        color: 0xcccccc,
         transparent: true,
         opacity: 0.15,
         side: THREE.DoubleSide
@@ -55,6 +54,10 @@ export default class NavigationPortals {
     this.currentRoute = route;
   }
 
+  setAccentColor(hex) {
+    this.accentColor = new THREE.Color(hex);
+  }
+
   setHoveredPortal(portal) {
     this.portals.forEach(p => {
       if (p === portal) {
@@ -81,10 +84,8 @@ export default class NavigationPortals {
       
       if (isActive) {
         portal.material.color.setHex(0xffffff);
-      } else if (portal.userData.isHovered) {
-        portal.material.color.setHex(ACCENT_COLOR);
       } else {
-        portal.material.color.setHex(ACCENT_COLOR);
+        portal.material.color.copy(this.accentColor);
       }
     });
   }

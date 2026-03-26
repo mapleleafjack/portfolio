@@ -3,6 +3,7 @@ class ThreeEventManager {
     this.sceneManager = sceneManager;
     this.onPointerMove = onPointerMove;
     this.isMiddleMouseDown = false;
+    this.isModifierDrag = false;
     this.lastDrag = { x: 0, y: 0 };
     this._bindEvents();
   }
@@ -28,6 +29,11 @@ class ThreeEventManager {
       this.lastDrag.x = e.clientX;
       this.lastDrag.y = e.clientY;
       e.preventDefault();
+    } else if (e.button === 0 && (e.ctrlKey || e.metaKey)) {
+      this.isModifierDrag = true;
+      this.lastDrag.x = e.clientX;
+      this.lastDrag.y = e.clientY;
+      e.preventDefault();
     }
   }
 
@@ -36,10 +42,13 @@ class ThreeEventManager {
       this.isMiddleMouseDown = false;
       e.preventDefault();
     }
+    if (e.button === 0) {
+      this.isModifierDrag = false;
+    }
   }
 
   handlePointerMove(e) {
-    if (this.isMiddleMouseDown) {
+    if (this.isMiddleMouseDown || this.isModifierDrag) {
       const dx = e.clientX - this.lastDrag.x;
       const dy = e.clientY - this.lastDrag.y;
       this.sceneManager._sceneRotation.y += dx * 0.01;

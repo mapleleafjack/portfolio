@@ -199,6 +199,21 @@
   font-style: italic;
 }
 
+.cr-game-embed {
+  margin-top: 0.75rem;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(120, 200, 80, 0.12);
+}
+
+.cr-game-iframe {
+  display: block;
+  border: none;
+  border-radius: 10px;
+  min-height: 500px;
+}
+
 @media (max-width: 640px) {
   .cr-hero {
     padding-top: 6rem;

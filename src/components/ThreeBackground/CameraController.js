@@ -26,6 +26,25 @@ export default class CameraController {
     this.isTransitioning = true;
   }
 
+  focusOnPosition(worldPos) {
+    const dir = new THREE.Vector3().subVectors(worldPos, new THREE.Vector3(0, 0, 0)).normalize();
+    const camOffset = dir.multiplyScalar(2.5);
+    this.targetPosition.set(
+      worldPos.x + camOffset.x,
+      worldPos.y + 0.5,
+      worldPos.z + 3.5
+    );
+    this.targetLookAt.set(worldPos.x, worldPos.y, worldPos.z);
+    this.isTransitioning = true;
+  }
+
+  resetToDefault() {
+    const config = ROUTE_CAMERA_POSITIONS['/'];
+    this.targetPosition.set(config.x, config.y, config.z);
+    this.targetLookAt.set(config.lookAt.x, config.lookAt.y, config.lookAt.z);
+    this.isTransitioning = true;
+  }
+
   update(dt) {
     if (!this.isTransitioning) return;
 

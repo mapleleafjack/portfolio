@@ -14,35 +14,22 @@ import { orderedRoutes, getNextRoute, getPrevRoute } from './scrollNav';
 
 
 // Animation for non-index pages (slide from side)
-const pageVariants = {
+const fadeVariants = {
   initial: {
-    x: -200,
+    opacity: 0,
   },
   enter: {
-    x: 0,
+    opacity: 1,
   },
   exit: {
-    x: 200,
-  }
-};
-
-// Animation for index page (fade in from center)
-const indexVariants = {
-  initial: {
-    scale: 0.98,
-  },
-  enter: {
-    scale: 1,
-  },
-  exit: {
-    scale: 1,
+    opacity: 0,
   }
 };
 
 const pageTransition = {
   type: "tween",
-  ease: "anticipate",
-  duration: 0.5
+  ease: "easeInOut",
+  duration: 0.4
 };
 
 const BLUR_OPACITY_MAP = {
@@ -166,7 +153,6 @@ const AnimatedRoutes = ({ location }) => {
     }
   };
 
-  const isIndex = normalizedPath === '/';
   return (
     <>
       <motion.div
@@ -182,7 +168,7 @@ const AnimatedRoutes = ({ location }) => {
           initial="initial"
           animate="enter"
           exit="exit"
-          variants={isIndex ? indexVariants : pageVariants}
+          variants={fadeVariants}
           transition={pageTransition}
           className="route-content"
         >
