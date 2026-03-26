@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, navigate } from 'gatsby';
+import { navigate } from 'gatsby';
 import { useLocation } from '@reach/router';
 import './mainMenu.css';
 
@@ -9,27 +9,25 @@ const MainMenu = () => {
   // Remove trailing slash unless root
   const normalizedPath = path === '/' ? path : path.replace(/\/$/, '');
 
-  const resetPage = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-    navigate('/');
+  const goTo = (e, to) => {
+    e.preventDefault();
+    const mainEl = document.querySelector('.main');
+    if (mainEl) mainEl.scrollTop = 0;
+    navigate(to);
   };
 
   return (
     <nav className="main-menu">
-      <div className="logo-container" onClick={resetPage}>
+      <div className="logo-container" onClick={(e) => goTo(e, '/')}>
         <img src="/images/octopus_bw.png" alt="Logo" className="logo" />
         <span className="logo-text">
           JackMusajo<span className="blinking-cursor">|</span>
         </span>
       </div>
       <ul>
-        <li><Link to="/" className={normalizedPath === '/' ? 'active' : ''}>// Home</Link></li>
-        <li><Link to="/projects" className={normalizedPath === '/projects' ? 'active' : ''}>// Projects</Link></li>
-        <li><Link to="/portfolio" className={normalizedPath === '/portfolio' ? 'active' : ''}>// Portfolio</Link></li>
-        <li><Link to="/contact" className={normalizedPath === '/contact' ? 'active' : ''}>// Contact</Link></li>
+        <li><a href="/" onClick={(e) => goTo(e, '/')} className={normalizedPath === '/' ? 'active' : ''}>// Home</a></li>
+        <li><a href="/how-i-work" onClick={(e) => goTo(e, '/how-i-work')} className={normalizedPath === '/how-i-work' ? 'active' : ''}>// How I Work</a></li>
+        <li><a href="/contact" onClick={(e) => goTo(e, '/contact')} className={normalizedPath === '/contact' ? 'active' : ''}>// Contact</a></li>
       </ul>
     </nav>
   );

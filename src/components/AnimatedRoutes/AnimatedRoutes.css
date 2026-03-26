@@ -8,15 +8,6 @@
   overflow: visible;
 }
 
-/* Allow scrolling for portfolio page */
-.route-content.portfolio-route {
-  min-height: 100vh;
-  height: auto;
-  overflow-y: auto;
-  overflow-x: visible;
-}
-
-/* Ensure parent container has relative positioning */
 .main {
   position: relative;
   min-height: 100vh;

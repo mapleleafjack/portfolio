@@ -9,11 +9,18 @@
 }
 
 body, html {
-    height: 100vh; /* Use viewport height */
+    height: 100vh;
     margin: 0;
     padding: 0;
     background-color: transparent;
-    overflow: hidden; /* Prevent both vertical and horizontal scrolling */
+    overflow: hidden;
+    font-family: 'Oxanium', sans-serif !important;
+    color: #fff;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Oxanium', sans-serif;
+    color: #fff;
   }
 
   canvas {
@@ -39,8 +46,14 @@ body, html {
     padding: 0;
     margin: 0;
     background-color: transparent;
-    font-family: 'oxanium';
+    font-family: 'Oxanium', sans-serif;
     overflow: hidden;
+  }
+
+  .main.main--scrollable {
+    overflow-y: auto;
+    overflow-x: hidden;
+    justify-content: flex-start;
   }
   
   .header {

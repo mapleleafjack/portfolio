@@ -3,9 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { navigate } from 'gatsby';
 
 import AboutSection from '../AboutSection/AboutSection';
-import ProjectsSection from '../ProjectsSection/ProjectsSection';
 import ContactSection from '../ContactSection/ContactSection';
-import PortfolioSection from '../PortfolioSection/PortfolioSection';
+import HowIWorkSection from '../HowIWorkSection/HowIWorkSection';
 import BlurryBackground from '../BlurryBackground';
 import './AnimatedRoutes.css';
 import { orderedRoutes, getNextRoute, getPrevRoute } from './scrollNav';
@@ -50,126 +49,91 @@ const pageTransition = {
 };
 
 const BLUR_OPACITY_MAP = {
-  '/': 0.1, // About
-  '/projects': 0.7,
+  '/': 0.1,
   '/contact': 0.8,
-  '/portfolio': 0.6,
+  '/how-i-work': 0.75,
+};
+
+const BG_COLOR_MAP = {
+  '/': '10, 12, 14',
+  '/how-i-work': '12, 10, 18',
+  '/contact': '10, 14, 16',
 };
 
 
+const EDGE_DWELL_MS = 800;
+const NAV_COOLDOWN_MS = 1200;
+
 const AnimatedRoutes = ({ location }) => {
   const path = location?.pathname || '';
-  // Remove trailing slash unless it's the root path
   const normalizedPath = path === '/' ? path : path.replace(/\/$/, '');
   const blurOpacity = BLUR_OPACITY_MAP[normalizedPath] ?? 0.5;
+  const bgColor = BG_COLOR_MAP[normalizedPath] || '10, 12, 14';
 
-  // Debounce ref
-  const scrollTimeout = useRef(null);
-  const lastScrollTime = useRef(0);
+  const edgeSince = useRef(null);
+  const edgeDir = useRef(null);
+  const lastNavTime = useRef(0);
 
-  // Panel index state for PortfolioSection
-  const [portfolioPanelIndex, setPortfolioPanelIndex] = React.useState(0);
-  const THEMES_COUNT = 5; // Keep in sync with PortfolioSection THEMES.length
-
-  // Track modal state from ProjectsSection
-  const modalOpenRef = useRef(false);
   useEffect(() => {
-    const onModalState = (e) => {
-      modalOpenRef.current = !!(e.detail && e.detail.open);
-    };
-    window.addEventListener('project-modal-state', onModalState);
-    return () => window.removeEventListener('project-modal-state', onModalState);
+    const mainEl = document.querySelector('.main');
+    if (mainEl) mainEl.classList.add('main--scrollable');
+    return () => { if (mainEl) mainEl.classList.remove('main--scrollable'); };
   }, []);
 
-  // Scroll wheel navigation effect
   useEffect(() => {
-    // Custom scroll handling for /portfolio
-    if (normalizedPath !== '/portfolio') {
-      // Default scroll nav for other pages
-      const handleWheel = (e) => {
-        if (modalOpenRef.current) return;
-        const now = Date.now();
-        if (now - lastScrollTime.current < 350) return;
-        if (Math.abs(e.deltaY) < 2) return;
-        const scrollY = window.scrollY || window.pageYOffset;
-        const windowHeight = window.innerHeight;
-        const docHeight = document.documentElement.scrollHeight;
-        const atTop = scrollY <= 0;
-        const atBottom = scrollY + windowHeight >= docHeight - 2;
-        if (e.deltaY < 0 && !atTop) return;
-        if (e.deltaY > 0 && !atBottom) return;
-        lastScrollTime.current = now;
-        let nextPath;
-        if (e.deltaY > 0) {
-          nextPath = getNextRoute(normalizedPath);
-        } else {
-          nextPath = getPrevRoute(normalizedPath);
+    edgeSince.current = null;
+    edgeDir.current = null;
+
+    const mainEl = document.querySelector('.main');
+    if (!mainEl) return;
+
+    const handleWheel = (e) => {
+      if (Math.abs(e.deltaY) < 3) return;
+      const now = Date.now();
+      if (now - lastNavTime.current < NAV_COOLDOWN_MS) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = mainEl;
+      const atTop = scrollTop <= 1;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 2;
+      const dir = e.deltaY > 0 ? 'down' : 'up';
+      const atEdge = (dir === 'down' && atBottom) || (dir === 'up' && atTop);
+
+      if (!atEdge || dir !== edgeDir.current) {
+        edgeSince.current = atEdge ? now : null;
+        edgeDir.current = atEdge ? dir : null;
+        return;
+      }
+
+      if (!edgeSince.current) {
+        edgeSince.current = now;
+        return;
+      }
+
+      if (now - edgeSince.current >= EDGE_DWELL_MS) {
+        const next = dir === 'down'
+          ? getNextRoute(normalizedPath)
+          : getPrevRoute(normalizedPath);
+        if (next !== normalizedPath) {
+          edgeSince.current = null;
+          edgeDir.current = null;
+          lastNavTime.current = now;
+          mainEl.scrollTop = 0;
+          navigate(next);
         }
-        if (nextPath !== normalizedPath) {
-          navigate(nextPath);
-        }
-      };
-      window.addEventListener('wheel', handleWheel, { passive: false });
-      return () => {
-        window.removeEventListener('wheel', handleWheel);
-      };
-    } else {
-      // Custom scroll for /portfolio
-      const handleWheel = (e) => {
-        if (modalOpenRef.current) return;
-        const now = Date.now();
-        if (now - lastScrollTime.current < 350) return;
-        if (Math.abs(e.deltaY) < 2) return;
-        // Only trigger at top or bottom
-        const scrollY = window.scrollY || window.pageYOffset;
-        const windowHeight = window.innerHeight;
-        const docHeight = document.documentElement.scrollHeight;
-        const atTop = scrollY <= 0;
-        const atBottom = scrollY + windowHeight >= docHeight - 2;
-        // Only allow scroll nav if at top (up) or bottom (down)
-        if (e.deltaY < 0 && !atTop) return;
-        if (e.deltaY > 0 && !atBottom) return;
-        lastScrollTime.current = now;
-        // Panel navigation logic
-        if (e.deltaY > 0) {
-          // Scroll down
-          if (portfolioPanelIndex < THEMES_COUNT - 1) {
-            setPortfolioPanelIndex(portfolioPanelIndex + 1);
-          } else {
-            // At last panel, go to next route
-            navigate(getNextRoute('/portfolio'));
-          }
-        } else {
-          // Scroll up
-          if (portfolioPanelIndex > 0) {
-            setPortfolioPanelIndex(portfolioPanelIndex - 1);
-          } else {
-            // At first panel, go to previous route
-            navigate(getPrevRoute('/portfolio'));
-          }
-        }
-      };
-      window.addEventListener('wheel', handleWheel, { passive: false });
-      return () => {
-        window.removeEventListener('wheel', handleWheel);
-      };
-    }
-  }, [normalizedPath, portfolioPanelIndex]);
+      }
+    };
+
+    mainEl.addEventListener('wheel', handleWheel, { passive: true });
+    return () => mainEl.removeEventListener('wheel', handleWheel);
+  }, [normalizedPath]);
 
 
   const renderComponent = () => {
     switch (normalizedPath) {
-      case '/projects':
-        return <ProjectsSection />;
       case '/contact':
         return <ContactSection />;
-      case '/portfolio':
-        return (
-          <PortfolioSection
-            selectedPanelIndex={portfolioPanelIndex}
-            onPanelIndexChange={setPortfolioPanelIndex}
-          />
-        );
+      case '/how-i-work':
+        return <HowIWorkSection />;
       case '/':
         return <AboutSection />;
       default:
@@ -177,12 +141,10 @@ const AnimatedRoutes = ({ location }) => {
     }
   };
 
-  // Use different animation for index (About) page
   const isIndex = normalizedPath === '/';
-  const isPortfolio = normalizedPath === '/portfolio';
   return (
     <>
-      <BlurryBackground opacity={blurOpacity} />
+      <BlurryBackground opacity={blurOpacity} color={bgColor} />
       <AnimatePresence mode="wait">
         <motion.div
           key={location?.pathname || '/'}
@@ -191,7 +153,7 @@ const AnimatedRoutes = ({ location }) => {
           exit="exit"
           variants={isIndex ? indexVariants : pageVariants}
           transition={pageTransition}
-          className={`route-content${isPortfolio ? ' portfolio-route' : ''}`}
+          className="route-content"
         >
           {renderComponent()}
         </motion.div>
