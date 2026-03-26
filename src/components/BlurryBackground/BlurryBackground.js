@@ -12,7 +12,7 @@ const BlurryBackground = ({ opacity = 0.5, blur = 20, color = '0, 0, 0' }) => {
         background: `rgba(${color}, 0.3)`,
         backdropFilter: `blur(${blur}px)`,
         WebkitBackdropFilter: `blur(${blur}px)`,
-        transition: 'opacity 0.5s, background 0.8s',
+        transition: 'background 0.8s',
       }}
     />
   );

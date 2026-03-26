@@ -48,6 +48,7 @@ const ThreeBackground = () => {
           cubeGroup.current.setHoveredCube(newHovered);
         }
         cubeGroup.current.update(t, dt);
+        sceneManager.current.lerpBackground(dt);
         // Apply scene rotation
         if (sceneManager.current._sceneRotation) {
           sceneManager.current.scene.rotation.x = sceneManager.current._sceneRotation.x;

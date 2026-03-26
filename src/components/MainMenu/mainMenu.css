@@ -85,16 +85,35 @@
   .main-menu {
     flex-direction: column;
     align-items: center;
-    padding: 20px 0;
+    padding: 8px 0;
+    gap: 4px;
   }
 
   .main-menu ul {
-    flex-direction: column;
-    width: 100%;
-    text-align: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
   }
 
   .main-menu ul li {
-    margin: 10px 0;
+    margin: 0 8px;
+  }
+
+  .main-menu ul li a {
+    font-size: 0.8em;
+  }
+
+  .logo-container {
+    margin-left: 0;
+  }
+
+  .logo-text {
+    font-size: 1.2em;
+  }
+
+  .logo {
+    height: 30px;
   }
 }

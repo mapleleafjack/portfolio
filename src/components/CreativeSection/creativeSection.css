@@ -1,0 +1,218 @@
+.cr-section {
+  color: #d4d4d4;
+  padding-bottom: 4rem;
+  min-height: 100vh;
+}
+
+.cr-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.cr-hero {
+  text-align: center;
+  padding: 5rem 0 2.5rem;
+}
+
+.cr-title {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.6rem;
+}
+
+.cr-subtitle {
+  font-size: 1.05rem;
+  color: #888;
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.cr-block {
+  margin-top: 3rem;
+  padding: 1.5rem 1.25rem;
+  border-radius: 12px;
+  background: rgba(18, 18, 18, 0.35);
+  border: 1px solid rgba(var(--tint, 255, 255, 255), 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.cr-heading {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: rgba(var(--tint, 255, 255, 255), 0.85);
+  margin: 0 0 0.4rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(var(--tint, 255, 255, 255), 0.12);
+}
+
+.cr-section-intro {
+  font-size: 0.95rem;
+  color: #777;
+  margin: 0.3rem 0 1rem;
+  line-height: 1.6;
+}
+
+/* ── Music split layout ── */
+
+.cr-music-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.cr-music-col {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cr-col-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  text-decoration: none;
+  background: rgba(var(--platform, 255, 255, 255), 0.06);
+  border-bottom: 1px solid rgba(var(--platform, 255, 255, 255), 0.1);
+  transition: background 0.2s;
+}
+
+.cr-col-header:hover {
+  background: rgba(var(--platform, 255, 255, 255), 0.1);
+}
+
+.cr-platform-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.cr-platform-name {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(var(--platform, 220, 220, 220), 0.9);
+}
+
+.cr-platform-handle {
+  display: block;
+  font-size: 0.72rem;
+  color: #666;
+  margin-top: 1px;
+}
+
+.cr-col-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.cr-highlight-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(var(--tint, 255, 255, 255), 0.85);
+  margin: 0 0 0.35rem;
+}
+
+.cr-soundcloud-embed {
+  border-radius: 6px;
+  display: block;
+  width: 100%;
+  flex: 1;
+}
+
+.cr-spotify-embed {
+  border-radius: 6px;
+  display: block;
+}
+
+/* ── Cards grid ── */
+
+.cr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.cr-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.cr-card:hover {
+  border-color: rgba(var(--tint, 255, 255, 255), 0.18);
+  background: rgba(var(--tint, 255, 255, 255), 0.06);
+}
+
+.cr-card-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(var(--tint, 224, 224, 224), 0.9);
+  margin: 0 0 0.35rem;
+}
+
+.cr-card-text {
+  font-size: 0.85rem;
+  color: #888;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.cr-card-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  color: rgba(var(--tint, 200, 200, 200), 0.7);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.cr-card-link:hover {
+  color: rgba(var(--tint, 255, 255, 255), 0.9);
+}
+
+.cr-placeholder {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  border: 1px dashed rgba(var(--tint, 255, 255, 255), 0.15);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: #555;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .cr-hero {
+    padding-top: 6rem;
+  }
+
+  .cr-title {
+    font-size: 1.8rem;
+  }
+
+  .cr-music-split {
+    grid-template-columns: 1fr;
+  }
+
+  .cr-grid {
+    grid-template-columns: 1fr;
+  }
+}
