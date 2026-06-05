@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Music symlink (files live in /static/music, copied at build)
+public/music

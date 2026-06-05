@@ -1,7 +1,12 @@
 [build]
   base = "v2"
-  command = "npm install && npm run build"
+  command = "cp -r ../static/music public/music && npm install && npm run build"
   publish = "dist"
+
+[[redirects]]
+  from = "/egcdemo"
+  to = "/egcdemo/index.html"
+  status = 200
 
 [[redirects]]
   from = "/*"
