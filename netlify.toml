@@ -4,11 +4,6 @@
   publish = "dist"
 
 [[redirects]]
-  from = "/egcdemo"
-  to = "/egcdemo/index.html"
-  status = 200
-
-[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EGC — Documenti Condivisi</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f6f8; color: #1e2a4a; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Header */
+    .header { background: #1e2a4a; padding: 24px 24px; text-align: center; }
+    .header img { height: 64px; margin-bottom: 8px; }
+    .header h1 { color: #fff; font-size: 15px; font-weight: 500; letter-spacing: 0.5px; }
+
+    /* Main */
+    .main { flex: 1; max-width: 600px; width: 100%; margin: 0 auto; padding: 32px 20px 48px; }
+    .section { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #8a94a8; margin: 28px 0 10px; }
+    .section:first-child { margin-top: 0; }
+
+    a.item { display: flex; align-items: center; gap: 14px; padding: 16px; background: #fff; border: 1px solid #e2e5eb; border-radius: 10px; text-decoration: none; color: inherit; margin-bottom: 8px; transition: border-color 0.15s, box-shadow 0.15s; }
+    a.item:hover { border-color: #1e2a4a; box-shadow: 0 2px 8px rgba(30,42,74,0.08); }
+    .item-icon { width: 40px; height: 40px; border-radius: 8px; background: #e8ecf2; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .item-body { flex: 1; min-width: 0; }
+    .item-name { font-size: 14px; font-weight: 600; color: #1e2a4a; }
+    .item-desc { font-size: 12px; color: #7a8499; margin-top: 2px; line-height: 1.4; }
+    .item-date { font-size: 11px; color: #a0a8b8; margin-top: 4px; }
+    .item-arrow { color: #b0b8c8; font-size: 16px; flex-shrink: 0; }
+
+    /* Footer */
+    .footer { text-align: center; padding: 20px; font-size: 11px; color: #a0a8b8; }
+    .footer a { color: #1e2a4a; text-decoration: none; font-weight: 500; }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <img src="/egc/logo.png" alt="EGC — European Grading Company">
+  <h1>Documenti e Demo Condivisi</h1>
+</div>
+
+<div class="main">
+
+  <div class="section">Demo</div>
+
+  <a class="item" href="/egc/demo/">
+    <div class="item-icon">🖥️</div>
+    <div class="item-body">
+      <div class="item-name">Intake System — Panoramica Schermate</div>
+      <div class="item-desc">Diagramma flusso operatore — Home, 4 scenari di scansione, correzione e valutazione</div>
+      <div class="item-date">1 giugno 2026</div>
+    </div>
+    <span class="item-arrow">→</span>
+  </a>
+
+  <!-- Aggiungi altri documenti:
+  <a class="item" href="/egc/proposta.pdf">
+    <div class="item-icon">📄</div>
+    <div class="item-body">
+      <div class="item-name">Proposta Progetto</div>
+      <div class="item-desc">Scope iniziale e tempistiche</div>
+    </div>
+    <span class="item-arrow">→</span>
+  </a>
+  -->
+
+</div>
+
+<div class="footer">
+  Realizzato da <a href="https://jackmusajo.com" target="_blank">Jack Musajo</a>
+</div>
+
+</body>
+</html>

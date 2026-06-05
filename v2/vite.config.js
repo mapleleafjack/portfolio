@@ -13,9 +13,9 @@ export default defineConfig({
       name: 'static-html',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          const match = req.url?.match(/^\/([a-z0-9-]+)\/?$/);
-          if (match) {
-            const file = path.join(__dirname, 'public', match[1], 'index.html');
+          const clean = req.url?.split('?')[0].replace(/\/+$/, '') || '';
+          const file = path.join(__dirname, 'public', clean, 'index.html');
+          if (clean && clean !== '') {
             if (fs.existsSync(file)) {
               res.setHeader('Content-Type', 'text/html');
               fs.createReadStream(file).pipe(res);
