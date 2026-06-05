@@ -183,6 +183,9 @@ const EGC_STYLES = `
 `;
 
 const EGC_HTML = `
+<div style="text-align:center;margin-bottom:16px">
+  <a href="/egcdashboard.html" style="display:inline-block;padding:8px 20px;background:#1F2C4B;color:white;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;">→ EGC Database UI</a>
+</div>
 <h1>EGC Intake System</h1>
 <p class="subtitle">Flusso operatore — Schermata Home, 4 scenari di scansione, Correzione e Valutazione</p>
 

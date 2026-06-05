@@ -1,4 +1,4 @@
-const defined_pages = ['/egcdemo'];
+const defined_pages = ['/egcdemo', '/egcdashboard'];
 
 exports.onCreatePage = async ({ page, actions }) => {
   const { createPage, deletePage } = actions;

@@ -15,21 +15,14 @@ import { orderedRoutes, getNextRoute, getPrevRoute } from './scrollNav';
 
 // Animation for non-index pages (slide from side)
 const fadeVariants = {
-  initial: {
-    opacity: 0,
-  },
-  enter: {
-    opacity: 1,
-  },
-  exit: {
-    opacity: 0,
-  }
+  initial: { opacity: 1 },
+  enter: { opacity: 1 },
+  exit: { opacity: 1 },
 };
 
 const pageTransition = {
   type: "tween",
-  ease: "easeInOut",
-  duration: 0.4
+  duration: 0,
 };
 
 const BLUR_OPACITY_MAP = {

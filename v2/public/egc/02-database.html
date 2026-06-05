@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EGC Database</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #1F2C4B;
+  --navy2:  #253355;
+  --navy3:  #2d3d65;
+  --teal:   #1D9E75;
+  --teal-d: #0F6E56;
+  --teal-l: #E1F5EE;
+  --amber:  #854F0B;
+  --amb-l:  #FAEEDA;
+  --purp:   #533AB7;
+  --purp-l: #EEEDFE;
+  --g100:   #F5F4F0;
+  --g200:   #ECEAE3;
+  --g300:   #D4D2C9;
+  --g500:   #888780;
+  --white:  #FFFFFF;
+  --text:   #1F2C4B;
+  --text2:  #5a5957;
+  --r:      10px;
+  --rsm:    6px;
+  --sh: 0 1px 3px rgba(31,44,75,0.08), 0 4px 16px rgba(31,44,75,0.06);
+  --sh2: 0 2px 8px rgba(31,44,75,0.12), 0 8px 24px rgba(31,44,75,0.09);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--g100);color:var(--text);min-height:100vh;}
+
+/* NAV */
+.nav{background:var(--navy);height:60px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.25);}
+.nav-logo{height:38px;display:flex;align-items:center;}
+.nav-logo img{height:38px;width:auto;}
+.nav-tabs{display:flex;gap:2px;}
+.nav-tab{padding:6px 14px;border-radius:var(--rsm);font-size:13.5px;color:rgba(255,255,255,0.55);cursor:pointer;border:none;background:none;font-family:inherit;transition:all 0.15s;}
+.nav-tab:hover{color:rgba(255,255,255,0.9);background:rgba(255,255,255,0.08);}
+.nav-tab.active{color:white;background:rgba(255,255,255,0.13);}
+.nav-user{width:32px;height:32px;border-radius:50%;background:var(--teal);color:white;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+
+/* SCREENS */
+.screen{display:none;}.screen.active{display:block;}
+
+/* LAYOUT */
+.page{max-width:1060px;margin:0 auto;padding:28px 24px 64px;}
+.page-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.page-title{font-family:'EB Garamond',serif;font-size:26px;font-weight:500;color:var(--navy);}
+.page-sub{font-size:13px;color:var(--text2);margin-top:3px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rsm);font-family:inherit;font-size:13.5px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;}
+.btn-primary{background:var(--navy);color:white;}
+.btn-primary:hover{background:var(--navy2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(31,44,75,0.3);}
+.btn-secondary{background:white;color:var(--navy);border:1.5px solid var(--g300);}
+.btn-secondary:hover{border-color:var(--navy);}
+.btn-ghost{background:none;color:var(--text2);padding:8px 12px;}
+.btn-ghost:hover{background:var(--g200);color:var(--navy);}
+.btn-teal{background:var(--teal-d);color:white;}
+.btn-teal:hover{background:var(--teal);}
+
+/* CARD */
+.card{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--navy);color:white;padding:11px 16px;border-radius:var(--rsm);font-size:13.5px;box-shadow:0 6px 20px rgba(0,0,0,0.22);transform:translateY(60px);opacity:0;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);z-index:200;display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+
+/* TABLE */
+.search-wrap{position:relative;margin-bottom:16px;}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--g500);pointer-events:none;}
+.search-input{width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--g300);border-radius:var(--rsm);font-family:inherit;font-size:14px;color:var(--text);outline:none;transition:border-color 0.15s;background:white;}
+.search-input:focus{border-color:var(--navy);}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:10px 14px;text-align:left;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2);border-bottom:1.5px solid var(--g200);white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--g200);transition:background 0.1s;cursor:pointer;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#F6F5F1;}
+td{padding:11px 14px;font-size:13.5px;vertical-align:middle;}
+.cover-dot{width:34px;height:44px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,0.7);}
+.c-marvel {background:linear-gradient(135deg,#1B2A4A,#2d4a8a);}
+.c-dc     {background:linear-gradient(135deg,#1a1a2e,#16213e);}
+.c-bonelli{background:linear-gradient(135deg,#2d1b00,#5c3a00);}
+.c-marvel2{background:linear-gradient(135deg,#5c1a1a,#8b0000);}
+.c-dc2    {background:linear-gradient(135deg,#0d2137,#1a3a5c);}
+.c-xmen   {background:linear-gradient(135deg,#1a3a1a,#2d6b2d);}
+.pub-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11.5px;font-weight:500;}
+.t-marvel {background:#EBF0FF;color:#2348B0;}
+.t-dc     {background:#FFF8E1;color:#9A6D00;}
+.t-bonelli{background:#FFF0E0;color:#8B4000;}
+.grade-pill{display:inline-flex;padding:3px 9px;border-radius:20px;font-size:12.5px;font-weight:700;}
+.g-high{background:var(--teal-l);color:var(--teal-d);}
+.g-mid {background:var(--amb-l);color:var(--amber);}
+.g-warn{background:var(--amb-l);color:var(--amber);}
+.tipo-pill{display:inline-flex;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:500;font-family:monospace;}
+.tp-std{background:#F0F4FF;color:#3052C8;}
+.tp-f  {background:var(--amb-l);color:var(--amber);}
+.tp-s  {background:var(--purp-l);color:var(--purp);}
+.stato{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--text2);}
+.stato::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.s-stock::before {background:var(--teal);}
+.s-ordine::before{background:#2348B0;}
+.s-review::before{background:var(--amber);}
+.review-row{background:#FFFCF5 !important;}
+.review-msg{font-size:11.5px;color:var(--amber);display:flex;align-items:center;gap:4px;margin-top:2px;}
+
+/* FORM */
+.form-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
+.form-col{display:flex;flex-direction:column;gap:14px;}
+.sec{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);overflow:hidden;}
+.sec-head{display:flex;align-items:center;gap:9px;padding:13px 18px;border-bottom:1px solid var(--g200);background:var(--g100);}
+.sec-letter{width:22px;height:22px;border-radius:5px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.la{background:var(--navy);color:white;} .lb{background:var(--teal-d);color:white;} .lc{background:var(--amber);color:white;} .ld{background:var(--purp);color:white;}
+.sec-title{font-size:13px;font-weight:600;color:var(--navy);}
+.sec-sub{font-size:11.5px;color:var(--text2);margin-top:1px;}
+.sec-body{padding:18px;}
+.fg{display:grid;gap:14px;} .fg2{grid-template-columns:1fr 1fr;} .fg3{grid-template-columns:1fr 1fr 1fr;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.flabel{font-size:11.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;}
+.flabel .req{color:var(--teal-d);}
+.finput{width:100%;padding:8px 11px;border:1.5px solid var(--g300);border-radius:var(--rsm);font-family:inherit;font-size:13.5px;color:var(--text);outline:none;transition:border-color 0.15s;background:white;}
+.finput:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,44,75,0.07);}
+.finput.filled{background:#FAFAF8;}
+select.finput{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='11' height='7' viewBox='0 0 11 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5.5 6L10 1' stroke='%23888780' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:28px;}
+.tipo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.tipo-opt{padding:9px 6px;border-radius:var(--rsm);border:1.5px solid var(--g300);cursor:pointer;text-align:center;transition:all 0.12s;}
+.tipo-opt:hover{border-color:var(--navy);}
+.tipo-opt.sel{border-color:var(--navy);background:#F0F4FF;}
+.tipo-name{font-size:12px;font-weight:600;color:var(--navy);}
+.tipo-prog{font-size:10.5px;color:var(--text2);font-family:monospace;margin-top:1px;}
+.grade-disp{font-family:'EB Garamond',serif;font-size:52px;color:var(--teal-d);line-height:1;}
+.grade-max{font-size:16px;color:var(--g500);}
+.grade-slider{width:100%;accent-color:var(--navy);cursor:pointer;margin:6px 0;}
+.grade-presets{display:flex;gap:5px;flex-wrap:wrap;}
+.gp{padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--g300);background:white;color:var(--text2);transition:all 0.12s;font-family:inherit;}
+.gp:hover,.gp.active{background:var(--navy);border-color:var(--navy);color:white;}
+.qual-opts{display:flex;flex-direction:column;gap:5px;}
+.qual-opt{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:var(--rsm);border:1.5px solid var(--g300);cursor:pointer;transition:all 0.12s;}
+.qual-opt:hover{border-color:var(--teal-d);}
+.qual-opt.sel{border-color:var(--navy);background:#EEF1FA;}
+.qual-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--g300);flex-shrink:0;transition:all 0.12s;}
+.qual-opt.sel .qual-dot{border-color:var(--navy);background:var(--navy);}
+.qual-name{font-size:13px;font-weight:500;}
+.qual-desc{font-size:11.5px;color:var(--text2);margin-top:1px;}
+.autori-row{display:grid;grid-template-columns:80px 1fr;gap:7px;align-items:center;margin-bottom:7px;}
+.autori-tag{padding:8px 10px;background:var(--g100);border:1.5px solid var(--g300);border-radius:var(--rsm);font-size:11.5px;font-weight:600;color:var(--text2);text-align:center;}
+/* sidebar */
+.sidebar{display:flex;flex-direction:column;gap:12px;position:sticky;top:70px;}
+.prog-card{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);padding:16px;}
+.prog-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2);margin-bottom:6px;}
+.prog-val{font-family:'EB Garamond',serif;font-size:36px;color:var(--navy);line-height:1;margin-bottom:3px;}
+.prog-hint{font-size:11.5px;color:var(--text2);margin-bottom:10px;}
+.summary{background:#EEF1FA;border-radius:var(--r);border:1px solid #C5CCE0;padding:14px 16px;}
+.sum-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--navy);margin-bottom:9px;}
+.srow{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0;border-bottom:1px solid rgba(31,44,75,0.08);}
+.srow:last-child{border-bottom:none;}
+.sk{color:var(--text2);} .sv{font-weight:500;color:var(--navy);}
+.form-footer{display:flex;justify-content:space-between;align-items:center;padding:13px 18px;background:white;border-top:1.5px solid var(--g200);position:sticky;bottom:0;box-shadow:0 -3px 12px rgba(31,44,75,0.06);margin-top:20px;border-radius:0 0 var(--r) var(--r);}
+/* picker */
+.picker-wrap{position:relative;}
+.title-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:white;border:1.5px solid var(--g300);border-radius:var(--rsm);box-shadow:var(--sh2);z-index:50;max-height:220px;overflow-y:auto;display:none;}
+.title-opt{padding:9px 12px;cursor:pointer;transition:background 0.1s;border-bottom:1px solid var(--g200);}
+.title-opt:last-of-type{border-bottom:none;}
+.title-opt:hover{background:var(--g100);}
+.t-opt-name{font-size:13.5px;font-weight:500;color:var(--navy);}
+.t-opt-meta{font-size:11.5px;color:var(--text2);margin-top:1px;}
+.title-opt-new{padding:9px 12px;cursor:pointer;border-top:1px solid var(--g200);font-size:13px;color:var(--teal-d);font-weight:500;display:flex;align-items:center;gap:6px;}
+.title-opt-new:hover{background:var(--teal-l);}
+.selected-pill{display:none;margin-top:10px;padding:8px 12px;background:#EEF1FA;border:1.5px solid #C5CCE0;border-radius:var(--rsm);align-items:center;justify-content:space-between;}
+.selected-pill.show{display:flex;}
+.pill-clear{background:none;border:none;cursor:pointer;color:var(--text2);font-size:13px;padding:0 4px;}
+.autografi-box{display:none;margin-top:14px;padding:12px;background:var(--teal-l);border-radius:var(--rsm);border:1px solid #9FE1CB;}
+.autografi-box.show{display:block;}
+/* catalog */
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.cat-card{background:white;border-radius:var(--r);border:1.5px solid var(--g200);box-shadow:var(--sh);overflow:hidden;cursor:pointer;transition:all 0.15s;}
+.cat-card:hover{border-color:var(--navy3);transform:translateY(-2px);box-shadow:var(--sh2);}
+.cat-card.empty{opacity:0.6;cursor:default;}
+.cat-card.empty:hover{transform:none;border-color:var(--g300);}
+.cat-cover{height:160px;position:relative;display:flex;align-items:flex-end;padding:8px;background-size:cover;background-position:center top;}
+.cat-cover-label{color:white;font-size:12.5px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,0.5);}
+.cat-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.4);backdrop-filter:blur(3px);color:white;font-size:11px;font-weight:600;padding:2px 7px;border-radius:20px;}
+.cat-body{padding:12px 14px;}
+.cat-title{font-size:13.5px;font-weight:600;color:var(--navy);margin-bottom:2px;}
+.cat-meta{font-size:12px;color:var(--text2);margin-bottom:2px;}
+.cat-authors{font-size:12px;color:var(--g500);margin-bottom:8px;}
+.first-app{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-size:11.5px;font-weight:600;background:var(--amb-l);color:var(--amber);border:1px solid #FAC775;margin-bottom:6px;}
+.cat-avg{display:flex;justify-content:space-between;align-items:baseline;padding-top:8px;border-top:1px solid var(--g200);}
+.cat-avg-label{font-size:11.5px;color:var(--text2);}
+.cat-avg-val{font-family:'EB Garamond',serif;font-size:22px;color:var(--navy);}
+.cat-actions{display:flex;gap:6px;margin-top:10px;}
+.cat-btn{flex:1;padding:7px;border-radius:var(--rsm);font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;transition:all 0.12s;border:1.5px solid var(--g300);background:white;}
+.cat-btn-add{color:var(--teal-d);}
+.cat-btn-add:hover{background:var(--teal-l);border-color:var(--teal-d);}
+.cat-btn-edit{color:var(--navy);}
+.cat-btn-edit:hover{background:var(--g100);border-color:var(--navy);}
+/* cover modal */
+.cover-modal{display:none;position:fixed;inset:0;background:rgba(10,15,30,0.85);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.cover-modal.show{display:flex;}
+.cover-modal-inner{position:relative;max-width:360px;width:90%;}
+.cover-modal-img{width:100%;border-radius:var(--r);box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+.cover-modal-close{position:absolute;top:-14px;right:-14px;width:32px;height:32px;background:white;border-radius:50%;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+.cover-modal-title{color:white;text-align:center;margin-top:14px;font-family:'EB Garamond',serif;font-size:18px;}
+.cover-modal-meta{color:rgba(255,255,255,0.6);text-align:center;font-size:13px;margin-top:4px;}
+.cat-cover-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(10,15,30,0.75) 100%);cursor:zoom-in;}
+
+.breadcrumb{font-size:13px;margin-bottom:20px;display:flex;align-items:center;gap:6px;}
+.breadcrumb a{color:var(--teal-d);cursor:pointer;font-weight:500;}
+.breadcrumb a:hover{text-decoration:underline;}
+.breadcrumb-sep{color:var(--g300);}
+.det-layout{display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:start;}
+.det-side{display:flex;flex-direction:column;gap:12px;position:sticky;top:70px;}
+.det-cover{height:280px;border-radius:var(--r);display:flex;align-items:flex-end;padding:12px;box-shadow:var(--sh);}
+.det-cover-label{color:white;font-size:14px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,0.5);line-height:1.3;}
+.det-grade-card{background:var(--navy);border-radius:var(--r);padding:14px 16px;text-align:center;box-shadow:var(--sh);}
+.det-grade-num{font-family:'EB Garamond',serif;font-size:44px;color:#7ECFB0;line-height:1;}
+.det-grade-sub{font-size:10.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.07em;margin-top:3px;}
+.det-quality{font-size:13px;color:rgba(255,255,255,0.75);margin-top:6px;}
+.det-title{font-family:'EB Garamond',serif;font-size:24px;font-weight:500;color:var(--navy);margin-bottom:4px;}
+.det-meta{font-size:13px;color:var(--text2);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.det-sep{color:var(--g300);}
+.det-sec-head{padding:11px 18px;background:var(--g100);border-bottom:1px solid var(--g200);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text2);}
+.det-fields{padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;}
+.det-field-key{font-size:11.5px;color:var(--text2);margin-bottom:3px;}
+.det-field-val{font-size:14px;font-weight:500;color:var(--text);}
+.det-field-val.mono{font-family:monospace;font-size:13px;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">
+    <img src="data:image/jpeg;base64,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" alt="EGC Logo">
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="go('list')">Copie graduate</button>
+    <button class="nav-tab" onclick="go('catalog')">Catalogo titoli</button>
+  </div>
+  <div class="nav-user">J</div>
+</nav>
+
+<div class="toast" id="toast"><div class="toast-dot"></div><span id="tmsg"></span></div>
+
+<!-- ═══════════ COPIE GRADUATE ═══════════ -->
+<div id="screen-list" class="screen active">
+<div class="page">
+  <div class="page-hd">
+    <div>
+      <div class="page-title">Copie graduate</div>
+      <div class="page-sub">7.489 copie fisiche · progressivo EGC, voto, qualità pagine</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-secondary" onclick="toast('Export avviato — file in preparazione…')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export Excel
+      </button>
+      <button class="btn btn-primary" onclick="openCopiaForm(null)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nuova copia
+      </button>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-input" id="list-search" placeholder="Cerca titolo, progressivo, editore…">
+  </div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:44px"></th><th>Titolo</th><th>Editore</th><th>Tipo</th>
+          <th>Progressivo</th><th>Voto</th><th>Qualità pagine</th><th>Stato</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr onclick="openDetail(0)">
+          <td><div class="cover-dot c-marvel">ASM</div></td>
+          <td><div style="font-weight:500">Amazing Spider-Man #35</div><div style="font-size:11.5px;color:var(--g500)">2021</div></td>
+          <td><span class="pub-tag t-marvel">Marvel</span></td>
+          <td><span class="tipo-pill tp-f">F####</span></td>
+          <td style="font-family:monospace;font-size:13px">F1544</td>
+          <td><span class="grade-pill g-high">9.8</span></td>
+          <td style="font-size:13px">WHITE</td>
+          <td><span class="stato s-stock">Stock</span></td>
+        </tr>
+        <tr onclick="openDetail(1)">
+          <td><div class="cover-dot c-dc">DC</div></td>
+          <td><div style="font-weight:500">Batman #100</div><div style="font-size:11.5px;color:var(--g500)">2020</div></td>
+          <td><span class="pub-tag t-dc">DC Comics</span></td>
+          <td><span class="tipo-pill tp-std">12345</span></td>
+          <td style="font-family:monospace;font-size:13px">14821</td>
+          <td><span class="grade-pill g-high">9.6</span></td>
+          <td style="font-size:13px">WHITE</td>
+          <td><span class="stato s-ordine">Ordine</span></td>
+        </tr>
+        <tr onclick="openDetail(2)">
+          <td><div class="cover-dot c-bonelli">BON</div></td>
+          <td><div style="font-weight:500">Dylan Dog #120</div><div style="font-size:11.5px;color:var(--g500)">1997</div></td>
+          <td><span class="pub-tag t-bonelli">Bonelli</span></td>
+          <td><span class="tipo-pill tp-s">S####</span></td>
+          <td style="font-family:monospace;font-size:13px">S1847</td>
+          <td><span class="grade-pill g-high">9.4</span></td>
+          <td style="font-size:13px">OFF-WHITE</td>
+          <td><span class="stato s-stock">Stock</span></td>
+        </tr>
+        <tr class="review-row" onclick="openDetail(3)">
+          <td><div class="cover-dot c-marvel2">ASM</div></td>
+          <td>
+            <div style="font-weight:500">Amazing Spider-Man #1</div>
+            <div class="review-msg">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              NEEDS_REVIEW — qualità pagine non valida
+            </div>
+          </td>
+          <td><span class="pub-tag t-marvel">Marvel</span></td>
+          <td><span class="tipo-pill tp-std">12345</span></td>
+          <td style="font-family:monospace;font-size:13px">17813</td>
+          <td><span class="grade-pill g-warn">FIRMATO</span></td>
+          <td style="font-size:13px;color:var(--amber)">YAYAYAYA</td>
+          <td><span class="stato s-review">Review</span></td>
+        </tr>
+        <tr onclick="openDetail(4)">
+          <td><div class="cover-dot c-dc2">DC</div></td>
+          <td><div style="font-weight:500">Batman #423</div><div style="font-size:11.5px;color:var(--g500)">1988</div></td>
+          <td><span class="pub-tag t-dc">DC Comics</span></td>
+          <td><span class="tipo-pill tp-f">F####</span></td>
+          <td style="font-family:monospace;font-size:13px">F1702</td>
+          <td><span class="grade-pill g-mid">8.5</span></td>
+          <td style="font-size:13px">OFF-WHITE/WHITE</td>
+          <td><span class="stato s-stock">Stock</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ CATALOGO TITOLI ═══════════ -->
+<div id="screen-catalog" class="screen">
+<div class="page">
+  <div class="page-hd">
+    <div>
+      <div class="page-title">Catalogo titoli</div>
+      <div class="page-sub">5.268 titoli unici · un record per fumetto, indipendente dalle copie</div>
+    </div>
+    <button class="btn btn-primary" onclick="go('form-titolo')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuovo titolo
+    </button>
+  </div>
+  <div class="search-wrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="search-input" id="cat-search" placeholder="Cerca titolo, editore, autore, prima apparizione…">
+  </div>
+  <div class="cat-grid" id="cat-grid">
+    <div class="cat-card">
+      <div class="cat-cover c-marvel" style="background-image:linear-gradient(to bottom,transparent 30%,rgba(10,15,30,0.6)),url('https://covers.openlibrary.org/b/id/14630548-L.jpg')">
+        <div class="cat-cover-overlay" onclick="openCover('Amazing Spider-Man #35','Marvel Comics · 01/2021','https://covers.openlibrary.org/b/id/14630548-L.jpg');event.stopPropagation()"></div>
+        <div class="cat-badge">24 copie</div><div class="cat-cover-label">ASM #35</div></div>
+      <div class="cat-body">
+        <div class="cat-title">Amazing Spider-Man #35</div>
+        <div class="cat-meta">Marvel Comics · 01/2021 · USA</div>
+        <div class="cat-authors">Zeb Wells · Patrick Gleason</div>
+        <div class="cat-avg"><span class="cat-avg-label">Voto medio</span><span class="cat-avg-val">9.7</span></div>
+        <div class="cat-actions">
+          <button class="cat-btn cat-btn-edit" onclick="openEditTitolo(0);event.stopPropagation()">Modifica titolo</button>
+          <button class="cat-btn cat-btn-add" onclick="openCopiaForm('Amazing Spider-Man #35');event.stopPropagation()">+ Copia</button>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-cover c-dc" style="background-image:linear-gradient(to bottom,transparent 30%,rgba(10,15,30,0.6)),url('https://covers.openlibrary.org/b/id/10523338-L.jpg')">
+        <div class="cat-cover-overlay" onclick="openCover('Batman #100','DC Comics · 11/2020','https://covers.openlibrary.org/b/id/10523338-L.jpg');event.stopPropagation()"></div>
+        <div class="cat-badge">7 copie</div><div class="cat-cover-label">Batman #100</div></div>
+      <div class="cat-body">
+        <div class="cat-title">Batman #100</div>
+        <div class="cat-meta">DC Comics · 11/2020 · USA</div>
+        <div class="cat-authors">James Tynion IV · Jorge Jiménez</div>
+        <div class="cat-avg"><span class="cat-avg-label">Voto medio</span><span class="cat-avg-val">9.6</span></div>
+        <div class="cat-actions">
+          <button class="cat-btn cat-btn-edit" onclick="openEditTitolo(1);event.stopPropagation()">Modifica titolo</button>
+          <button class="cat-btn cat-btn-add" onclick="openCopiaForm('Batman #100');event.stopPropagation()">+ Copia</button>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-cover c-bonelli" style="background-image:linear-gradient(to bottom,transparent 30%,rgba(10,15,30,0.6)),url('https://covers.openlibrary.org/b/id/8091016-L.jpg')">
+        <div class="cat-cover-overlay" onclick="openCover('Dylan Dog #120','Bonelli · 09/1997','https://covers.openlibrary.org/b/id/8091016-L.jpg');event.stopPropagation()"></div>
+        <div class="cat-badge">3 copie</div><div class="cat-cover-label">Dylan Dog #120</div></div>
+      <div class="cat-body">
+        <div class="cat-title">Dylan Dog #120</div>
+        <div class="cat-meta">Bonelli · 09/1997 · Italy</div>
+        <div class="cat-authors">Tiziano Sclavi · Luigi Piccatto</div>
+        <div class="cat-avg"><span class="cat-avg-label">Voto medio</span><span class="cat-avg-val">9.4</span></div>
+        <div class="cat-actions">
+          <button class="cat-btn cat-btn-edit" onclick="openEditTitolo(2);event.stopPropagation()">Modifica titolo</button>
+          <button class="cat-btn cat-btn-add" onclick="openCopiaForm('Dylan Dog #120');event.stopPropagation()">+ Copia</button>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-cover c-marvel2" style="background-image:linear-gradient(to bottom,transparent 30%,rgba(10,15,30,0.6)),url('https://covers.openlibrary.org/b/id/12801020-L.jpg')">
+        <div class="cat-cover-overlay" onclick="openCover('Amazing Spider-Man #300','Marvel Comics · 05/1988','https://covers.openlibrary.org/b/id/12801020-L.jpg');event.stopPropagation()"></div>
+        <div class="cat-badge">12 copie</div><div class="cat-cover-label">ASM #300</div></div>
+      <div class="cat-body">
+        <div class="cat-title">Amazing Spider-Man #300</div>
+        <div class="cat-meta">Marvel Comics · 05/1988 · USA</div>
+        <div class="cat-authors">David Michelinie · Todd McFarlane</div>
+        <div class="first-app"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>1st full app. Venom</div>
+        <div class="cat-avg"><span class="cat-avg-label">Voto medio</span><span class="cat-avg-val">8.9</span></div>
+        <div class="cat-actions">
+          <button class="cat-btn cat-btn-edit" onclick="openEditTitolo(3);event.stopPropagation()">Modifica titolo</button>
+          <button class="cat-btn cat-btn-add" onclick="openCopiaForm('Amazing Spider-Man #300');event.stopPropagation()">+ Copia</button>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card empty">
+      <div class="cat-cover c-dc2" style="background-image:linear-gradient(to bottom,transparent 30%,rgba(10,15,30,0.6)),url('https://covers.openlibrary.org/b/id/7222246-L.jpg')">
+        <div class="cat-cover-overlay" onclick="openCover('Batman #423','DC Comics · 09/1988','https://covers.openlibrary.org/b/id/7222246-L.jpg');event.stopPropagation()"></div>
+        <div class="cat-badge" style="opacity:0.6">0 copie</div><div class="cat-cover-label">Batman #423</div></div>
+      <div class="cat-body">
+        <div class="cat-title">Batman #423</div>
+        <div class="cat-meta">DC Comics · 09/1988 · USA</div>
+        <div class="cat-authors">Jim Starlin · Todd McFarlane</div>
+        <div style="font-size:12px;color:var(--text2);font-style:italic;margin:4px 0 8px">Nessuna copia in database.</div>
+        <div class="cat-avg" style="opacity:0.4"><span class="cat-avg-label">Voto medio</span><span class="cat-avg-val">—</span></div>
+        <div class="cat-actions">
+          <button class="cat-btn cat-btn-edit" onclick="openEditTitolo(4);event.stopPropagation()">Modifica titolo</button>
+          <button class="cat-btn cat-btn-add" onclick="openCopiaForm('Batman #423');event.stopPropagation()">+ Copia</button>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-cover c-xmen" style="background-image:linear-gradient(to bottom,transparent 30%,rgba(10,15,30,0.6)),url('https://covers.openlibrary.org/b/id/8739161-L.jpg')">
+        <div class="cat-cover-overlay" onclick="openCover('X-Men #1','Marvel Comics · 10/1991','https://covers.openlibrary.org/b/id/8739161-L.jpg');event.stopPropagation()"></div>
+        <div class="cat-badge">2 copie</div><div class="cat-cover-label">X-Men #1</div></div>
+      <div class="cat-body">
+        <div class="cat-title">X-Men #1</div>
+        <div class="cat-meta">Marvel Comics · 10/1991 · USA</div>
+        <div class="cat-authors">Chris Claremont · Jim Lee</div>
+        <div class="cat-avg"><span class="cat-avg-label">Voto medio</span><span class="cat-avg-val">9.8</span></div>
+        <div class="cat-actions">
+          <button class="cat-btn cat-btn-edit" onclick="openEditTitolo(5);event.stopPropagation()">Modifica titolo</button>
+          <button class="cat-btn cat-btn-add" onclick="openCopiaForm('X-Men #1');event.stopPropagation()">+ Copia</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ FORM NUOVO / MODIFICA TITOLO ═══════════ -->
+<div id="screen-form-titolo" class="screen">
+<div class="page">
+  <div class="breadcrumb">
+    <a onclick="go('catalog')">← Catalogo titoli</a>
+    <span class="breadcrumb-sep">›</span>
+    <span id="titolo-breadcrumb">Nuovo titolo</span>
+  </div>
+  <div class="page-hd">
+    <div>
+      <div class="page-title" id="titolo-form-heading">Nuovo titolo</div>
+      <div class="page-sub" id="titolo-form-sub">Aggiungi un titolo al catalogo senza gradarlo</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="go('catalog')">Annulla</button>
+      <button class="btn btn-primary" onclick="salvaTitolo()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="titolo-save-label">Aggiungi al catalogo</span>
+      </button>
+    </div>
+  </div>
+  <div style="max-width:640px">
+    <div class="sec">
+      <div class="sec-head">
+        <div class="sec-letter la">A</div>
+        <div><div class="sec-title">Dati copertina</div><div class="sec-sub">Informazioni editoriali e URL copertina</div></div>
+      </div>
+      <div class="sec-body">
+        <div class="fg" style="margin-bottom:14px">
+          <div class="field"><label class="flabel">Titolo <span class="req">*</span></label><input class="finput" id="et-titolo" placeholder="es. Amazing Spider-Man #400"></div>
+        </div>
+        <div class="fg fg3">
+          <div class="field"><label class="flabel">Editore <span class="req">*</span></label>
+            <select class="finput" id="et-editore"><option>Marvel Comics</option><option>DC Comics</option><option>Panini Comics</option><option>Bonelli</option><option>Altro…</option></select>
+          </div>
+          <div class="field"><label class="flabel">Data pub.</label><input class="finput" id="et-data" placeholder="MM/YYYY"></div>
+          <div class="field"><label class="flabel">Nazionalità</label>
+            <select class="finput" id="et-naz"><option>USA</option><option>Italy</option><option>Spain</option><option>Germany</option></select>
+          </div>
+        </div>
+        <div class="fg fg2" style="margin-top:14px">
+          <div class="field"><label class="flabel">Variant</label><input class="finput" id="et-variant" placeholder="opzionale"></div>
+          <div class="field"><label class="flabel">URL copertina</label><input class="finput" id="et-url" placeholder="https://…"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec" style="margin-top:14px">
+      <div class="sec-head">
+        <div class="sec-letter lc">C</div>
+        <div><div class="sec-title">Dati editoriali</div><div class="sec-sub">Autori, storia, apparizioni</div></div>
+      </div>
+      <div class="sec-body">
+        <div class="flabel" style="margin-bottom:7px">Autori</div>
+        <div class="autori-row"><div class="autori-tag">Story</div><input class="finput" id="et-story" placeholder="Scrittore"></div>
+        <div class="autori-row"><div class="autori-tag">Art</div><input class="finput" id="et-art" placeholder="Disegnatore"></div>
+        <div class="autori-row" style="margin-bottom:14px"><div class="autori-tag">Cover</div><input class="finput" id="et-cover" placeholder="Copertinista"></div>
+        <div class="fg fg2">
+          <div class="field"><label class="flabel">Dati editoria</label><input class="finput" id="et-edit" placeholder="es. Vol. 1 #400"></div>
+          <div class="field"><label class="flabel">Prima apparizione / Dati storia</label><input class="finput" id="et-firstapp" placeholder="es. 1st app. Venom…"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ FORM NUOVA COPIA ═══════════ -->
+<div id="screen-form-copia" class="screen">
+<div class="page">
+  <div class="breadcrumb">
+    <a id="copia-back-link" onclick="go('list')">← Copie graduate</a>
+  </div>
+  <div class="page-hd">
+    <div>
+      <div class="page-title">Nuova copia gradată</div>
+      <div class="page-sub">Seleziona il titolo dal catalogo, poi inserisci i dati di grading</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" id="copia-cancel" onclick="go('list')">Annulla</button>
+      <button class="btn btn-primary" onclick="salvaCopia()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Salva copia
+      </button>
+    </div>
+  </div>
+  <div class="form-layout">
+    <div class="form-col">
+      <!-- TITOLO SELECTOR -->
+      <div class="sec">
+        <div class="sec-head">
+          <div class="sec-letter" style="background:var(--purp);color:white">↗</div>
+          <div><div class="sec-title">Titolo di riferimento</div><div class="sec-sub">Cerca nel catalogo esistente</div></div>
+        </div>
+        <div class="sec-body">
+          <div class="picker-wrap">
+            <input class="finput" id="picker-input" placeholder="Cerca nel catalogo…" oninput="filterPicker(this.value)" onfocus="document.getElementById('title-dd').style.display='block'">
+            <div class="title-dropdown" id="title-dd">
+              <div class="title-opt" onclick="selectTitle('Amazing Spider-Man #35','Marvel Comics','01/2021','USA')"><div class="t-opt-name">Amazing Spider-Man #35</div><div class="t-opt-meta">Marvel Comics · 2021</div></div>
+              <div class="title-opt" onclick="selectTitle('Amazing Spider-Man #300','Marvel Comics','05/1988','USA')"><div class="t-opt-name">Amazing Spider-Man #300</div><div class="t-opt-meta">Marvel Comics · 1988</div></div>
+              <div class="title-opt" onclick="selectTitle('Batman #100','DC Comics','11/2020','USA')"><div class="t-opt-name">Batman #100</div><div class="t-opt-meta">DC Comics · 2020</div></div>
+              <div class="title-opt" onclick="selectTitle('Batman #423','DC Comics','09/1988','USA')"><div class="t-opt-name">Batman #423</div><div class="t-opt-meta">DC Comics · 1988</div></div>
+              <div class="title-opt" onclick="selectTitle('Dylan Dog #120','Bonelli','09/1997','Italy')"><div class="t-opt-name">Dylan Dog #120</div><div class="t-opt-meta">Bonelli · 1997</div></div>
+              <div class="title-opt" onclick="selectTitle('X-Men #1','Marvel Comics','10/1991','USA')"><div class="t-opt-name">X-Men #1</div><div class="t-opt-meta">Marvel Comics · 1991</div></div>
+              <div class="title-opt-new" onclick="closePicker()">+ Titolo non in catalogo — inserimento manuale</div>
+            </div>
+          </div>
+          <div class="selected-pill" id="selected-pill">
+            <span id="selected-name" style="font-size:13.5px;font-weight:500;color:var(--navy)"></span>
+            <button class="pill-clear" onclick="clearPicker()">✕</button>
+          </div>
+        </div>
+      </div>
+      <!-- A -->
+      <div class="sec">
+        <div class="sec-head"><div class="sec-letter la">A</div><div><div class="sec-title">Dati copertina</div><div class="sec-sub">Pre-compilati se titolo selezionato</div></div></div>
+        <div class="sec-body">
+          <div class="fg" style="margin-bottom:14px"><div class="field"><label class="flabel">Titolo <span class="req">*</span></label><input class="finput" id="f-titolo" placeholder="es. Amazing Spider-Man #35"></div></div>
+          <div class="fg fg3">
+            <div class="field"><label class="flabel">Editore <span class="req">*</span></label><select class="finput" id="f-editore"><option value="">—</option><option>Marvel Comics</option><option>DC Comics</option><option>Panini Comics</option><option>Bonelli</option><option>Altro…</option></select></div>
+            <div class="field"><label class="flabel">Data pub.</label><input class="finput" id="f-data" placeholder="MM/YYYY"></div>
+            <div class="field"><label class="flabel">Nazionalità</label><select class="finput" id="f-naz"><option>USA</option><option>Italy</option><option>Spain</option><option>Germany</option></select></div>
+          </div>
+          <div class="field" style="margin-top:14px"><label class="flabel">Variant</label><input class="finput" placeholder="es. Newsstand, Variant cover 1:25…"></div>
+        </div>
+      </div>
+      <!-- B -->
+      <div class="sec">
+        <div class="sec-head"><div class="sec-letter lb">B</div><div><div class="sec-title">Identificativo e grading</div><div class="sec-sub">Tipo progressivo, voto, qualità pagine, stato</div></div></div>
+        <div class="sec-body">
+          <div style="margin-bottom:16px">
+            <div class="flabel" style="margin-bottom:7px">Tipo progressivo <span class="req">*</span></div>
+            <div class="tipo-grid">
+              <div class="tipo-opt" onclick="setTipo(this,'12345')"><div class="tipo-name">Standard</div><div class="tipo-prog">12345</div></div>
+              <div class="tipo-opt" onclick="setTipo(this,'S####')"><div class="tipo-name">Firmato</div><div class="tipo-prog">S####</div></div>
+              <div class="tipo-opt sel" onclick="setTipo(this,'F####')"><div class="tipo-name">Extra</div><div class="tipo-prog">F####</div></div>
+              <div class="tipo-opt" onclick="setTipo(this,'FS###')"><div class="tipo-name">Extra Firmato</div><div class="tipo-prog">FS###</div></div>
+              <div class="tipo-opt" onclick="setTipo(this,'B###')"><div class="tipo-name">Bonelli</div><div class="tipo-prog">B###</div></div>
+              <div class="tipo-opt" onclick="setTipo(this,'BS###')"><div class="tipo-name">Bonelli Firm.</div><div class="tipo-prog">BS###</div></div>
+            </div>
+          </div>
+          <div class="fg fg2">
+            <div>
+              <div class="flabel" style="margin-bottom:6px">Voto <span class="req">*</span></div>
+              <div style="display:flex;align-items:baseline;gap:5px;margin-bottom:4px"><div class="grade-disp" id="gdisplay">9.8</div><div class="grade-max">/ 10</div></div>
+              <input type="range" class="grade-slider" min="1" max="100" value="96" oninput="updateGrade(this.value)">
+              <div class="grade-presets">
+                <button class="gp active" onclick="setGrade(this,96,'9.8')">9.8</button>
+                <button class="gp" onclick="setGrade(this,92,'9.6')">9.6</button>
+                <button class="gp" onclick="setGrade(this,88,'9.4')">9.4</button>
+                <button class="gp" onclick="setGrade(this,84,'9.2')">9.2</button>
+                <button class="gp" onclick="setGrade(this,80,'9.0')">9.0</button>
+              </div>
+            </div>
+            <div>
+              <div class="flabel" style="margin-bottom:7px">Qualità pagine</div>
+              <div class="qual-opts">
+                <label class="qual-opt sel" onclick="selQual(this)"><div class="qual-dot"></div><div><div class="qual-name">WHITE</div><div class="qual-desc">Pagine bianche, ottimale</div></div></label>
+                <label class="qual-opt" onclick="selQual(this)"><div class="qual-dot"></div><div><div class="qual-name">OFF-WHITE / WHITE</div><div class="qual-desc">Lieve ingiallimento</div></div></label>
+                <label class="qual-opt" onclick="selQual(this)"><div class="qual-dot"></div><div><div class="qual-name">OFF-WHITE</div><div class="qual-desc">Ingiallimento visibile</div></div></label>
+                <label class="qual-opt" onclick="selQual(this)"><div class="qual-dot"></div><div><div class="qual-name">CREAM</div><div class="qual-desc">Carta anni 70–80</div></div></label>
+              </div>
+            </div>
+          </div>
+          <div class="fg fg2" style="margin-top:16px">
+            <div class="field"><label class="flabel">Stato <span class="req">*</span></label><select class="finput"><option>Stock</option><option>Ordine</option><option>In lavorazione</option><option>Venduto</option></select></div>
+            <div class="field"><label class="flabel">Testo etichetta stamperia</label><input class="finput" placeholder="Stringa per lo script stamperia…" style="font-family:monospace;font-size:12.5px"></div>
+          </div>
+        </div>
+      </div>
+      <!-- C -->
+      <div class="sec">
+        <div class="sec-head"><div class="sec-letter lc">C</div><div><div class="sec-title">Dati editoriali</div><div class="sec-sub">Autori, storia, autografi</div></div></div>
+        <div class="sec-body">
+          <div class="flabel" style="margin-bottom:7px">Autori</div>
+          <div class="autori-row"><div class="autori-tag">Story</div><input class="finput" placeholder="Scrittore"></div>
+          <div class="autori-row"><div class="autori-tag">Art</div><input class="finput" placeholder="Disegnatore"></div>
+          <div class="autori-row" style="margin-bottom:14px"><div class="autori-tag">Cover</div><input class="finput" placeholder="Copertinista"></div>
+          <div class="fg fg2">
+            <div class="field"><label class="flabel">Dati editoria</label><input class="finput" placeholder="es. Vol. 6 #35"></div>
+            <div class="field"><label class="flabel">Prima apparizione / Dati storia</label><input class="finput" placeholder="es. 1st app. Venom…"></div>
+          </div>
+          <div class="autografi-box" id="autografi-box">
+            <div class="flabel" style="margin-bottom:8px;color:var(--teal-d)">Autografi</div>
+            <div class="autori-row" style="margin-bottom:7px"><div class="autori-tag" style="background:white">Firmato da</div><input class="finput" placeholder="es. Chip Zdarsky"></div>
+            <div class="autori-row"><div class="autori-tag" style="background:white">Certificato</div><input class="finput" placeholder="es. CSA, Dynamic Forces"></div>
+            <div style="margin-top:8px;font-size:12px;color:var(--teal-d);cursor:pointer">+ Aggiungi firmatario</div>
+          </div>
+        </div>
+      </div>
+      <!-- D -->
+      <div class="sec">
+        <div class="sec-head"><div class="sec-letter ld">D</div><div><div class="sec-title">Campi aggiuntivi</div><div class="sec-sub">Note personalizzate EGC</div></div></div>
+        <div class="sec-body">
+          <div class="fg fg2">
+            <div class="field"><label class="flabel">Edizione</label><select class="finput"><option>Non specificato</option><option>Newsstand</option><option>Direct Edition</option></select></div>
+            <div class="field"><label class="flabel">Provenienza</label><input class="finput" placeholder="es. Catawiki, Fiera Milano…"></div>
+          </div>
+          <div style="margin-top:12px;padding:9px 11px;background:var(--g100);border-radius:var(--rsm);font-size:12.5px;color:var(--text2);cursor:pointer">+ Aggiungi campo personalizzato</div>
+        </div>
+      </div>
+    </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="prog-card">
+        <div class="prog-label">Progressivo assegnato</div>
+        <div class="prog-val" id="pdisplay">F1545</div>
+        <div class="prog-hint">Prossimo disponibile · Extra</div>
+        <input class="finput" id="prog-input" value="F1545" style="font-family:monospace;font-size:13.5px;margin-top:8px">
+      </div>
+      <div class="summary">
+        <div class="sum-title">Riepilogo</div>
+        <div class="srow"><span class="sk">Tipo</span><span class="sv" id="sum-tipo">Extra</span></div>
+        <div class="srow"><span class="sk">Progressivo</span><span class="sv" id="sum-prog" style="font-family:monospace">F1545</span></div>
+        <div class="srow"><span class="sk">Voto</span><span class="sv" id="sum-voto" style="color:var(--teal-d)">9.8</span></div>
+        <div class="srow"><span class="sk">Foglio export</span><span class="sv" id="sum-foglio">Stampa Extra</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="form-footer">
+    <span style="font-size:13px;color:var(--text2)">Verrà aggiunto a <strong id="footer-foglio">Stampa Extra</strong></span>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="go('list')">Annulla</button>
+      <button class="btn btn-primary" onclick="salvaCopia()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Salva e aggiungi
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ DETTAGLIO COPIA ═══════════ -->
+<div id="screen-detail" class="screen">
+<div class="page">
+  <div class="breadcrumb"><a onclick="go('list')">← Copie graduate</a></div>
+  <div class="det-layout">
+    <div class="det-side">
+      <div class="det-cover" id="det-cover"><div class="det-cover-label" id="det-cover-label"></div></div>
+      <div class="det-grade-card">
+        <div class="det-grade-num" id="det-grade"></div>
+        <div class="det-grade-sub">EGC Grade</div>
+        <div class="det-quality" id="det-quality"></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card" style="padding:20px 22px">
+        <div class="det-title" id="det-title"></div>
+        <div class="det-meta" id="det-meta"></div>
+        <div style="margin-top:12px"><button class="btn btn-secondary" onclick="go('form-copia')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Modifica
+        </button></div>
+      </div>
+      <div class="card"><div class="det-sec-head">Grading</div><div class="det-fields" id="det-grading"></div></div>
+      <div class="card"><div class="det-sec-head">Dati editoriali</div><div class="det-fields" id="det-editorial"></div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const RECORDS = [
+  {title:'Amazing Spider-Man #35',year:'2021',pub:'Marvel Comics',tipo:'Extra',prog:'F1544',grade:'9.8',quality:'WHITE',stato:'Stock',cls:'c-marvel',authors:'Zeb Wells · Patrick Gleason',editoria:'Vol. 6 #35',firstApp:'—',naz:'USA'},
+  {title:'Batman #100',year:'2020',pub:'DC Comics',tipo:'Standard',prog:'14821',grade:'9.6',quality:'WHITE',stato:'Ordine',cls:'c-dc',authors:'James Tynion IV · Jorge Jiménez',editoria:'Vol. 3 #100',firstApp:'—',naz:'USA'},
+  {title:'Dylan Dog #120',year:'1997',pub:'Bonelli',tipo:'Firmato',prog:'S1847',grade:'9.4',quality:'OFF-WHITE',stato:'Stock',cls:'c-bonelli',authors:'Tiziano Sclavi · Luigi Piccatto',editoria:'#120',firstApp:'—',naz:'Italy'},
+  {title:'Amazing Spider-Man #1',year:'1963',pub:'Marvel Comics',tipo:'Standard',prog:'17813',grade:'FIRMATO',quality:'YAYAYAYA',stato:'NEEDS_REVIEW',cls:'c-marvel2',authors:'Stan Lee · Steve Ditko',editoria:'Vol. 1 #1',firstApp:'1st app. Spider-Man solo series',naz:'USA'},
+  {title:'Batman #423',year:'1988',pub:'DC Comics',tipo:'Extra',prog:'F1702',grade:'8.5',quality:'OFF-WHITE/WHITE',stato:'Stock',cls:'c-dc2',authors:'Jim Starlin · Todd McFarlane',editoria:'Vol. 1 #423',firstApp:'—',naz:'USA'},
+];
+
+const CATALOG = [
+  {title:'Amazing Spider-Man #35',pub:'Marvel Comics',data:'01/2021',naz:'USA',story:'Zeb Wells',art:'Patrick Gleason',cover:'Claudio Sciarrone',editoria:'Vol. 6 #35',firstApp:'—',url:''},
+  {title:'Batman #100',pub:'DC Comics',data:'11/2020',naz:'USA',story:'James Tynion IV',art:'Jorge Jiménez',cover:'Jorge Jiménez',editoria:'Vol. 3 #100',firstApp:'—',url:''},
+  {title:'Dylan Dog #120',pub:'Bonelli',data:'09/1997',naz:'Italy',story:'Tiziano Sclavi',art:'Luigi Piccatto',cover:'Angelo Stano',editoria:'#120',firstApp:'—',url:''},
+  {title:'Amazing Spider-Man #300',pub:'Marvel Comics',data:'05/1988',naz:'USA',story:'David Michelinie',art:'Todd McFarlane',cover:'Todd McFarlane',editoria:'Vol. 1 #300',firstApp:'1st full app. Venom',url:''},
+  {title:'Batman #423',pub:'DC Comics',data:'09/1988',naz:'USA',story:'Jim Starlin',art:'Todd McFarlane',cover:'Todd McFarlane',editoria:'Vol. 1 #423',firstApp:'—',url:''},
+  {title:'X-Men #1',pub:'Marvel Comics',data:'10/1991',naz:'USA',story:'Chris Claremont',art:'Jim Lee',cover:'Jim Lee',editoria:'Vol. 2 #1',firstApp:'—',url:''},
+];
+
+const TIPO_LABELS = {'12345':'Standard','S####':'Firmato','F####':'Extra','FS###':'Extra Firmato','B###':'Bonelli','BS###':'Bonelli Firm.'};
+const FOGLIO_MAP  = {'12345':'Stampa Azzurro','S####':'Stampa Giallo','F####':'Stampa Extra','FS###':'Stampa Extra Giallo','B###':'Stampa Azzurro','BS###':'Stampa Giallo'};
+
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',['list','catalog'][i]===name));
+  window.scrollTo(0,0);
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('tmsg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// CATALOGO EDIT
+function openEditTitolo(idx){
+  const c=CATALOG[idx];
+  document.getElementById('titolo-breadcrumb').textContent=c.title;
+  document.getElementById('titolo-form-heading').textContent='Modifica titolo';
+  document.getElementById('titolo-form-sub').textContent=c.title+' · '+c.pub;
+  document.getElementById('titolo-save-label').textContent='Salva modifiche';
+  document.getElementById('et-titolo').value=c.title;
+  document.getElementById('et-editore').value=c.pub;
+  document.getElementById('et-data').value=c.data;
+  document.getElementById('et-naz').value=c.naz;
+  document.getElementById('et-variant').value='';
+  document.getElementById('et-url').value=c.url||'';
+  document.getElementById('et-story').value=c.story;
+  document.getElementById('et-art').value=c.art;
+  document.getElementById('et-cover').value=c.cover;
+  document.getElementById('et-edit').value=c.editoria;
+  document.getElementById('et-firstapp').value=c.firstApp;
+  go('form-titolo');
+}
+
+function openNewTitolo(){
+  document.getElementById('titolo-breadcrumb').textContent='Nuovo titolo';
+  document.getElementById('titolo-form-heading').textContent='Nuovo titolo';
+  document.getElementById('titolo-form-sub').textContent='Aggiungi un titolo al catalogo senza gradarlo';
+  document.getElementById('titolo-save-label').textContent='Aggiungi al catalogo';
+  ['et-titolo','et-data','et-variant','et-url','et-story','et-art','et-cover','et-edit','et-firstapp'].forEach(id=>document.getElementById(id).value='');
+  go('form-titolo');
+}
+
+function salvaTitolo(){
+  toast('Titolo salvato nel catalogo');
+  setTimeout(()=>go('catalog'),2400);
+}
+
+// COPIA FORM
+function openCopiaForm(titleName){
+  clearPicker();
+  const backScreen = titleName ? 'catalog' : 'list';
+  document.getElementById('copia-cancel').onclick=()=>go(backScreen);
+  document.getElementById('copia-back-link').onclick=()=>go(backScreen);
+  document.getElementById('copia-back-link').textContent='← '+(titleName?'Catalogo titoli':'Copie graduate');
+  if(titleName&&CATALOG.find(c=>c.title===titleName)){
+    const c=CATALOG.find(c=>c.title===titleName);
+    selectTitle(c.title,c.pub,c.data,c.naz);
+  }
+  go('form-copia');
+}
+
+function filterPicker(val){
+  const q=val.toLowerCase();
+  document.querySelectorAll('#title-dd .title-opt').forEach(el=>{el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';});
+  document.getElementById('title-dd').style.display='block';
+}
+function selectTitle(title,pub,date,naz){
+  document.getElementById('picker-input').value=title;
+  document.getElementById('title-dd').style.display='none';
+  document.getElementById('selected-name').textContent=title;
+  document.getElementById('selected-pill').classList.add('show');
+  document.getElementById('f-titolo').value=title;
+  document.getElementById('f-editore').value=pub;
+  document.getElementById('f-data').value=date;
+  document.getElementById('f-naz').value=naz;
+}
+function clearPicker(){
+  document.getElementById('picker-input').value='';
+  document.getElementById('title-dd').style.display='none';
+  document.getElementById('selected-pill').classList.remove('show');
+  ['f-titolo','f-data'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-editore').value='';
+}
+function closePicker(){document.getElementById('title-dd').style.display='none';}
+document.addEventListener('click',e=>{if(!e.target.closest('.picker-wrap'))closePicker();});
+
+function setTipo(el,prog){
+  document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  const p=prog.replace('####','1545').replace('###','157');
+  document.getElementById('pdisplay').textContent=p;
+  document.getElementById('prog-input').value=p;
+  document.getElementById('sum-tipo').textContent=TIPO_LABELS[prog];
+  document.getElementById('sum-prog').textContent=p;
+  document.getElementById('sum-foglio').textContent=FOGLIO_MAP[prog];
+  document.getElementById('footer-foglio').textContent=FOGLIO_MAP[prog];
+  const isFirmato=prog.startsWith('S')||prog.startsWith('FS')||prog.startsWith('BS');
+  document.getElementById('autografi-box').classList.toggle('show',isFirmato);
+}
+function updateGrade(v){
+  const l=(v/10).toFixed(1);
+  document.getElementById('gdisplay').textContent=l;
+  document.getElementById('sum-voto').textContent=l;
+  document.querySelectorAll('.gp').forEach(b=>b.classList.remove('active'));
+}
+function setGrade(btn,sv,label){
+  document.querySelectorAll('.gp').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('gdisplay').textContent=label;
+  document.getElementById('sum-voto').textContent=label;
+  document.querySelector('.grade-slider').value=sv;
+}
+function selQual(el){document.querySelectorAll('.qual-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');}
+function salvaCopia(){toast('Copia salvata con successo');setTimeout(()=>go('list'),2400);}
+
+function fld(key,val,style='',mono=false){
+  return '<div><div class="det-field-key">'+key+'</div><div class="det-field-val'+(mono?' mono':'')+'" style="'+style+'">'+(val||'—')+'</div></div>';
+}
+function openDetail(idx){
+  const r=RECORDS[idx];
+  document.getElementById('det-cover').className='det-cover '+r.cls;
+  document.getElementById('det-cover-label').innerHTML=r.title+'<br><span style="font-weight:400;opacity:0.7">'+r.pub+' · '+r.year+'</span>';
+  document.getElementById('det-grade').textContent=r.grade;
+  document.getElementById('det-quality').textContent=r.quality;
+  document.getElementById('det-title').textContent=r.title;
+  const pt=r.pub.includes('Marvel')?'t-marvel':r.pub.includes('DC')?'t-dc':'t-bonelli';
+  document.getElementById('det-meta').innerHTML='<span class="pub-tag '+pt+'">'+r.pub+'</span><span class="det-sep">·</span><span>'+r.year+'</span><span class="det-sep">·</span><span>'+r.naz+'</span>';
+  document.getElementById('det-grading').innerHTML=
+    fld('Voto EGC',r.grade,!isNaN(r.grade)?'color:var(--teal-d);font-size:18px':'')+
+    fld('Qualità pagine',r.quality,r.quality==='YAYAYAYA'?'color:var(--amber):':'')+
+    fld('Progressivo',r.prog,'',true)+fld('Tipo',r.tipo)+
+    fld('Stato',r.stato,r.stato==='NEEDS_REVIEW'?'color:var(--amber)':'');
+  document.getElementById('det-editorial').innerHTML=
+    fld('Autori',r.authors)+fld('Dati editoria',r.editoria)+fld('Prima apparizione',r.firstApp)+fld('Nazionalità',r.naz);
+  go('detail');
+}
+
+// Searches
+document.getElementById('list-search').addEventListener('input',function(){
+  const q=this.value.toLowerCase();
+  document.querySelectorAll('#tbody tr').forEach(tr=>{tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';});
+});
+document.getElementById('cat-search').addEventListener('input',function(){
+  const q=this.value.toLowerCase();
+  document.querySelectorAll('#cat-grid .cat-card').forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(q)?'':'none';});
+});
+
+// Wire up "Nuovo titolo" button
+document.querySelector('#screen-catalog .btn-primary').onclick=openNewTitolo;
+</script>
+<!-- COVER MODAL -->
+<div class="cover-modal" id="cover-modal" onclick="closeCover()">
+  <div class="cover-modal-inner" onclick="event.stopPropagation()">
+    <button class="cover-modal-close" onclick="closeCover()">✕</button>
+    <img class="cover-modal-img" id="cover-modal-img" src="" alt="Copertina" onerror="this.style.display='none'">
+    <div class="cover-modal-title" id="cover-modal-title"></div>
+    <div class="cover-modal-meta" id="cover-modal-meta"></div>
+  </div>
+</div>
+
+<script>
+function openCover(title, meta, url) {
+  document.getElementById('cover-modal-img').src = url;
+  document.getElementById('cover-modal-img').style.display = 'block';
+  document.getElementById('cover-modal-title').textContent = title;
+  document.getElementById('cover-modal-meta').textContent = meta;
+  document.getElementById('cover-modal').classList.add('show');
+}
+function closeCover() {
+  document.getElementById('cover-modal').classList.remove('show');
+}
+</script>
+
+</body>
+</html>
