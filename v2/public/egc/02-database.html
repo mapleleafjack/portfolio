@@ -112,7 +112,7 @@ td{padding:11px 14px;font-size:13.5px;vertical-align:middle;}
 .form-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
 .form-col{display:flex;flex-direction:column;gap:14px;}
 .sec{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);overflow:hidden;}
-.sec-head{display:flex;align-items:center;gap:9px;padding:13px 18px;border-bottom:1px solid var(--g200);background:var(--g100);}
+.sec-head{display:flex;align-items:center;gap:9px;padding:13px 18px;border-bottom:1px solid var(--g200);background:var(--g100);border-radius:var(--r) var(--r) 0 0;}
 .sec-letter{width:22px;height:22px;border-radius:5px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .la{background:var(--navy);color:white;} .lb{background:var(--teal-d);color:white;} .lc{background:var(--amber);color:white;} .ld{background:var(--purp);color:white;}
 .sec-title{font-size:13px;font-weight:600;color:var(--navy);}
@@ -571,7 +571,7 @@ select.finput{cursor:pointer;appearance:none;background-image:url("data:image/sv
   <div class="form-layout">
     <div class="form-col">
       <!-- TITOLO SELECTOR -->
-      <div class="sec">
+      <div class="sec" style="overflow:visible">
         <div class="sec-head">
           <div class="sec-letter" style="background:var(--purp);color:white">↗</div>
           <div><div class="sec-title">Titolo di riferimento</div><div class="sec-sub">Cerca nel catalogo esistente</div></div>
