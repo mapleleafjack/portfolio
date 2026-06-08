@@ -7,13 +7,13 @@
 body {
   margin: 0;
   font-family: 'Oxanium', sans-serif;
-  background: #faf8f5;
-  color: #111;
+  background: #fff;
+  color: #0a0a0a;
   -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: #111;
+  color: #0a0a0a;
   text-decoration: none;
 }
 
@@ -22,8 +22,51 @@ a:hover {
 }
 
 ::selection {
-  background: #111;
-  color: #fff;
+  background: #0a0a0a;
+  color: #f0c830;
+}
+
+/* ============================================
+   Pixel sprites
+   ============================================ */
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Pixel star — top right */
+body::before {
+  top: 18px;
+  right: 24px;
+  background: #f0c830;
+  box-shadow:
+    /* top point */
+    -4px -8px 0 #f0c830,
+    /* arms */
+    -8px -4px 0 #f0c830,  -4px -4px 0 #0a0a0a, 0px -4px 0 #f0c830, 4px -4px 0 #f0c830,
+    -8px  0px 0 #0a0a0a,  -4px  0px 0 #f0c830, 0px  0px 0 #f0c830, 4px  0px 0 #0a0a0a,
+    -8px  4px 0 #f0c830,  -4px  4px 0 #f0c830, 0px  4px 0 #f0c830, 4px  4px 0 #f0c830,
+    /* bottom point */
+    0px  8px 0 #f0c830;
+}
+
+/* Pixel diamond — bottom left */
+body::after {
+  bottom: 24px;
+  left: 24px;
+  background: #0a0a0a;
+  box-shadow:
+    -4px -4px 0 #f0c830,
+    0px -4px 0 #0a0a0a, 4px -4px 0 #f0c830,
+    -8px  0px 0 #f0c830, -4px 0px 0 #0a0a0a, 0px 0px 0 #f0c830, 4px 0px 0 #0a0a0a, 8px 0px 0 #f0c830,
+    -4px  4px 0 #f0c830, 0px 4px 0 #0a0a0a, 4px 4px 0 #f0c830,
+    0px  8px 0 #f0c830;
 }
 
 /* ============================================
@@ -74,28 +117,6 @@ a:hover {
 }
 
 /* ============================================
-   Living signal line
-   ============================================ */
-
-.signal-line {
-  height: 1px;
-  background: #4a5b7a;
-  width: 2.5rem;
-  animation: drawLine 1.2s ease-out both, breatheLine 3.5s ease-in-out 1.5s infinite;
-}
-
-@keyframes drawLine {
-  from { width: 0; opacity: 0; }
-  to   { width: 2.5rem; opacity: 1; }
-}
-
-@keyframes breatheLine {
-  0%, 100% { width: 2.5rem; opacity: 0.6; background: #4a5b7a; }
-  35%      { width: 3.5rem; opacity: 1; background: #111; }
-  70%      { width: 1.6rem; opacity: 0.4; background: #6b7d9a; }
-}
-
-/* ============================================
    Typewriter phrase
    ============================================ */
 
@@ -109,7 +130,7 @@ a:hover {
   display: inline-block;
   width: 0.55em;
   height: 1.05em;
-  background: #4a5b7a;
+  background: #f0c830;
   vertical-align: text-bottom;
   margin-left: 1px;
   animation: cursorBlink 1s step-end infinite;
@@ -128,7 +149,7 @@ a:hover {
   display: flex;
   align-items: baseline;
   padding: 1rem 0;
-  border-top: 1px solid #e4e0da;
+  border-top: 1px solid #e8e8e8;
   transition: padding 0.35s ease, border-color 0.35s ease, background 0.35s ease;
   cursor: pointer;
   text-decoration: none;
@@ -137,7 +158,7 @@ a:hover {
 }
 
 .door-card:last-child {
-  border-bottom: 1px solid #e4e0da;
+  border-bottom: 1px solid #e8e8e8;
 }
 
 .door-card:hover {
@@ -161,21 +182,21 @@ a:hover {
 }
 
 .door-card-work:hover {
-  border-color: #bcc5d4;
-  background: rgba(74, 91, 122, 0.05);
+  border-color: #1a1a1a;
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .door-card-work::before {
-  background: #4a5b7a;
+  background: #1a1a1a;
 }
 
 .door-card-creative:hover {
-  border-color: #d4c5b4;
-  background: rgba(162, 123, 82, 0.05);
+  border-color: #f0c830;
+  background: rgba(240, 200, 48, 0.05);
 }
 
 .door-card-creative::before {
-  background: #c49a6c;
+  background: #f0c830;
 }
 
 /* ============================================
@@ -186,7 +207,7 @@ a:hover {
   text-align: center;
   font-size: 0.7rem;
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-  color: #c49a6c;
+  color: #f0c830;
   padding: 2rem 0 1.5rem;
   user-select: none;
 }
@@ -196,10 +217,15 @@ a:hover {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #c49a6c;
+  background: #f0c830;
   margin-right: 5px;
   vertical-align: middle;
   animation: ledPulse 2s ease-in-out infinite;
+}
+
+@keyframes ledPulse {
+  0%, 100% { opacity: 0.4; box-shadow: 0 0 2px rgba(240, 200, 48, 0.3); }
+  50%      { opacity: 1;   box-shadow: 0 0 6px rgba(240, 200, 48, 0.7); }
 }
 
 /* ============================================

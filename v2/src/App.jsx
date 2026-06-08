@@ -23,7 +23,7 @@ export default function App() {
     <BrowserRouter>
       <CursorTrail />
       <Nav />
-      <main className="max-w-2xl mx-auto px-6 py-12">
+      <main className="max-w-2xl mx-auto px-6 py-8 sm:py-12">
         <Routes>
           <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
           <Route path="/work" element={<PageWrapper><Work /></PageWrapper>} />

@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROTATING_PHRASES } from '../data';
+import { Cpu, Fire, Headphone, Volume, Lightbulb, PenSquare } from 'pixelarticons/react';
 
 /* ── Magnetic letter name ─────────────────────────────── */
 
@@ -146,22 +147,21 @@ function DoorCard({ to, label, subtitle, variant }) {
 
 export default function Home() {
   return (
-    <div className="py-24">
+    <div className="py-16 sm:py-24">
       {/* Hero */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 mb-12">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 mb-14">
         <div>
-          <h1 className="text-4xl font-bold mb-4 select-none">
+          <h1 className="text-5xl sm:text-6xl font-bold mb-5 select-none leading-none tracking-tight">
             <MagneticName text="Jack Musajo" />
           </h1>
-          <p className="text-lg text-gray-600 max-w-md leading-relaxed mb-1">
-            Software engineer{' '}
+          <p className="text-base sm:text-lg text-gray-500 leading-relaxed mb-0.5">
+            Software engineer
+          </p>
+          <p className="text-base sm:text-lg text-gray-400 leading-relaxed min-h-[1.6em]">
             <RotatingPhrase />
           </p>
-          <p className="text-sm text-gray-500 max-w-md leading-relaxed">
-            across healthtech, creative coding, hardware, and music.
-          </p>
         </div>
-        <div className="text-sm text-gray-500 sm:text-right space-y-1 sm:pt-2">
+        <div className="text-sm text-gray-400 sm:text-right space-y-1 sm:pt-3">
           <p><a href="mailto:jack.musajo@gmail.com" className="link-underline">jack.musajo@gmail.com</a></p>
           <p><a href="https://github.com/mapleleafjack" target="_blank" rel="noopener noreferrer" className="link-underline">GitHub</a></p>
           <p><a href="https://www.linkedin.com/in/chakri-musajo-somma" target="_blank" rel="noopener noreferrer" className="link-underline">LinkedIn</a></p>
@@ -169,24 +169,28 @@ export default function Home() {
       </div>
 
       {/* Doors */}
-      <section className="mb-16">
+      <section className="mb-14">
         <DoorCard to="/work" label="Work" subtitle="projects, systems, product engineering" variant="work" />
         <DoorCard to="/creative" label="Creative" subtitle="music, hardware, performance, experiments" variant="creative" />
       </section>
 
-      {/* Summary line */}
-      <section className="mb-16">
-        <p className="text-sm text-gray-600 leading-relaxed">
-          12 years across Python, React, product engineering, healthtech, fintech, and hardware.
-        </p>
-      </section>
-
-      {/* Currently */}
+      {/* Punchline */}
       <section>
-        <h2 className="text-xs uppercase tracking-widest text-gray-500 mb-4">Currently</h2>
-        <p className="text-sm text-gray-600 leading-relaxed">
-          Building freelance tools, creative systems, and hardware experiments. Open to interesting projects in healthtech, developer tooling, and creative technology.
-        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
+          {[
+            [Cpu, 'Bio-engineering'],
+            [Fire, 'Fire performance'],
+            [Headphone, 'Psytrance'],
+            [Volume, 'Audio systems'],
+            [Lightbulb, 'LED hardware'],
+            [PenSquare, 'Creative tools'],
+          ].map(([Icon, label]) => (
+            <div key={label} className="flex items-center gap-2 text-sm text-gray-600">
+              <Icon className="shrink-0 text-yellow-400" width={16} height={16} />
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );
