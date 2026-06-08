@@ -108,6 +108,12 @@ td{padding:11px 14px;font-size:13.5px;vertical-align:middle;}
 .review-row{background:#FFFCF5 !important;}
 .review-msg{font-size:11.5px;color:var(--amber);display:flex;align-items:center;gap:4px;margin-top:2px;}
 
+/* Mobile table scroll */
+@media (max-width:768px){
+  #screen-list .card{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #screen-list table{min-width:640px;}
+}
+
 /* FORM */
 .form-layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
 .form-col{display:flex;flex-direction:column;gap:14px;}
