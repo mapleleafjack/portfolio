@@ -6,21 +6,18 @@ import Work from './components/Work';
 import Creative from './components/Creative';
 import Album from './components/Album';
 import CursorTrail from './components/CursorTrail';
+import ColorShift from './components/ColorShift';
 
 function PageWrapper({ children }) {
-  const [key, setKey] = useState(0);
   const location = useLocation();
 
-  useEffect(() => {
-    setKey(k => k + 1);
-  }, [location.pathname]);
-
-  return <div key={key} className="page-enter">{children}</div>;
+  return <div key={location.pathname} className="page-enter">{children}</div>;
 }
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ColorShift />
       <CursorTrail />
       <Nav />
       <main className="max-w-2xl mx-auto px-6 py-8 sm:py-12">

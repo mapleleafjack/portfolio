@@ -1,12 +1,5 @@
 export const FEATURED_PROJECTS = [
   {
-    name: 'EGC Comics Intake System',
-    category: 'Work',
-    year: '2025',
-    description: 'Barcode-first workflow for comic grading — React, Python, and PostgreSQL.',
-    url: '/egcdashboard',
-  },
-  {
     name: 'Vision LED Poi',
     category: 'Creative',
     year: '2023–25',
@@ -28,6 +21,7 @@ export const ROTATING_PHRASES = [
   'building creative systems',
   'building hardware experiments',
   'building playful systems',
+  'building LED props',
 ];
 
 const brandLogo = (domain) =>
@@ -84,23 +78,36 @@ export const KEY_PROJECTS = [
 
 export const SKILLS = {
   Languages: ['Python', 'JavaScript / TypeScript', 'C#', 'C++', 'Java'],
-  Frameworks: ['React', 'FastAPI', 'GraphQL (Strawberry)', '.NET'],
-  Infrastructure: ['AWS', 'Terraform', 'Docker', 'Kubernetes', 'PostgreSQL', 'NextFlow'],
-  Practices: ['Clean Architecture', 'RESTful APIs', 'CI/CD', 'Code Reviews', 'GitHub / Bitbucket'],
-  Other: ['Arduino / ESP32', 'Android', 'Linux'],
+  Frameworks: ['React', 'FastAPI', 'GraphQL (Strawberry)', '.NET', 'Next.js'],
+  Infrastructure: ['AWS', 'Terraform', 'Docker', 'Kubernetes', 'PostgreSQL', 'Supabase', 'NextFlow'],
+  Practices: ['Clean Architecture', 'RESTful APIs', 'CI/CD', 'Code Reviews', 'ETL Pipelines'],
+  Hardware: ['Arduino / ESP32', 'PCB Design (EasyEDA)', 'SMD Assembly', 'Addressable LEDs', 'Sensors & Gyroscopes'],
+  Other: ['AI / LLM Integration', 'Barcode Recognition', 'Lab Automation', 'Android', 'Linux'],
 };
 
 export const SIDE_PROJECTS = [
   {
+    name: 'EsPoi — LED Poi',
+    url: 'https://github.com/mapleleafjack/EsPoi',
+    github: 'https://github.com/mapleleafjack/EsPoi',
+    description: 'Custom ESP32 LED juggling prop with gyro-reactive effects, BLE control, and POV animation',
+  },
+  {
     name: 'SlimeChan',
     url: 'https://www.slimechan.xyz/',
     github: 'https://github.com/mapleleafjack/slime-chan',
-    description: 'LLM-powered interactive slime colony — each slime has its own personality and responds to conversation',
+    description: 'LLM-powered interactive slime colony — each slime has its own personality',
   },
   {
     name: 'Glypho',
     url: 'https://www.glypho.xyz/',
     description: 'Creative web experiment exploring generative art and typography',
+  },
+  {
+    name: 'BMO',
+    url: 'https://github.com/mapleleafjack/BMO',
+    github: 'https://github.com/mapleleafjack/BMO',
+    description: 'ESP32 microcontroller project with display and I²C peripheral integration',
   },
 ];
 
@@ -146,10 +153,11 @@ export const ALBUMS = [
 ];
 
 export const HARDWARE_ITEMS = [
-  'Custom PCB design and SMD assembly',
-  'ESP32 / Arduino microcontrollers',
-  'Addressable LEDs and lighting systems',
-  'PIR sensors, audio-reactive installations',
+  'Custom PCB design and SMD assembly (EasyEDA, 0603 packages)',
+  'ESP32 / Arduino microcontroller programming',
+  'Addressable LEDs and reactive lighting systems (APA102)',
+  'Gyroscopes, PIR sensors, audio-reactive installations',
+  'BLE wireless control and OTA firmware updates',
   'Raspberry Pi for AV and generative audio',
   'OLED displays and companion robots',
 ];

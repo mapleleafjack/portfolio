@@ -1,6 +1,20 @@
 @import "tailwindcss";
 
 /* ============================================
+   Accent colour — slowly shifts hue
+   ============================================ */
+
+:root {
+  --accent: #f0c830;
+  --accent-r: 240;
+  --accent-g: 200;
+  --accent-b: 48;
+}
+
+.text-accent { color: var(--accent); }
+.border-accent { border-color: var(--accent); }
+
+/* ============================================
    Base
    ============================================ */
 
@@ -23,7 +37,7 @@ a:hover {
 
 ::selection {
   background: #0a0a0a;
-  color: #f0c830;
+  color: var(--accent);
 }
 
 /* ============================================
@@ -44,16 +58,16 @@ body::after {
 body::before {
   top: 18px;
   right: 24px;
-  background: #f0c830;
+  background: var(--accent);
   box-shadow:
     /* top point */
-    -4px -8px 0 #f0c830,
+    -4px -8px 0 var(--accent),
     /* arms */
-    -8px -4px 0 #f0c830,  -4px -4px 0 #0a0a0a, 0px -4px 0 #f0c830, 4px -4px 0 #f0c830,
-    -8px  0px 0 #0a0a0a,  -4px  0px 0 #f0c830, 0px  0px 0 #f0c830, 4px  0px 0 #0a0a0a,
-    -8px  4px 0 #f0c830,  -4px  4px 0 #f0c830, 0px  4px 0 #f0c830, 4px  4px 0 #f0c830,
+    -8px -4px 0 var(--accent),  -4px -4px 0 #0a0a0a, 0px -4px 0 var(--accent), 4px -4px 0 var(--accent),
+    -8px  0px 0 #0a0a0a,  -4px  0px 0 var(--accent), 0px  0px 0 var(--accent), 4px  0px 0 #0a0a0a,
+    -8px  4px 0 var(--accent),  -4px  4px 0 var(--accent), 0px  4px 0 var(--accent), 4px  4px 0 var(--accent),
     /* bottom point */
-    0px  8px 0 #f0c830;
+    0px  8px 0 var(--accent);
 }
 
 /* Pixel diamond — bottom left */
@@ -62,11 +76,11 @@ body::after {
   left: 24px;
   background: #0a0a0a;
   box-shadow:
-    -4px -4px 0 #f0c830,
-    0px -4px 0 #0a0a0a, 4px -4px 0 #f0c830,
-    -8px  0px 0 #f0c830, -4px 0px 0 #0a0a0a, 0px 0px 0 #f0c830, 4px 0px 0 #0a0a0a, 8px 0px 0 #f0c830,
-    -4px  4px 0 #f0c830, 0px 4px 0 #0a0a0a, 4px 4px 0 #f0c830,
-    0px  8px 0 #f0c830;
+    -4px -4px 0 var(--accent),
+    0px -4px 0 #0a0a0a, 4px -4px 0 var(--accent),
+    -8px  0px 0 var(--accent), -4px 0px 0 #0a0a0a, 0px 0px 0 var(--accent), 4px 0px 0 #0a0a0a, 8px 0px 0 var(--accent),
+    -4px  4px 0 var(--accent), 0px 4px 0 #0a0a0a, 4px 4px 0 var(--accent),
+    0px  8px 0 var(--accent);
 }
 
 /* ============================================
@@ -130,7 +144,7 @@ body::after {
   display: inline-block;
   width: 0.55em;
   height: 1.05em;
-  background: #f0c830;
+  background: var(--accent);
   vertical-align: text-bottom;
   margin-left: 1px;
   animation: cursorBlink 1s step-end infinite;
@@ -142,64 +156,6 @@ body::after {
 }
 
 /* ============================================
-   Door cards — Work / Creative
-   ============================================ */
-
-.door-card {
-  display: flex;
-  align-items: baseline;
-  padding: 1rem 0;
-  border-top: 1px solid #e8e8e8;
-  transition: padding 0.35s ease, border-color 0.35s ease, background 0.35s ease;
-  cursor: pointer;
-  text-decoration: none;
-  color: #111;
-  position: relative;
-}
-
-.door-card:last-child {
-  border-bottom: 1px solid #e8e8e8;
-}
-
-.door-card:hover {
-  padding-left: 1rem;
-  color: #111;
-}
-
-/* Accent bar on hover */
-.door-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: -1px;
-  bottom: -1px;
-  width: 0;
-  transition: width 0.35s ease;
-}
-
-.door-card:hover::before {
-  width: 3px;
-}
-
-.door-card-work:hover {
-  border-color: #1a1a1a;
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.door-card-work::before {
-  background: #1a1a1a;
-}
-
-.door-card-creative:hover {
-  border-color: #f0c830;
-  background: rgba(240, 200, 48, 0.05);
-}
-
-.door-card-creative::before {
-  background: #f0c830;
-}
-
-/* ============================================
    Status line
    ============================================ */
 
@@ -207,7 +163,7 @@ body::after {
   text-align: center;
   font-size: 0.7rem;
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-  color: #f0c830;
+  color: var(--accent);
   padding: 2rem 0 1.5rem;
   user-select: none;
 }
@@ -217,15 +173,15 @@ body::after {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #f0c830;
+  background: var(--accent);
   margin-right: 5px;
   vertical-align: middle;
   animation: ledPulse 2s ease-in-out infinite;
 }
 
 @keyframes ledPulse {
-  0%, 100% { opacity: 0.4; box-shadow: 0 0 2px rgba(240, 200, 48, 0.3); }
-  50%      { opacity: 1;   box-shadow: 0 0 6px rgba(240, 200, 48, 0.7); }
+  0%, 100% { opacity: 0.4; box-shadow: 0 0 2px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3); }
+  50%      { opacity: 1;   box-shadow: 0 0 6px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.7); }
 }
 
 /* ============================================
@@ -262,17 +218,15 @@ body::after {
    ============================================ */
 
 .page-enter {
-  animation: pageIn 0.45s ease-out both;
+  animation: pageIn 0.3s ease-out both;
 }
 
 @keyframes pageIn {
   from {
     opacity: 0;
-    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 

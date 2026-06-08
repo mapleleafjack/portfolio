@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ROTATING_PHRASES } from '../data';
-import { Cpu, Fire, Headphone, Volume, Lightbulb, PenSquare } from 'pixelarticons/react';
+import { Cpu, Fire, Headphone, Volume, Lightbulb, PenSquare, Terminal, Cloud, Music } from 'pixelarticons/react';
 
 /* ── Magnetic letter name ─────────────────────────────── */
 
@@ -129,20 +129,6 @@ function RotatingPhrase() {
   );
 }
 
-/* ── Door card ────────────────────────────────────────── */
-
-function DoorCard({ to, label, subtitle, variant }) {
-  return (
-    <Link
-      to={to}
-      className={`door-card door-card-${variant}`}
-    >
-      <span className="text-sm font-medium">{label}</span>
-      <span className="text-sm text-gray-500 ml-3">{subtitle}</span>
-    </Link>
-  );
-}
-
 /* ── Home ─────────────────────────────────────────────── */
 
 export default function Home() {
@@ -168,28 +154,56 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Doors */}
+      {/* Skills */}
       <section className="mb-14">
-        <DoorCard to="/work" label="Work" subtitle="projects, systems, product engineering" variant="work" />
-        <DoorCard to="/creative" label="Creative" subtitle="music, hardware, performance, experiments" variant="creative" />
-      </section>
-
-      {/* Punchline */}
-      <section>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
-          {[
-            [Cpu, 'Bio-engineering'],
-            [Fire, 'Fire performance'],
-            [Headphone, 'Psytrance'],
-            [Volume, 'Audio systems'],
-            [Lightbulb, 'LED hardware'],
-            [PenSquare, 'Creative tools'],
-          ].map(([Icon, label]) => (
-            <div key={label} className="flex items-center gap-2 text-sm text-gray-600">
-              <Icon className="shrink-0 text-yellow-400" width={16} height={16} />
-              <span>{label}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          {/* Tech */}
+          <div>
+            <h2 className="flex items-center gap-2 text-sm uppercase tracking-widest text-gray-500 mb-4">
+              <Terminal className="text-accent" width={16} height={16} />
+              Tech
+            </h2>
+            <div className="space-y-1.5">
+              {[
+                [Terminal, 'Python, JS/TS, C#, C++, Java'],
+                [PenSquare, 'React, FastAPI, GraphQL, .NET'],
+                [Cloud, 'AWS, Docker, Terraform, K8s, PostgreSQL'],
+                [Cpu, 'ESP32, PCB design, SMD assembly, LEDs'],
+              ].map(([Icon, text]) => (
+                <div key={text} className="flex items-start gap-2 text-sm text-gray-600">
+                  <Icon className="shrink-0 text-accent mt-0.5" width={16} height={16} />
+                  <span className="leading-snug">{text}</span>
+                </div>
+              ))}
             </div>
-          ))}
+            <p className="text-sm text-gray-400 mt-4">
+              <Link to="/work" className="link-underline">Full projects →</Link>
+            </p>
+          </div>
+
+          {/* Creative */}
+          <div>
+            <h2 className="flex items-center gap-2 text-sm uppercase tracking-widest text-gray-500 mb-4">
+              <Music className="text-accent" width={16} height={16} />
+              Creative
+            </h2>
+            <div className="space-y-1.5">
+              {[
+                [Volume, 'Audio engineering, psytrance production'],
+                [Headphone, 'Ableton Live, music composition'],
+                [Fire, 'Fire spinning, flow arts, LED props'],
+                [Lightbulb, 'Installations, reactive lighting, AV systems'],
+              ].map(([Icon, text]) => (
+                <div key={text} className="flex items-start gap-2 text-sm text-gray-600">
+                  <Icon className="shrink-0 text-accent mt-0.5" width={16} height={16} />
+                  <span className="leading-snug">{text}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-gray-400 mt-4">
+              <Link to="/creative" className="link-underline">Music &amp; hardware →</Link>
+            </p>
+          </div>
         </div>
       </section>
     </div>
