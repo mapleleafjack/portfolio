@@ -14,7 +14,7 @@ export default function Album() {
   if (!album) {
     return (
       <div>
-        <p className="text-sm text-gray-400">Album not found.</p>
+        <p className="text-sm text-gray-500">Album not found.</p>
         <p className="text-sm mt-2"><Link to="/creative">← Back</Link></p>
       </div>
     );
@@ -37,10 +37,10 @@ export default function Album() {
 
   return (
     <div>
-      <p className="text-sm text-gray-400 mb-8"><Link to="/creative">← Creative</Link></p>
+      <p className="text-sm text-gray-500 mb-8"><Link to="/creative">← Creative</Link></p>
 
       <h1 className="text-2xl font-bold mb-1">{album.title}</h1>
-      <p className="text-sm text-gray-500 mb-8">{album.artist}</p>
+      <p className="text-sm text-gray-600 mb-8">{album.artist}</p>
 
       <ol className="list-none p-0 space-y-1 text-sm">
         {album.tracks.map((track, i) => {

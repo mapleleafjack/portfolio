@@ -1,24 +1,294 @@
 @import "tailwindcss";
 
+/* ============================================
+   Base
+   ============================================ */
+
 body {
   margin: 0;
   font-family: 'Oxanium', sans-serif;
-  background: #fff;
+  background: #faf8f5;
   color: #111;
   -webkit-font-smoothing: antialiased;
 }
 
 a {
   color: #111;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
 }
 
 a:hover {
-  color: #666;
+  color: #333;
 }
 
 ::selection {
   background: #111;
   color: #fff;
+}
+
+/* ============================================
+   Link underline — draws left to right on hover
+   ============================================ */
+
+.link-underline {
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 0.35s ease, color 0.35s ease;
+}
+
+.link-underline:hover {
+  background-size: 100% 1px;
+  color: #333;
+}
+
+/* ============================================
+   Staggered letter entrance
+   ============================================ */
+
+.stagger-name {
+  display: inline;
+}
+
+.stagger-char {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.stagger-char-inner {
+  display: inline-block;
+  animation: fadeRise 0.55s ease-out both;
+}
+
+@keyframes fadeRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   Living signal line
+   ============================================ */
+
+.signal-line {
+  height: 1px;
+  background: #4a5b7a;
+  width: 2.5rem;
+  animation: drawLine 1.2s ease-out both, breatheLine 3.5s ease-in-out 1.5s infinite;
+}
+
+@keyframes drawLine {
+  from { width: 0; opacity: 0; }
+  to   { width: 2.5rem; opacity: 1; }
+}
+
+@keyframes breatheLine {
+  0%, 100% { width: 2.5rem; opacity: 0.6; background: #4a5b7a; }
+  35%      { width: 3.5rem; opacity: 1; background: #111; }
+  70%      { width: 1.6rem; opacity: 0.4; background: #6b7d9a; }
+}
+
+/* ============================================
+   Typewriter phrase
+   ============================================ */
+
+.typewriter-text {
+  display: inline;
+}
+
+/* Terminal cursor at end of typed text */
+.typewriter-text::after {
+  content: '';
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  background: #4a5b7a;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: cursorBlink 1s step-end infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+/* ============================================
+   Door cards — Work / Creative
+   ============================================ */
+
+.door-card {
+  display: flex;
+  align-items: baseline;
+  padding: 1rem 0;
+  border-top: 1px solid #e4e0da;
+  transition: padding 0.35s ease, border-color 0.35s ease, background 0.35s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: #111;
+  position: relative;
+}
+
+.door-card:last-child {
+  border-bottom: 1px solid #e4e0da;
+}
+
+.door-card:hover {
+  padding-left: 1rem;
+  color: #111;
+}
+
+/* Accent bar on hover */
+.door-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -1px;
+  bottom: -1px;
+  width: 0;
+  transition: width 0.35s ease;
+}
+
+.door-card:hover::before {
+  width: 3px;
+}
+
+.door-card-work:hover {
+  border-color: #bcc5d4;
+  background: rgba(74, 91, 122, 0.05);
+}
+
+.door-card-work::before {
+  background: #4a5b7a;
+}
+
+.door-card-creative:hover {
+  border-color: #d4c5b4;
+  background: rgba(162, 123, 82, 0.05);
+}
+
+.door-card-creative::before {
+  background: #c49a6c;
+}
+
+/* ============================================
+   Status line
+   ============================================ */
+
+.status-line {
+  text-align: center;
+  font-size: 0.7rem;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  color: #c49a6c;
+  padding: 2rem 0 1.5rem;
+  user-select: none;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c49a6c;
+  margin-right: 5px;
+  vertical-align: middle;
+  animation: ledPulse 2s ease-in-out infinite;
+}
+
+/* ============================================
+   Project preview rows
+   ============================================ */
+
+.project-preview {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid #eee;
+  transition: padding 0.25s ease, background 0.25s ease;
+  cursor: default;
+  text-decoration: none;
+  color: inherit;
+}
+
+.project-preview:hover {
+  padding-left: 0.5rem;
+  background: linear-gradient(90deg, rgba(0,0,0,0.015) 0%, transparent 100%);
+}
+
+.project-preview-year {
+  font-variant-numeric: tabular-nums;
+}
+
+.project-preview:hover .project-preview-name {
+  font-weight: 500;
+}
+
+/* ============================================
+   Page entrance
+   ============================================ */
+
+.page-enter {
+  animation: pageIn 0.45s ease-out both;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   Cursor trail canvas
+   ============================================ */
+
+.cursor-trail {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ============================================
+   Reduced motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .stagger-char {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .signal-line {
+    animation: none;
+    width: 2.5rem;
+    opacity: 1;
+  }
+
+  .rotating-phrase span {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }

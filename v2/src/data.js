@@ -1,3 +1,35 @@
+export const FEATURED_PROJECTS = [
+  {
+    name: 'EGC Comics Intake System',
+    category: 'Work',
+    year: '2025',
+    description: 'Barcode-first workflow for comic grading — React, Python, and PostgreSQL.',
+    url: '/egcdashboard',
+  },
+  {
+    name: 'Vision LED Poi',
+    category: 'Creative',
+    year: '2023–25',
+    description: 'Custom hardware/software performance prop with motion-reactive LEDs.',
+    url: 'https://www.instagram.com/jackmusajo',
+  },
+  {
+    name: 'SlimeChan',
+    category: 'Creative',
+    year: '2025',
+    description: 'LLM-powered interactive slime colony — each slime has its own personality.',
+    url: 'https://www.slimechan.xyz/',
+  },
+];
+
+export const ROTATING_PHRASES = [
+  'building tools',
+  'building interfaces',
+  'building creative systems',
+  'building hardware experiments',
+  'building playful systems',
+];
+
 const brandLogo = (domain) =>
   `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 

@@ -1,26 +1,193 @@
+import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ROTATING_PHRASES } from '../data';
+
+/* ── Magnetic letter name ─────────────────────────────── */
+
+const MAGNET_RADIUS = 60; // px, how close cursor must be
+const MAX_SHIFT = 2.5;    // px, max letter displacement
+const HOVER_SCALE = 1.07;  // subtle zoom when hovering the name
+
+function MagneticName({ text }) {
+  const containerRef = useRef(null);
+  const charRefs = useRef([]);
+  const hoveringRef = useRef(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleMove = (e) => {
+      const rect = el.getBoundingClientRect();
+      const mx = e.clientX;
+      const my = e.clientY;
+
+      charRefs.current.forEach((span) => {
+        if (!span) return;
+        const cr = span.getBoundingClientRect();
+        const cx = cr.left + cr.width / 2;
+        const cy = cr.top + cr.height / 2;
+        const dx = mx - cx;
+        const dy = my - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < MAGNET_RADIUS) {
+          const strength = (1 - dist / MAGNET_RADIUS) * MAX_SHIFT;
+          const angle = Math.atan2(dy, dx);
+          span.style.transform = `translate(${-Math.cos(angle) * strength}px, ${-Math.sin(angle) * strength}px)`;
+        } else if (hoveringRef.current) {
+          span.style.transform = `scale(${HOVER_SCALE})`;
+        }
+      });
+    };
+
+    const handleEnter = () => {
+      hoveringRef.current = true;
+      charRefs.current.forEach((span) => {
+        if (span) span.style.transform = `scale(${HOVER_SCALE})`;
+      });
+    };
+
+    const handleLeave = () => {
+      hoveringRef.current = false;
+      charRefs.current.forEach((span) => {
+        if (span) span.style.transform = '';
+      });
+    };
+
+    el.addEventListener('mouseenter', handleEnter);
+    el.addEventListener('mousemove', handleMove, { passive: true });
+    el.addEventListener('mouseleave', handleLeave);
+    return () => {
+      el.removeEventListener('mouseenter', handleEnter);
+      el.removeEventListener('mousemove', handleMove);
+      el.removeEventListener('mouseleave', handleLeave);
+    };
+  }, []);
+
+  return (
+    <span ref={containerRef} className="stagger-name inline-block cursor-default">
+      {text.split('').map((char, i) => (
+        <span
+          key={i}
+          ref={(el) => { charRefs.current[i] = el; }}
+          className="stagger-char"
+        >
+          <span
+            className="stagger-char-inner"
+            style={{ animationDelay: `${i * 0.04}s` }}
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/* ── Rotating phrase (typewriter) ─────────────────────── */
+
+const TYPE_SPEED = 50;   // ms per character typing
+const DELETE_SPEED = 28; // ms per character deleting
+const PAUSE_AFTER = 1800; // ms pause when phrase fully typed
+
+function RotatingPhrase() {
+  const [text, setText] = useState('');
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = ROTATING_PHRASES[phraseIdx];
+
+    if (!deleting && text === current) {
+      // Fully typed — pause then delete
+      const t = setTimeout(() => setDeleting(true), PAUSE_AFTER);
+      return () => clearTimeout(t);
+    }
+
+    if (deleting && text === '') {
+      // Fully deleted — next phrase
+      setDeleting(false);
+      setPhraseIdx(i => (i + 1) % ROTATING_PHRASES.length);
+      return;
+    }
+
+    const speed = deleting ? DELETE_SPEED : TYPE_SPEED;
+    const t = setTimeout(() => {
+      setText(deleting
+        ? current.slice(0, text.length - 1)
+        : current.slice(0, text.length + 1)
+      );
+    }, speed);
+
+    return () => clearTimeout(t);
+  }, [text, deleting, phraseIdx]);
+
+  return (
+    <span className="typewriter-text text-gray-500">{text}</span>
+  );
+}
+
+/* ── Door card ────────────────────────────────────────── */
+
+function DoorCard({ to, label, subtitle, variant }) {
+  return (
+    <Link
+      to={to}
+      className={`door-card door-card-${variant}`}
+    >
+      <span className="text-sm font-medium">{label}</span>
+      <span className="text-sm text-gray-500 ml-3">{subtitle}</span>
+    </Link>
+  );
+}
+
+/* ── Home ─────────────────────────────────────────────── */
 
 export default function Home() {
   return (
     <div className="py-24">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 mb-16">
+      {/* Hero */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 mb-12">
         <div>
-          <h1 className="text-4xl font-bold mb-4">Jack Musajo</h1>
-          <p className="text-lg text-gray-500">
-            Software Engineer &amp; Creative Technologist
+          <h1 className="text-4xl font-bold mb-4 select-none">
+            <MagneticName text="Jack Musajo" />
+          </h1>
+          <p className="text-lg text-gray-600 max-w-md leading-relaxed mb-1">
+            Software engineer{' '}
+            <RotatingPhrase />
+          </p>
+          <p className="text-sm text-gray-500 max-w-md leading-relaxed">
+            across healthtech, creative coding, hardware, and music.
           </p>
         </div>
-        <div className="text-sm text-gray-400 sm:text-right space-y-1 sm:pt-2">
-          <p><a href="mailto:jack.musajo@gmail.com">jack.musajo@gmail.com</a></p>
-          <p><a href="https://github.com/mapleleafjack" target="_blank" rel="noopener noreferrer">GitHub</a></p>
-          <p><a href="https://www.linkedin.com/in/chakri-musajo-somma" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
+        <div className="text-sm text-gray-500 sm:text-right space-y-1 sm:pt-2">
+          <p><a href="mailto:jack.musajo@gmail.com" className="link-underline">jack.musajo@gmail.com</a></p>
+          <p><a href="https://github.com/mapleleafjack" target="_blank" rel="noopener noreferrer" className="link-underline">GitHub</a></p>
+          <p><a href="https://www.linkedin.com/in/chakri-musajo-somma" target="_blank" rel="noopener noreferrer" className="link-underline">LinkedIn</a></p>
         </div>
       </div>
 
-      <div className="space-y-1 text-sm">
-        <p><Link to="/work">Work</Link> — projects, skills, experience</p>
-        <p><Link to="/creative">Creative</Link> — music, hardware, performance</p>
-      </div>
+      {/* Doors */}
+      <section className="mb-16">
+        <DoorCard to="/work" label="Work" subtitle="projects, systems, product engineering" variant="work" />
+        <DoorCard to="/creative" label="Creative" subtitle="music, hardware, performance, experiments" variant="creative" />
+      </section>
+
+      {/* Summary line */}
+      <section className="mb-16">
+        <p className="text-sm text-gray-600 leading-relaxed">
+          12 years across Python, React, product engineering, healthtech, fintech, and hardware.
+        </p>
+      </section>
+
+      {/* Currently */}
+      <section>
+        <h2 className="text-xs uppercase tracking-widest text-gray-500 mb-4">Currently</h2>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Building freelance tools, creative systems, and hardware experiments. Open to interesting projects in healthtech, developer tooling, and creative technology.
+        </p>
+      </section>
     </div>
   );
 }
