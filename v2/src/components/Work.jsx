@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { BRANDS, KEY_PROJECTS, SIDE_PROJECTS } from '../data';
-import { Briefcase, Folder, Building, ChevronRight, ExternalLink, Close } from 'pixelarticons/react';
+import { BRANDS, KEY_PROJECTS, SIDE_PROJECTS, SKILLS, STRENGTHS, TRANSVERSAL_SKILLS } from '../data';
+import { Briefcase, Folder, Building, ExternalLink, Close } from 'pixelarticons/react';
 
 const normTech = (t) => (t === 'React 19' ? 'React' : t);
 
@@ -47,32 +47,33 @@ function toggleSet(set, value) {
 function ProjectCard({ p, company, logo }) {
   const content = (
     <>
-      {logo && (
-        <img
-          src={logo}
-          alt={company}
-          title={company}
-          className="w-6 h-6 rounded shrink-0 opacity-60 mt-0.5"
-          loading="lazy"
-        />
-      )}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-semibold text-gray-900">{p.name}</span>
-          {p.impact && (
-            <span className="impact-badge">{p.impact}</span>
-          )}
-        </div>
-        <p className="text-sm text-gray-500 mb-2 leading-relaxed">{p.description}</p>
-        <div className="flex flex-wrap gap-1.5">
-          {p.tech.map((t) => (
-            <span key={t} className="tech-pill">{t}</span>
-          ))}
-        </div>
+      <div className="flex items-center gap-1.5 mb-1.5">
+        {logo && (
+          <img
+            src={logo}
+            alt={company}
+            title={company}
+            className="w-4 h-4 rounded-sm shrink-0 opacity-50"
+            loading="lazy"
+          />
+        )}
+        <span className="text-[0.65rem] uppercase tracking-wider text-gray-400 truncate">{company}</span>
       </div>
-      {p.slug && (
-        <ChevronRight className="text-gray-300 group-hover:text-accent shrink-0 transition-colors mt-1" width={16} height={16} />
-      )}
+      <div className="flex items-center gap-1.5 mb-1">
+        <span className="font-semibold text-sm text-gray-900 truncate">{p.name}</span>
+        {p.impact && (
+          <span className="impact-badge">{p.impact}</span>
+        )}
+      </div>
+      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-2">{p.description}</p>
+      <div className="flex flex-wrap gap-1">
+        {p.tech.slice(0, 3).map((t) => (
+          <span key={t} className="tech-pill">{t}</span>
+        ))}
+        {p.tech.length > 3 && (
+          <span className="tech-pill">+{p.tech.length - 3}</span>
+        )}
+      </div>
     </>
   );
 
@@ -221,7 +222,7 @@ export default function Work() {
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {filteredProjects.map((p) => (
               <ProjectCard key={p.name} p={p} company={p.company} logo={p.logo} />
             ))}
@@ -240,17 +241,75 @@ export default function Work() {
             {SIDE_PROJECTS.map((p) => (
               <a
                 key={p.name}
-                href={p.url}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={p.url || '#'}
+                target={p.url ? '_blank' : undefined}
+                rel={p.url ? 'noopener noreferrer' : undefined}
                 className="side-project-card group"
               >
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-sm text-gray-900">{p.name}</span>
-                  <ExternalLink className="text-gray-300 group-hover:text-accent shrink-0 transition-colors" width={12} height={12} />
+                  {p.url && <ExternalLink className="text-gray-300 group-hover:text-accent shrink-0 transition-colors" width={12} height={12} />}
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed">{p.description}</p>
               </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Skills — hidden when filtering */}
+      {!hasFilters && (
+        <section className="mt-14">
+          <h2 className="section-label mb-6">
+            <Briefcase className="text-accent" width={12} height={12} />
+            Skills
+          </h2>
+          <div className="space-y-4">
+            {Object.entries(SKILLS).map(([category, items]) => (
+              <div key={category}>
+                <h3 className="text-xs uppercase tracking-widest text-gray-400 mb-2">{category}</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {items.map((item) => (
+                    <span key={item} className="tech-pill">{item}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Strengths — hidden when filtering */}
+      {!hasFilters && (
+        <section className="mt-14">
+          <h2 className="section-label mb-6">
+            <Briefcase className="text-accent" width={12} height={12} />
+            Strengths
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {STRENGTHS.map((s) => (
+              <div key={s.title} className="project-card">
+                <span className="font-semibold text-sm text-gray-900 mb-1 block">{s.title}</span>
+                <p className="text-xs text-gray-500 leading-relaxed">{s.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Transversal Skills — hidden when filtering */}
+      {!hasFilters && (
+        <section className="mt-14">
+          <h2 className="section-label mb-6">
+            <Briefcase className="text-accent" width={12} height={12} />
+            Transversal Skills
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {TRANSVERSAL_SKILLS.map((s) => (
+              <div key={s.title} className="project-card">
+                <span className="font-semibold text-sm text-gray-900 mb-1 block">{s.title}</span>
+                <p className="text-xs text-gray-500 leading-relaxed">{s.text}</p>
+              </div>
             ))}
           </div>
         </section>

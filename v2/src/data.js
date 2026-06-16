@@ -22,6 +22,9 @@ export const ROTATING_PHRASES = [
   'building hardware experiments',
   'building playful systems',
   'building LED props',
+  'building AI workflows',
+  'building developer tools',
+  'building productivity systems',
 ];
 
 const brandLogo = (domain) =>
@@ -94,6 +97,44 @@ export const KEY_PROJECTS = [
                 'React MFE → GraphQL query → sp-data-provider resolver → Snowflake stored procedure',
                 'Module Federation for micro-frontend integration into the main platform',
                 'Documented the complete data flow and handed over remaining work with full context',
+              ],
+            },
+          ],
+        },
+      },
+      {
+        name: 'Contact Profile System',
+        slug: 'contact-profiles',
+        tech: ['React', 'Python', 'GraphQL', 'Module Federation'],
+        description: 'Cross-MFE contact profiles across 6+ services in 3 languages',
+        detail: {
+          subtitle: 'BlackRock / Preqin — Distributed Contact Profile System',
+          role: 'Senior Software Engineer',
+          period: 'Dec 2024 – present',
+          overview: 'Owned the full contact profile system spanning 6+ services across Python, TypeScript, and C#/.NET — two separate contact databases with no ID mapping, consumed by multiple micro-frontends via Module Federation.',
+          sections: [
+            {
+              title: 'System Scope',
+              items: [
+                'Two contact systems: CI Key Contacts (PostgreSQL via .NET) and Firm Contacts (MongoDB via Python GraphQL) — no shared identifiers',
+                'Cross-MFE Contact Profile Drawer via Module Federation, consumed by both modern and legacy frontends',
+                'Contact Updates, Shared Filters, Business Development Dashboard, Saved Search features',
+                'Hexagonal architecture (ports & adapters) enforced across all backend feature packages',
+              ],
+            },
+            {
+              title: 'Investigations & Incident Response',
+              content: '17+ documented investigations tracing issues across MFE → GraphQL → REST API → MongoDB/PostgreSQL → SharePoint/Snowflake. Handled the SharePoint OAuth Expiry production incident (~3,300 stuck contacts, credential rotation across 5 environments). Each investigation follows a forensic methodology: observe → hypothesise → isolate → verify independently → document.',
+            },
+            {
+              title: 'Knowledge Assets Created',
+              items: [
+                'Contact Data Sources architecture doc — how contacts flow through the platform',
+                'Contacts Ordering Logic — priority rules, sorting, filtering by firm type',
+                'MongoDB Firm Type & Visibility Model — how visibility arrays control contact display',
+                'Portfolio Company Data Architecture — CI schema documentation',
+                'Toast Notifications cross-MFE architecture (4 repos) — published to Confluence',
+                '12+ operational guides: deploy, release, log checking, database access, feature flags',
               ],
             },
           ],
@@ -349,11 +390,12 @@ export const KEY_PROJECTS = [
 
 export const SKILLS = {
   Languages: ['Python', 'JavaScript / TypeScript', 'C#', 'C++', 'Java'],
-  Frameworks: ['React', 'FastAPI', 'GraphQL (Strawberry)', '.NET', 'Next.js'],
-  Infrastructure: ['AWS', 'Terraform', 'Docker', 'Kubernetes', 'PostgreSQL', 'Supabase', 'NextFlow'],
-  Practices: ['Clean Architecture', 'RESTful APIs', 'CI/CD', 'Code Reviews', 'ETL Pipelines'],
+  Frameworks: ['React', 'FastAPI', 'GraphQL (Strawberry)', '.NET', 'Next.js', 'Module Federation', 'Redux Toolkit', 'Rsbuild'],
+  Infrastructure: ['AWS', 'Terraform', 'Docker', 'Kubernetes', 'PostgreSQL', 'Supabase', 'MongoDB', 'Snowflake', 'Elasticsearch', 'TeamCity', 'NextFlow'],
+  Practices: ['Hexagonal Architecture', 'Domain-Driven Design', 'RESTful APIs', 'CI/CD', 'Code Reviews', 'ETL Pipelines', 'MCP (Model Context Protocol)'],
+  'AI & Automation': ['RAG Pipelines', 'LLM Integration', 'MCP Integration', 'AI Workflow Automation', 'Prompt Engineering', 'OpenAI API'],
   Hardware: ['Arduino / ESP32', 'PCB Design (EasyEDA)', 'SMD Assembly', 'Addressable LEDs', 'Sensors & Gyroscopes'],
-  Other: ['AI / LLM Integration', 'Barcode Recognition', 'Lab Automation', 'Android', 'Linux'],
+  Other: ['Barcode Recognition', 'Lab Automation', 'Android', 'Linux'],
 };
 
 export const SIDE_PROJECTS = [
@@ -378,7 +420,11 @@ export const SIDE_PROJECTS = [
     name: 'BMO',
     url: 'https://github.com/mapleleafjack/BMO',
     github: 'https://github.com/mapleleafjack/BMO',
-    description: 'ESP32 microcontroller project with display and I²C peripheral integration',
+    description: 'Autonomous AI companion — ESP32 hardware with OLED display, GPT agent loop, Spotify control, RAG knowledge base, TTS, and macOS menu bar app',
+  },
+  {
+    name: 'Obsidian Productivity OS',
+    description: 'Full developer productivity system — live Jira/Bitbucket/TeamCity dashboard, automated daily logging via AI, objective tracking for performance reviews, 7+ custom AI workflows, and ADHD-informed design principles',
   },
 ];
 
@@ -443,10 +489,19 @@ export const PRINCIPLES = [
 ];
 
 export const STRENGTHS = [
-  { title: 'Debugging & Investigation', text: 'I thrive on the clue → hypothesis → test → result loop. Production incidents and tricky bugs energise me.' },
-  { title: 'Pattern Recognition', text: 'I naturally spot connections across seemingly unrelated systems. Useful for architecture and root cause analysis.' },
-  { title: 'Rapid Prototyping', text: 'I default to building. A working prototype surfaces problems faster than a spec ever will.' },
-  { title: 'Documentation & Knowledge', text: 'I obsessively document systems, decisions, and runbooks — because future-me will forget everything.' },
+  { title: 'Forensic Debugging', text: 'I thrive on the clue → hypothesis → test → result loop. 17+ documented investigations tracing issues across 5–6 services in Python, C#, and TypeScript in a single session.' },
+  { title: 'Cross-Stack Fluency', text: 'I routinely trace data across MFE → GraphQL → REST API → MongoDB/PostgreSQL → Snowflake without treating any language or system as a boundary.' },
+  { title: 'Rapid Prototyping', text: 'I default to building. A working prototype surfaces problems faster than a spec ever will. Crisis performance is an ADHD superpower — real stakes unlock deep focus.' },
+  { title: 'Knowledge Externalisation', text: 'I compulsively extract knowledge into reusable assets. 12+ published guides, 4+ architecture docs, 9 code review patterns — institutional memory that outlives any ticket.' },
+];
+
+export const TRANSVERSAL_SKILLS = [
+  { title: 'Developer Experience Engineering', text: 'I identify friction in engineering workflows and build tools to remove it — deploy automation, AI workflows, PR checklists, local testing guides. I think about the developer as a user.' },
+  { title: 'Toil Elimination', text: 'When I encounter a manual process, I build a tool. TeamCity deploys became slash commands. Jira ticket reading became an MCP integration. Daily note management became an automated dashboard.' },
+  { title: 'Stakeholder Translation', text: 'I turn engineering complexity into decision frameworks — data gap comparison tables, effort estimates, clear recommendations. Technical writing that non-technical readers can act on.' },
+  { title: 'Process Codification', text: 'I take informal team practices and codify them into explicit, referenceable standards — PR checklists, team ways of working, code review lessons with examples and anti-patterns.' },
+  { title: 'Migration-Aware Architecture', text: 'I hold both current-state and target-state simultaneously. Build what\'s right for today\'s delivery while documenting the migration path to the target architecture.' },
+  { title: 'Cognitive Workflow Design', text: 'I designed my entire productivity system around neurodivergent needs — externalising working memory, automating admin, embedding emotional regulation into tooling. Engineering applied to how you work, not just what you build.' },
 ];
 
 export const COLLABORATION = [

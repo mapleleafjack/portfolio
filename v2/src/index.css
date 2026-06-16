@@ -183,6 +183,7 @@ a:hover {
   border-radius: 9999px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   text-decoration: none;
+  background: #ffffff;
 }
 
 .brand-chip:hover {
@@ -193,19 +194,20 @@ a:hover {
 
 .brand-chip--filter {
   cursor: pointer;
-  background: none;
+  background: #ffffff;
   font-family: inherit;
 }
 
 .brand-chip--active {
   border-color: var(--accent);
-  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.1);
+  background: #fdf6e3;
   color: #111;
   box-shadow: 0 0 0 1px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
 }
 
 .brand-chip--dimmed {
   opacity: 0.4;
+  background: #ffffff;
 }
 
 .brand-chip--dimmed:hover {
@@ -217,18 +219,14 @@ a:hover {
    ============================================ */
 
 .project-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem 1.15rem;
+  display: block;
+  padding: 0.75rem 0.85rem;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 0.75rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   text-decoration: none;
   color: inherit;
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #ffffff;
 }
 
 .project-card:hover {
@@ -264,7 +262,7 @@ a:hover {
 }
 
 .tech-pill--active {
-  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12);
+  background: #fdf6e3;
   color: var(--accent);
   border-color: var(--accent);
   font-weight: 600;
@@ -284,7 +282,7 @@ a:hover {
   font-size: 0.7rem;
   font-weight: 600;
   color: var(--accent);
-  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.1);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
   padding: 0.1rem 0.55rem;
   border-radius: 9999px;
   white-space: nowrap;
@@ -302,9 +300,7 @@ a:hover {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   text-decoration: none;
   color: inherit;
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #ffffff;
 }
 
 .side-project-card:hover {

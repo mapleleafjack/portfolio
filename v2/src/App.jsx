@@ -31,9 +31,6 @@ export default function App() {
           <Route path="/creative" element={<PageWrapper><Creative /></PageWrapper>} />
           <Route path="/creative/:slug" element={<PageWrapper><Album /></PageWrapper>} />
         </Routes>
-        <footer className="status-line">
-          <span className="status-dot" /> open to projects &amp; collaborations
-        </footer>
       </main>
     </BrowserRouter>
   );

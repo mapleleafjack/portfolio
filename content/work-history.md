@@ -3,10 +3,16 @@
 ## Professional Experience
 
 ### BlackRock (Current)
-**Role:** Software Engineer
+**Role:** Software Engineer (Associate 3), ALADDIN Product Engineering — Private Markets — Preqin Engineering
 
 - Developed an LPA Extractor solution using LLM (RAG Chain) — reduced time for extracting economic terms from **6 hours to 1 hour** per LPA for lawyers
 - Migrated software solutions from PowerBI to React/Python (Term Intelligence) with focus on clean code and tests — delivered a polished end-user product replacing a temporary PowerBI solution
+- Owned the full Contact Profile System spanning 6+ services across Python, TypeScript, and C#/.NET — two separate contact databases, cross-MFE drawer via Module Federation, 17+ documented investigations
+- Handled SharePoint OAuth Expiry production incident (~3,300 stuck contacts, credential rotation across 5 environments)
+- Adapted BlackRock's internal AI framework (BreadKit) for Preqin — built Atlassian MCP integration from scratch, published 8+ reusable AI workflows, created team workspace and shared module
+- Published 12+ operational guides and 4+ architecture docs to Confluence — deploy guides, log checking, database access, feature flags, toast notifications architecture
+- Authored team PR checklist, team ways of working doc, code review lessons (9 patterns with examples)
+- Early adopter and power user of AI tooling — daily Windsurf usage, custom deploy automation, investigation saver, objective evidence tracking
 - Active participation in team dynamics, deciding technology and code guidelines
 
 ---
@@ -61,39 +67,69 @@
 - C#
 - C++
 - Java
-- SCSS
 
-### Frameworks & Tools
-- React
-- Clean Architecture
-- RESTful APIs
-- PostgreSQL
-- AWS
-- Terraform
-- NextFlow
-- Arduino / ESP32
-- Android
-- Linux OS
-- GitHub / Bitbucket
-- CI/CD / QA checks (GitHub hooks)
-- Code Reviews
+### Frameworks
+- React, Module Federation, Redux Toolkit, Rsbuild
+- FastAPI, GraphQL (Strawberry), .NET, Next.js
+
+### Infrastructure
+- AWS, Terraform, Docker, Kubernetes
+- PostgreSQL, Supabase, MongoDB, Snowflake, Elasticsearch
+- TeamCity, NextFlow
+
+### Practices
+- Hexagonal Architecture, Domain-Driven Design
+- RESTful APIs, CI/CD, Code Reviews, ETL Pipelines
+- MCP (Model Context Protocol)
+
+### AI & Automation
+- RAG Pipelines, LLM Integration, MCP Integration
+- AI Workflow Automation, Prompt Engineering, OpenAI API
+
+### Hardware
+- Arduino / ESP32, PCB Design (EasyEDA), SMD Assembly
+- Addressable LEDs, Sensors & Gyroscopes
+
+---
+
+## Strengths
+
+- **Forensic Debugging** — 17+ documented investigations tracing issues across 5–6 services in Python, C#, and TypeScript in a single session
+- **Cross-Stack Fluency** — routinely trace data across MFE → GraphQL → REST API → MongoDB/PostgreSQL → Snowflake without treating any language or system as a boundary
+- **Rapid Prototyping** — default to building; crisis performance is an ADHD superpower
+- **Knowledge Externalisation** — 12+ published guides, 4+ architecture docs, 9 code review patterns — institutional memory that outlives any ticket
+
+## Transversal Skills
+
+- **Developer Experience Engineering** — identify friction in engineering workflows and build tools to remove it
+- **Toil Elimination** — TeamCity deploys became slash commands, Jira reading became MCP integration, daily notes became automated dashboard
+- **Stakeholder Translation** — turn engineering complexity into decision frameworks non-technical readers can act on
+- **Process Codification** — turn informal team practices into explicit, referenceable standards
+- **Migration-Aware Architecture** — hold both current-state and target-state simultaneously
+- **Cognitive Workflow Design** — entire productivity system designed around neurodivergent needs
 
 ---
 
 ## Side Projects
 
-### Glypho
-**Website:** [glypho.xyz](https://www.glypho.xyz/)
+### EsPoi — LED Poi
+**GitHub:** [github.com/mapleleafjack/EsPoi](https://github.com/mapleleafjack/EsPoi)
+- Custom ESP32 LED juggling prop with gyro-reactive effects, BLE control, and POV animation
 
 ### SlimeChan
 **Website:** [slimechan.xyz](https://www.slimechan.xyz/) | **GitHub:** [github.com/mapleleafjack/slime-chan](https://github.com/mapleleafjack/slime-chan)
-- Uses LLM to interact with a group of slimes — a fun, creative AI project
+- LLM-powered interactive slime colony — each slime has its own personality
 
-### LED Juggling Prop Base
-- Custom hardware project — designed PCB schematic for LED juggling props
+### Glypho
+**Website:** [glypho.xyz](https://www.glypho.xyz/)
+- Creative web experiment exploring generative art and typography
 
-### ESP Visualiser
-- ESP32-based audio/visual project
+### BMO
+**GitHub:** [github.com/mapleleafjack/BMO](https://github.com/mapleleafjack/BMO)
+- Autonomous AI companion — ESP32 hardware with OLED display, GPT agent loop, Spotify control, RAG knowledge base, TTS, and macOS menu bar app
+
+### Obsidian Productivity OS
+- Full developer productivity system — live Jira/Bitbucket/TeamCity dashboard, automated daily logging via AI, objective tracking for performance reviews, 7+ custom AI workflows, and ADHD-informed design principles
 
 ---
 
@@ -103,6 +139,9 @@
 |---|---|
 | LPA Extractor (BlackRock) | Reduced extraction time from **6 hours → 1 hour** per document for lawyers |
 | Term Intelligence (BlackRock) | Replaced temporary PowerBI solution with polished React/Python product |
+| Contact Profile System (BlackRock) | Owned cross-MFE contact system spanning 6+ services, 17+ investigations |
+| AI Dev Workflows (BlackRock) | 8+ reusable AI workflows, MCP integration, team-wide adoption |
+| SharePoint OAuth Incident (BlackRock) | Production incident response — 3,300 contacts, 5 environments |
 | Housing Repairs SaaS (Made Tech) | First SaaS product — removed barriers between suppliers and tenants |
 | Hackney Social Care Restore (Made Tech) | Rebuilt critical public service after cyberattack |
 | Bio Pipeline Automation (Sano) | Replaced manual local scripts with automated cloud workflows |

@@ -12,7 +12,6 @@ export default function ThreeBackground() {
 
     // Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#ffffff');
 
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -22,7 +21,8 @@ export default function ThreeBackground() {
     );
     camera.position.z = 5;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
@@ -134,7 +134,7 @@ export default function ThreeBackground() {
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 0,
+        zIndex: -1,
         pointerEvents: 'none',
       }}
     />
