@@ -26,6 +26,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+nav,
+main {
+  position: relative;
+  z-index: 1;
+}
+
+nav {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
 a {
   color: #0a0a0a;
   text-decoration: none;
@@ -179,6 +191,27 @@ a:hover {
   color: #111;
 }
 
+.brand-chip--filter {
+  cursor: pointer;
+  background: none;
+  font-family: inherit;
+}
+
+.brand-chip--active {
+  border-color: var(--accent);
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.1);
+  color: #111;
+  box-shadow: 0 0 0 1px rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.2);
+}
+
+.brand-chip--dimmed {
+  opacity: 0.4;
+}
+
+.brand-chip--dimmed:hover {
+  opacity: 0.8;
+}
+
 /* ============================================
    Project cards
    ============================================ */
@@ -188,11 +221,14 @@ a:hover {
   align-items: flex-start;
   gap: 1rem;
   padding: 1rem 1.15rem;
-  border: 1px solid #f0f0f0;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 0.75rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   text-decoration: none;
   color: inherit;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .project-card:hover {
@@ -216,6 +252,32 @@ a:hover {
   line-height: 1.4;
 }
 
+.tech-pill--filter {
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+}
+
+.tech-pill--filter:hover {
+  border-color: #d1d5db;
+}
+
+.tech-pill--active {
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.tech-pill--dimmed {
+  opacity: 0.4;
+}
+
+.tech-pill--dimmed:hover {
+  opacity: 0.8;
+}
+
 .impact-badge {
   display: inline-flex;
   align-items: center;
@@ -235,11 +297,14 @@ a:hover {
 .side-project-card {
   display: block;
   padding: 0.85rem 1rem;
-  border: 1px solid #f0f0f0;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 0.75rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   text-decoration: none;
   color: inherit;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .side-project-card:hover {

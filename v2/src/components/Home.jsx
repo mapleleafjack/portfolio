@@ -1,7 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ROTATING_PHRASES } from '../data';
-import { Cpu, Fire, Headphone, Volume, Lightbulb, PenSquare, Terminal, Cloud, Music } from 'pixelarticons/react';
 
 /* ── Magnetic letter name ─────────────────────────────── */
 
@@ -153,59 +151,6 @@ export default function Home() {
           <p><a href="https://www.linkedin.com/in/chakri-musajo-somma" target="_blank" rel="noopener noreferrer" className="link-underline">LinkedIn</a></p>
         </div>
       </div>
-
-      {/* Skills */}
-      <section className="mb-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-          {/* Tech */}
-          <div>
-            <h2 className="flex items-center gap-2 text-sm uppercase tracking-widest text-gray-500 mb-4">
-              <Terminal className="text-accent" width={16} height={16} />
-              Tech
-            </h2>
-            <div className="space-y-1.5">
-              {[
-                [Terminal, 'Python, JS/TS, C#, C++, Java'],
-                [PenSquare, 'React, FastAPI, GraphQL, .NET'],
-                [Cloud, 'AWS, Docker, Terraform, K8s, PostgreSQL'],
-                [Cpu, 'ESP32, PCB design, SMD assembly, LEDs'],
-              ].map(([Icon, text]) => (
-                <div key={text} className="flex items-start gap-2 text-sm text-gray-600">
-                  <Icon className="shrink-0 text-accent mt-0.5" width={16} height={16} />
-                  <span className="leading-snug">{text}</span>
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-gray-400 mt-4">
-              <Link to="/work" className="link-underline">Full projects →</Link>
-            </p>
-          </div>
-
-          {/* Creative */}
-          <div>
-            <h2 className="flex items-center gap-2 text-sm uppercase tracking-widest text-gray-500 mb-4">
-              <Music className="text-accent" width={16} height={16} />
-              Creative
-            </h2>
-            <div className="space-y-1.5">
-              {[
-                [Volume, 'Audio engineering, psytrance production'],
-                [Headphone, 'Ableton Live, music composition'],
-                [Fire, 'Fire spinning, flow arts, LED props'],
-                [Lightbulb, 'Installations, reactive lighting, AV systems'],
-              ].map(([Icon, text]) => (
-                <div key={text} className="flex items-start gap-2 text-sm text-gray-600">
-                  <Icon className="shrink-0 text-accent mt-0.5" width={16} height={16} />
-                  <span className="leading-snug">{text}</span>
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-gray-400 mt-4">
-              <Link to="/creative" className="link-underline">Music &amp; hardware →</Link>
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

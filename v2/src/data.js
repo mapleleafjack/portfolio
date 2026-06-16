@@ -44,6 +44,7 @@ export const BRANDS = [
 export const KEY_PROJECTS = [
   {
     company: 'BlackRock',
+    clients: ['BlackRock'],
     projects: [
       {
         name: 'LPA Extractor',
@@ -132,6 +133,7 @@ export const KEY_PROJECTS = [
   },
   {
     company: 'Made Tech',
+    clients: ['Made Tech', 'Gov.UK', 'Hackney Council', 'Camden Council'],
     projects: [
       {
         name: 'Housing Repairs SaaS',
@@ -189,6 +191,7 @@ export const KEY_PROJECTS = [
   },
   {
     company: 'Engage Hub',
+    clients: ['Engage Hub', 'Bank of Ireland', 'Hermes / Evri'],
     projects: [
       {
         name: 'Dragon Platform',
@@ -226,6 +229,7 @@ export const KEY_PROJECTS = [
   },
   {
     company: 'Sano Genetics',
+    clients: ['Sano Genetics'],
     projects: [
       {
         name: 'Bio Pipeline Automation',
@@ -263,6 +267,7 @@ export const KEY_PROJECTS = [
   },
   {
     company: 'Sixs',
+    clients: ['Sixs'],
     projects: [
       {
         name: 'Social Care System',
@@ -295,6 +300,7 @@ export const KEY_PROJECTS = [
   },
   {
     company: 'EGC (Freelance)',
+    clients: ['EGC'],
     projects: [
       {
         name: 'Grading Management System',
