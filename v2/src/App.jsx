@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Nav from './components/Nav';
 import Home from './components/Home';
 import Work from './components/Work';
+import Project from './components/Project';
 import Creative from './components/Creative';
 import Album from './components/Album';
 import CursorTrail from './components/CursorTrail';
@@ -24,6 +25,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
           <Route path="/work" element={<PageWrapper><Work /></PageWrapper>} />
+          <Route path="/work/:slug" element={<PageWrapper><Project /></PageWrapper>} />
           <Route path="/creative" element={<PageWrapper><Creative /></PageWrapper>} />
           <Route path="/creative/:slug" element={<PageWrapper><Album /></PageWrapper>} />
         </Routes>
