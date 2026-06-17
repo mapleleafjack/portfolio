@@ -131,24 +131,28 @@ function RotatingPhrase() {
 
 export default function Home() {
   return (
-    <div className="py-16 sm:py-24">
+    <div className="flex-1 flex flex-col justify-center">
       {/* Hero */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 mb-14">
-        <div>
-          <h1 className="text-5xl sm:text-6xl font-bold mb-5 select-none leading-none tracking-tight">
-            <MagneticName text="Jack Musajo" />
-          </h1>
-          <p className="text-base sm:text-lg text-gray-500 leading-relaxed mb-0.5">
-            Software engineer
-          </p>
-          <p className="text-base sm:text-lg text-gray-400 leading-relaxed min-h-[1.6em]">
-            <RotatingPhrase />
-          </p>
-        </div>
-        <div className="text-sm text-gray-400 sm:text-right space-y-1 sm:pt-3">
-          <p><a href="mailto:jack.musajo@gmail.com" className="link-underline">jack.musajo@gmail.com</a></p>
-          <p><a href="https://github.com/mapleleafjack" target="_blank" rel="noopener noreferrer" className="link-underline">GitHub</a></p>
-          <p><a href="https://www.linkedin.com/in/chakri-musajo-somma" target="_blank" rel="noopener noreferrer" className="link-underline">LinkedIn</a></p>
+      <div className="flex flex-col items-center text-center">
+        <h1 className="mb-6 select-none leading-none">
+          <img
+            src="/images/jackmusajo_black.png"
+            alt="Jack Musajo"
+            className="h-32 sm:h-44 w-auto"
+          />
+        </h1>
+        <p className="text-base sm:text-lg text-gray-500 leading-relaxed mb-0.5">
+          Software engineer
+        </p>
+        <p className="text-base sm:text-lg text-gray-400 leading-relaxed min-h-[1.6em] mb-6">
+          <RotatingPhrase />
+        </p>
+        <div className="flex gap-4 text-sm text-gray-400">
+          <a href="mailto:jack.musajo@gmail.com" className="link-underline">Email</a>
+          <span className="text-gray-300">·</span>
+          <a href="https://github.com/mapleleafjack" target="_blank" rel="noopener noreferrer" className="link-underline">GitHub</a>
+          <span className="text-gray-300">·</span>
+          <a href="https://www.linkedin.com/in/chakri-musajo-somma" target="_blank" rel="noopener noreferrer" className="link-underline">LinkedIn</a>
         </div>
       </div>
     </div>

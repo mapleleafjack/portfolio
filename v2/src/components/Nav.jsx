@@ -4,7 +4,7 @@ export default function Nav() {
   const { pathname } = useLocation();
 
   return (
-    <nav className="max-w-2xl mx-auto px-6 pt-4 sm:pt-6 pb-4 flex flex-wrap items-baseline gap-x-6 gap-y-1 text-sm">
+    <nav className="px-6 sm:px-10 pt-4 sm:pt-6 pb-4 flex flex-wrap items-baseline gap-x-6 gap-y-1 text-sm">
       <Link to="/" className="font-semibold link-underline mr-auto flex items-center gap-2">
         <img src="/images/octopus_bw.png" alt="" className="w-5 h-5 opacity-70 invert" />
         Jack Musajo

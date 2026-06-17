@@ -22,16 +22,16 @@ export default function App() {
       <ColorShift />
       <ThreeBackground />
       <CursorTrail />
+      <div className="h-dvh flex flex-col overflow-hidden">
       <Nav />
-      <main className="max-w-2xl mx-auto px-6 py-8 sm:py-12">
-        <Routes>
-          <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-          <Route path="/work" element={<PageWrapper><Work /></PageWrapper>} />
-          <Route path="/work/:slug" element={<PageWrapper><Project /></PageWrapper>} />
-          <Route path="/creative" element={<PageWrapper><Creative /></PageWrapper>} />
-          <Route path="/creative/:slug" element={<PageWrapper><Album /></PageWrapper>} />
-        </Routes>
-      </main>
+      <Routes>
+        <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+        <Route path="/work" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Work /></PageWrapper></main>} />
+        <Route path="/work/:slug" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Project /></PageWrapper></main>} />
+        <Route path="/creative" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Creative /></PageWrapper></main>} />
+        <Route path="/creative/:slug" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Album /></PageWrapper></main>} />
+      </Routes>
+      </div>
     </BrowserRouter>
   );
 }

@@ -13,6 +13,13 @@ export const FEATURED_PROJECTS = [
     description: 'LLM-powered interactive slime colony — each slime has its own personality.',
     url: 'https://www.slimechan.xyz/',
   },
+  {
+    name: 'DnaVST',
+    category: 'Creative',
+    year: '2025',
+    description: 'Audio-responsive DNA visualisation — real-time 3D helix VST plugin built with C++ and JUCE.',
+    url: 'https://github.com/mapleleafjack/DnaVST',
+  },
 ];
 
 export const ROTATING_PHRASES = [
@@ -25,6 +32,7 @@ export const ROTATING_PHRASES = [
   'building AI workflows',
   'building developer tools',
   'building productivity systems',
+  'building audio plugins',
 ];
 
 const brandLogo = (domain) =>
@@ -390,12 +398,12 @@ export const KEY_PROJECTS = [
 
 export const SKILLS = {
   Languages: ['Python', 'JavaScript / TypeScript', 'C#', 'C++', 'Java'],
-  Frameworks: ['React', 'FastAPI', 'GraphQL (Strawberry)', '.NET', 'Next.js', 'Module Federation', 'Redux Toolkit', 'Rsbuild'],
+  Frameworks: ['React', 'FastAPI', 'GraphQL (Strawberry)', '.NET', 'Next.js', 'Module Federation', 'Redux Toolkit', 'Rsbuild', 'JUCE'],
   Infrastructure: ['AWS', 'Terraform', 'Docker', 'Kubernetes', 'PostgreSQL', 'Supabase', 'MongoDB', 'Snowflake', 'Elasticsearch', 'TeamCity', 'NextFlow'],
   Practices: ['Hexagonal Architecture', 'Domain-Driven Design', 'RESTful APIs', 'CI/CD', 'Code Reviews', 'ETL Pipelines', 'MCP (Model Context Protocol)'],
   'AI & Automation': ['RAG Pipelines', 'LLM Integration', 'MCP Integration', 'AI Workflow Automation', 'Prompt Engineering', 'OpenAI API'],
   Hardware: ['Arduino / ESP32', 'PCB Design (EasyEDA)', 'SMD Assembly', 'Addressable LEDs', 'Sensors & Gyroscopes'],
-  Other: ['Barcode Recognition', 'Lab Automation', 'Android', 'Linux'],
+  Other: ['Barcode Recognition', 'Lab Automation', 'Android', 'Linux', 'VST / Audio Plugins'],
 };
 
 export const SIDE_PROJECTS = [
@@ -425,6 +433,12 @@ export const SIDE_PROJECTS = [
   {
     name: 'Obsidian Productivity OS',
     description: 'Full developer productivity system — live Jira/Bitbucket/TeamCity dashboard, automated daily logging via AI, objective tracking for performance reviews, 7+ custom AI workflows, and ADHD-informed design principles',
+  },
+  {
+    name: 'DnaVST',
+    url: 'https://github.com/mapleleafjack/DnaVST',
+    github: 'https://github.com/mapleleafjack/DnaVST',
+    description: 'Audio-responsive DNA visualisation VST plugin — real-time 3D helix reacting to audio input, built with C++ and JUCE',
   },
 ];
 
@@ -477,6 +491,7 @@ export const HARDWARE_ITEMS = [
   'BLE wireless control and OTA firmware updates',
   'Raspberry Pi for AV and generative audio',
   'OLED displays and companion robots',
+  'VST audio plugin development with JUCE (C++)',
 ];
 
 export const PRINCIPLES = [
