@@ -3,6 +3,13 @@ import * as THREE from 'three';
 
 const NUM_CUBES = 35;
 
+// Read the current accent colour from CSS custom properties
+function getAccentColor() {
+  const style = getComputedStyle(document.documentElement);
+  const hex = style.getPropertyValue('--accent').trim() || '#f0c830';
+  return new THREE.Color(hex);
+}
+
 export default function ThreeBackground() {
   const containerRef = useRef(null);
 
@@ -27,18 +34,35 @@ export default function ThreeBackground() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
+    // Scene group — we rotate this on drag instead of moving the camera
+    const sceneGroup = new THREE.Group();
+    scene.add(sceneGroup);
+    const sceneRotation = { x: 0, y: 0 };       // target rotation
+    const smoothRotation = { x: 0, y: 0 };      // current (lerped)
+
+    // Raycaster for hover detection
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2(-999, -999);
+    let hoveredCube = null;
+
     // Create cubes
     const cubes = [];
+    const accentColor = getAccentColor();
+
     for (let i = 0; i < NUM_CUBES; i++) {
       const size = 0.3 + Math.random() * 0.5;
       const geometry = new THREE.BoxGeometry(size, size, size);
 
+      // ~20% of cubes get a hint of the accent colour
+      const hasAccent = Math.random() < 0.2;
       const isLight = Math.random() > 0.5;
-      const color = isLight ? '#555555' : '#0a0a0a';
+      const baseColor = hasAccent
+        ? accentColor.clone().lerp(new THREE.Color(isLight ? '#555555' : '#0a0a0a'), 0.6)
+        : new THREE.Color(isLight ? '#555555' : '#0a0a0a');
       const opacity = 0.15 + Math.random() * 0.35;
 
       const material = new THREE.MeshBasicMaterial({
-        color,
+        color: baseColor,
         wireframe: true,
         transparent: true,
         opacity,
@@ -70,28 +94,135 @@ export default function ThreeBackground() {
         idlePhase: Math.random() * Math.PI * 2,
         idleSpeed: 0.2 + Math.random() * 0.3,
         basePosition: { x, y, z },
+        baseColor: baseColor.clone(),
+        baseOpacity: opacity,
+        hoverLerp: 0,       // 0 = idle, 1 = fully hovered
       };
 
-      scene.add(cube);
+      sceneGroup.add(cube);
       cubes.push(cube);
     }
+
+    // ── Pointer tracking ──────────────────────────────────
+    const handlePointerMove = (e) => {
+      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    };
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+
+    // ── Cmd/Ctrl + drag (desktop) ─────────────────────────
+    let isDragging = false;
+    const lastDrag = { x: 0, y: 0 };
+
+    const handlePointerDown = (e) => {
+      if (e.button === 0 && (e.metaKey || e.ctrlKey)) {
+        isDragging = true;
+        lastDrag.x = e.clientX;
+        lastDrag.y = e.clientY;
+        e.preventDefault();
+      }
+    };
+    const handlePointerUp = () => { isDragging = false; };
+    const handleDragMove = (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - lastDrag.x;
+      const dy = e.clientY - lastDrag.y;
+      sceneRotation.y += dx * 0.005;
+      sceneRotation.x += dy * 0.005;
+      lastDrag.x = e.clientX;
+      lastDrag.y = e.clientY;
+    };
+
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointermove', handleDragMove, { passive: true });
+
+    // ── Two-finger drag (touch) ───────────────────────────
+    let touchDragging = false;
+    const lastTouch = { x: 0, y: 0 };
+
+    const handleTouchStart = (e) => {
+      if (e.touches.length === 2) {
+        touchDragging = true;
+        const mid = midpoint(e.touches);
+        lastTouch.x = mid.x;
+        lastTouch.y = mid.y;
+      }
+    };
+    const handleTouchMove = (e) => {
+      if (!touchDragging || e.touches.length !== 2) return;
+      e.preventDefault();
+      const mid = midpoint(e.touches);
+      sceneRotation.y += (mid.x - lastTouch.x) * 0.005;
+      sceneRotation.x += (mid.y - lastTouch.y) * 0.005;
+      lastTouch.x = mid.x;
+      lastTouch.y = mid.y;
+    };
+    const handleTouchEnd = (e) => {
+      if (e.touches.length < 2) touchDragging = false;
+    };
+
+    function midpoint(touches) {
+      return {
+        x: (touches[0].clientX + touches[1].clientX) / 2,
+        y: (touches[0].clientY + touches[1].clientY) / 2,
+      };
+    }
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     // Animation loop
     let animationId;
     let t = 0;
     const clock = new THREE.Clock();
+    const accent = getAccentColor();
 
     const animate = () => {
       animationId = requestAnimationFrame(animate);
       const dt = clock.getDelta();
       t += dt;
 
+      // Gentle automatic drift (pauses while user is dragging)
+      if (!isDragging && !touchDragging) {
+        sceneRotation.y += 0.0008;
+        sceneRotation.x += Math.sin(t * 0.15) * 0.00012;
+      }
+
+      // Smoothly lerp scene rotation (with damping / inertia feel)
+      smoothRotation.x += (sceneRotation.x - smoothRotation.x) * 0.08;
+      smoothRotation.y += (sceneRotation.y - smoothRotation.y) * 0.08;
+      sceneGroup.rotation.x = smoothRotation.x;
+      sceneGroup.rotation.y = smoothRotation.y;
+
+      // Raycast for hover
+      raycaster.setFromCamera(pointer, camera);
+      const intersects = raycaster.intersectObjects(cubes);
+      hoveredCube = intersects.length > 0 ? intersects[0].object : null;
+
       cubes.forEach((cube) => {
         const d = cube.userData;
+        const isHovered = cube === hoveredCube;
 
-        // Gentle spin
-        const q = new THREE.Quaternion().setFromAxisAngle(d.spinAxis, d.spinSpeed);
+        // Smooth hover lerp
+        const hoverTarget = isHovered ? 1 : 0;
+        d.hoverLerp += (hoverTarget - d.hoverLerp) * (isHovered ? 0.12 : 0.06);
+
+        // Spin — faster on hover
+        const spinSpeed = d.spinSpeed + d.hoverLerp * 0.04;
+        const q = new THREE.Quaternion().setFromAxisAngle(d.spinAxis, spinSpeed);
         cube.quaternion.multiply(q);
+
+        // Scale — subtle grow on hover
+        const s = 1 + d.hoverLerp * 0.35;
+        cube.scale.setScalar(s);
+
+        // Colour — lerp toward accent on hover
+        cube.material.color.copy(d.baseColor).lerp(accent, d.hoverLerp * 0.7);
+
+        // Opacity — brighten on hover
+        cube.material.opacity = d.baseOpacity + d.hoverLerp * 0.35;
 
         // Gentle idle sway
         cube.position.x = d.basePosition.x + Math.sin(t * d.idleSpeed * 0.4 + d.idlePhase) * 0.05;
@@ -116,10 +247,17 @@ export default function ThreeBackground() {
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointermove', handleDragMove);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
       cubes.forEach((cube) => {
         cube.geometry.dispose();
         cube.material.dispose();
-        scene.remove(cube);
+        sceneGroup.remove(cube);
       });
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
@@ -134,7 +272,7 @@ export default function ThreeBackground() {
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: -1,
+        zIndex: 0,
         pointerEvents: 'none',
       }}
     />

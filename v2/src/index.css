@@ -33,9 +33,16 @@ main {
 }
 
 nav {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: transparent;
+}
+
+main {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 1.5rem 1.5rem 0 0;
+  margin-top: 0.5rem;
+  box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.04);
 }
 
 a {
@@ -162,10 +169,19 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #6b7280;
+  letter-spacing: 0.12em;
+  color: #374151;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent);
+  margin-left: 0.75rem;
 }
 
 /* ============================================
@@ -220,19 +236,23 @@ a:hover {
 
 .project-card {
   display: block;
-  padding: 0.75rem 0.85rem;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 1.25rem 1.35rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left: 3px solid rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.35);
   border-radius: 0.75rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
   text-decoration: none;
   color: inherit;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .project-card:hover {
-  border-color: #ddd;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transform: translateY(-1px);
+  border-left-color: var(--accent);
+  border-color: rgba(0, 0, 0, 0.12);
+  border-left-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.95);
   color: inherit;
 }
 
@@ -242,12 +262,13 @@ a:hover {
 
 .tech-pill {
   display: inline-block;
-  font-size: 0.68rem;
-  color: #6b7280;
-  background: #f3f4f6;
-  padding: 0.15rem 0.5rem;
+  font-size: 0.75rem;
+  color: #374151;
+  background: #f0f1f3;
+  padding: 0.25rem 0.6rem;
   border-radius: 9999px;
   line-height: 1.4;
+  font-weight: 500;
 }
 
 .tech-pill--filter {
@@ -279,11 +300,11 @@ a:hover {
 .impact-badge {
   display: inline-flex;
   align-items: center;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: var(--accent);
-  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
-  padding: 0.1rem 0.55rem;
+  color: #92700c;
+  background: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.18);
+  padding: 0.15rem 0.6rem;
   border-radius: 9999px;
   white-space: nowrap;
 }
@@ -294,18 +315,22 @@ a:hover {
 
 .side-project-card {
   display: block;
-  padding: 0.85rem 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 1.15rem 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left: 3px solid rgba(0, 0, 0, 0.06);
   border-radius: 0.75rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   text-decoration: none;
   color: inherit;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .side-project-card:hover {
-  border-color: #ddd;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-left-color: var(--accent);
+  border-color: rgba(0, 0, 0, 0.12);
+  border-left-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.95);
   color: inherit;
 }
 

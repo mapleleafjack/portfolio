@@ -10,6 +10,7 @@ export default function Nav() {
         Jack Musajo
       </Link>
       <Link to="/work" className={`link-underline${pathname === '/work' ? ' font-medium' : ''}`}>Work</Link>
+      <Link to="/about" className={`link-underline${pathname === '/about' ? ' font-medium' : ''}`}>About</Link>
       <Link to="/creative" className={`link-underline${pathname === '/creative' ? ' font-medium' : ''}`}>Creative</Link>
     </nav>
   );

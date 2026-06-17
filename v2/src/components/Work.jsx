@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { BRANDS, KEY_PROJECTS, SIDE_PROJECTS, SKILLS, STRENGTHS, TRANSVERSAL_SKILLS } from '../data';
+import { BRANDS, KEY_PROJECTS, SIDE_PROJECTS } from '../data';
 import { Briefcase, Folder, Building, ExternalLink, Close } from 'pixelarticons/react';
 
 const normTech = (t) => (t === 'React 19' ? 'React' : t);
@@ -53,20 +53,20 @@ function ProjectCard({ p, company, logo }) {
             src={logo}
             alt={company}
             title={company}
-            className="w-4 h-4 rounded-sm shrink-0 opacity-50"
+            className="w-4 h-4 rounded-sm shrink-0 opacity-60"
             loading="lazy"
           />
         )}
-        <span className="text-[0.65rem] uppercase tracking-wider text-gray-400 truncate">{company}</span>
+        <span className="text-[0.72rem] uppercase tracking-wider text-gray-500 font-medium truncate">{company}</span>
       </div>
-      <div className="flex items-center gap-1.5 mb-1">
-        <span className="font-semibold text-sm text-gray-900 truncate">{p.name}</span>
+      <div className="flex items-center gap-2 mb-1.5">
+        <span className="font-semibold text-[0.95rem] text-gray-900 truncate">{p.name}</span>
         {p.impact && (
           <span className="impact-badge">{p.impact}</span>
         )}
       </div>
-      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-2">{p.description}</p>
-      <div className="flex flex-wrap gap-1">
+      <p className="text-[0.84rem] text-gray-600 leading-relaxed line-clamp-2 mb-3">{p.description}</p>
+      <div className="flex flex-wrap gap-1.5">
         {p.tech.slice(0, 3).map((t) => (
           <span key={t} className="tech-pill">{t}</span>
         ))}
@@ -125,15 +125,15 @@ export default function Work() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-10">
-        <Briefcase className="text-accent" width={20} height={20} />
-        <h1 className="text-2xl font-bold">Work</h1>
+      <div className="flex items-center gap-3 mb-12">
+        <Briefcase className="text-accent" width={24} height={24} />
+        <h1 className="text-3xl font-bold tracking-tight">Work</h1>
       </div>
 
       {/* Filter row: project-linked brands + cross-cutting tech */}
-      <section className="mb-10">
-        <h2 className="section-label mb-4">
-          <Building className="text-accent" width={12} height={12} />
+      <section className="mb-12">
+        <h2 className="section-label mb-5">
+          <Building className="text-accent" width={14} height={14} />
           Filter by client or tech
         </h2>
         <div className="flex flex-wrap items-center gap-2">
@@ -208,9 +208,9 @@ export default function Work() {
       )}
 
       {/* Projects */}
-      <section className="mb-14">
-        <h2 className="section-label mb-6">
-          <Folder className="text-accent" width={12} height={12} />
+      <section className="mb-16">
+        <h2 className="section-label mb-7">
+          <Folder className="text-accent" width={14} height={14} />
           Projects
         </h2>
 
@@ -222,7 +222,7 @@ export default function Work() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {filteredProjects.map((p) => (
               <ProjectCard key={p.name} p={p} company={p.company} logo={p.logo} />
             ))}
@@ -233,11 +233,11 @@ export default function Work() {
       {/* Side Projects — hidden when filtering */}
       {!hasFilters && (
         <section>
-          <h2 className="section-label mb-5">
-            <Folder className="text-accent" width={12} height={12} />
+          <h2 className="section-label mb-7">
+            <Folder className="text-accent" width={14} height={14} />
             Side Projects
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {SIDE_PROJECTS.map((p) => (
               <a
                 key={p.name}
@@ -246,74 +246,17 @@ export default function Work() {
                 rel={p.url ? 'noopener noreferrer' : undefined}
                 className="side-project-card group"
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-sm text-gray-900">{p.name}</span>
-                  {p.url && <ExternalLink className="text-gray-300 group-hover:text-accent shrink-0 transition-colors" width={12} height={12} />}
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="font-semibold text-[0.95rem] text-gray-900">{p.name}</span>
+                  {p.url && <ExternalLink className="text-gray-300 group-hover:text-accent shrink-0 transition-colors" width={14} height={14} />}
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed">{p.description}</p>
+                <p className="text-[0.84rem] text-gray-600 leading-relaxed">{p.description}</p>
               </a>
             ))}
           </div>
         </section>
       )}
 
-      {/* Skills — hidden when filtering */}
-      {!hasFilters && (
-        <section className="mt-14">
-          <h2 className="section-label mb-6">
-            <Briefcase className="text-accent" width={12} height={12} />
-            Skills
-          </h2>
-          <div className="space-y-4">
-            {Object.entries(SKILLS).map(([category, items]) => (
-              <div key={category}>
-                <h3 className="text-xs uppercase tracking-widest text-gray-400 mb-2">{category}</h3>
-                <div className="flex flex-wrap gap-1.5">
-                  {items.map((item) => (
-                    <span key={item} className="tech-pill">{item}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Strengths — hidden when filtering */}
-      {!hasFilters && (
-        <section className="mt-14">
-          <h2 className="section-label mb-6">
-            <Briefcase className="text-accent" width={12} height={12} />
-            Strengths
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {STRENGTHS.map((s) => (
-              <div key={s.title} className="project-card">
-                <span className="font-semibold text-sm text-gray-900 mb-1 block">{s.title}</span>
-                <p className="text-xs text-gray-500 leading-relaxed">{s.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Transversal Skills — hidden when filtering */}
-      {!hasFilters && (
-        <section className="mt-14">
-          <h2 className="section-label mb-6">
-            <Briefcase className="text-accent" width={12} height={12} />
-            Transversal Skills
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {TRANSVERSAL_SKILLS.map((s) => (
-              <div key={s.title} className="project-card">
-                <span className="font-semibold text-sm text-gray-900 mb-1 block">{s.title}</span>
-                <p className="text-xs text-gray-500 leading-relaxed">{s.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }

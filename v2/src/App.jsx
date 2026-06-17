@@ -5,10 +5,12 @@ import Home from './components/Home';
 import Work from './components/Work';
 import Project from './components/Project';
 import Creative from './components/Creative';
+import About from './components/About';
 import Album from './components/Album';
 import CursorTrail from './components/CursorTrail';
 import ColorShift from './components/ColorShift';
 import ThreeBackground from './components/ThreeBackground';
+import KofiButton from './components/KofiButton';
 
 function PageWrapper({ children }) {
   const location = useLocation();
@@ -23,10 +25,12 @@ export default function App() {
       <ThreeBackground />
       <CursorTrail />
       <Nav />
+      <KofiButton />
       <Routes>
         <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
         <Route path="/work" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Work /></PageWrapper></main>} />
         <Route path="/work/:slug" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Project /></PageWrapper></main>} />
+        <Route path="/about" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><About /></PageWrapper></main>} />
         <Route path="/creative" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Creative /></PageWrapper></main>} />
         <Route path="/creative/:slug" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Album /></PageWrapper></main>} />
       </Routes>
