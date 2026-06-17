@@ -25,7 +25,7 @@ export default function App() {
       <ThreeBackground />
       <CursorTrail />
       <Nav />
-      <KofiButton />
+      {/* <KofiButton /> */}
       <Routes>
         <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
         <Route path="/work" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Work /></PageWrapper></main>} />
