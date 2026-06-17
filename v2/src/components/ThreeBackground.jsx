@@ -138,29 +138,11 @@ export default function ThreeBackground() {
     window.addEventListener('pointermove', handleDragMove, { passive: true });
 
     // ── Two-finger drag (touch) ───────────────────────────
+    // Distinguishes drag from pinch: only rotates when the midpoint
+    // moves but the finger spread stays roughly constant.
     let touchDragging = false;
     const lastTouch = { x: 0, y: 0 };
-
-    const handleTouchStart = (e) => {
-      if (e.touches.length === 2) {
-        touchDragging = true;
-        const mid = midpoint(e.touches);
-        lastTouch.x = mid.x;
-        lastTouch.y = mid.y;
-      }
-    };
-    const handleTouchMove = (e) => {
-      if (!touchDragging || e.touches.length !== 2) return;
-      e.preventDefault();
-      const mid = midpoint(e.touches);
-      sceneRotation.y += (mid.x - lastTouch.x) * 0.005;
-      sceneRotation.x += (mid.y - lastTouch.y) * 0.005;
-      lastTouch.x = mid.x;
-      lastTouch.y = mid.y;
-    };
-    const handleTouchEnd = (e) => {
-      if (e.touches.length < 2) touchDragging = false;
-    };
+    let lastSpread = 0;
 
     function midpoint(touches) {
       return {
@@ -168,6 +150,45 @@ export default function ThreeBackground() {
         y: (touches[0].clientY + touches[1].clientY) / 2,
       };
     }
+
+    function spread(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    const handleTouchStart = (e) => {
+      if (e.touches.length === 2) {
+        touchDragging = true;
+        const mid = midpoint(e.touches);
+        lastTouch.x = mid.x;
+        lastTouch.y = mid.y;
+        lastSpread = spread(e.touches);
+      }
+    };
+    const handleTouchMove = (e) => {
+      if (!touchDragging || e.touches.length !== 2) return;
+      const mid = midpoint(e.touches);
+      const currentSpread = spread(e.touches);
+      const spreadDelta = Math.abs(currentSpread - lastSpread);
+      const midDelta = Math.sqrt(
+        (mid.x - lastTouch.x) ** 2 + (mid.y - lastTouch.y) ** 2
+      );
+
+      // If the spread is changing more than the midpoint, it's a pinch → skip rotation
+      if (spreadDelta < midDelta * 0.8) {
+        e.preventDefault();
+        sceneRotation.y += (mid.x - lastTouch.x) * 0.005;
+        sceneRotation.x += (mid.y - lastTouch.y) * 0.005;
+      }
+
+      lastTouch.x = mid.x;
+      lastTouch.y = mid.y;
+      lastSpread = currentSpread;
+    };
+    const handleTouchEnd = (e) => {
+      if (e.touches.length < 2) touchDragging = false;
+    };
 
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
