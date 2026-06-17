@@ -22,7 +22,6 @@ export default function App() {
       <ColorShift />
       <ThreeBackground />
       <CursorTrail />
-      <div className="h-dvh flex flex-col overflow-hidden">
       <Nav />
       <Routes>
         <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
@@ -31,7 +30,6 @@ export default function App() {
         <Route path="/creative" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Creative /></PageWrapper></main>} />
         <Route path="/creative/:slug" element={<main className="max-w-5xl mx-auto px-6 py-8 sm:py-12"><PageWrapper><Album /></PageWrapper></main>} />
       </Routes>
-      </div>
     </BrowserRouter>
   );
 }

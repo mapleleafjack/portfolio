@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useLayoutEffect } from 'react';
 import { ROTATING_PHRASES } from '../data';
 
 /* ── Magnetic letter name ─────────────────────────────── */
@@ -130,8 +130,18 @@ function RotatingPhrase() {
 /* ── Home ─────────────────────────────────────────────── */
 
 export default function Home() {
+  const [navH, setNavH] = useState(0);
+
+  useLayoutEffect(() => {
+    const nav = document.querySelector('nav');
+    if (nav) setNavH(nav.getBoundingClientRect().height);
+  }, []);
+
   return (
-    <div className="flex-1 flex flex-col justify-center">
+    <div
+      className="flex flex-col justify-center"
+      style={{ height: navH ? `calc(100dvh - ${navH}px)` : '100dvh' }}
+    >
       {/* Hero */}
       <div className="flex flex-col items-center text-center">
         <h1 className="mb-6 select-none leading-none">
