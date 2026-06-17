@@ -25,13 +25,18 @@ export default function KofiButton() {
 
     const style = document.createElement('style');
     style.textContent = `
-      .floatingchat-container-wrap {
-        transform: scale(0.8);
-        transform-origin: bottom left;
+      .floatingchat-container-wrap,
+      .floatingchat-container-wrap-mo498 {
+        transform: scale(0.8) !important;
+        transform-origin: bottom left !important;
       }
       @media (max-width: 640px) {
-        .floatingchat-container-wrap {
-          transform: scale(0.3);
+        .floatingchat-container-wrap,
+        .floatingchat-container-wrap-mo498,
+        #kofi-widget-overlay-DpNihqUJi7 {
+          transform: scale(0.35) !important;
+          transform-origin: bottom left !important;
+          zoom: 0.35;
         }
       }
     `;
