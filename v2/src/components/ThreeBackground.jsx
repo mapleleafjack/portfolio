@@ -39,6 +39,9 @@ export default function ThreeBackground() {
     scene.add(sceneGroup);
     const sceneRotation = { x: 0, y: 0 };       // target rotation
     const smoothRotation = { x: 0, y: 0 };      // current (lerped)
+    let targetZoom = camera.position.z;           // pinch-zoom target
+    const ZOOM_MIN = 2;
+    const ZOOM_MAX = 12;
 
     // Raycaster for hover detection
     const raycaster = new THREE.Raycaster();
@@ -175,9 +178,16 @@ export default function ThreeBackground() {
         (mid.x - lastTouch.x) ** 2 + (mid.y - lastTouch.y) ** 2
       );
 
-      // If the spread is changing more than the midpoint, it's a pinch → skip rotation
+      e.preventDefault();
+
+      // Pinch → zoom the camera
+      if (spreadDelta > 2) {
+        const zoomDelta = (currentSpread - lastSpread) * 0.012;
+        targetZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, targetZoom - zoomDelta));
+      }
+
+      // Drag → rotate the scene (only when spread is mostly stable)
       if (spreadDelta < midDelta * 0.8) {
-        e.preventDefault();
         sceneRotation.y += (mid.x - lastTouch.x) * 0.005;
         sceneRotation.x += (mid.y - lastTouch.y) * 0.005;
       }
@@ -216,6 +226,9 @@ export default function ThreeBackground() {
       smoothRotation.y += (sceneRotation.y - smoothRotation.y) * 0.08;
       sceneGroup.rotation.x = smoothRotation.x;
       sceneGroup.rotation.y = smoothRotation.y;
+
+      // Smoothly lerp camera zoom
+      camera.position.z += (targetZoom - camera.position.z) * 0.08;
 
       // Raycast for hover
       raycaster.setFromCamera(pointer, camera);
