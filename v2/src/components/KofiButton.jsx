@@ -1,7 +1,12 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export default function KofiButton() {
+  const { pathname } = useLocation();
+  const isHome = pathname === '/';
+
   useEffect(() => {
+    if (!isHome) return;
     const root = getComputedStyle(document.documentElement);
     const r = parseInt(root.getPropertyValue('--accent-r')) || 200;
     const g = parseInt(root.getPropertyValue('--accent-g')) || 200;
@@ -26,7 +31,7 @@ export default function KofiButton() {
       }
       @media (max-width: 640px) {
         .floatingchat-container-wrap {
-          transform: scale(0.45);
+          transform: scale(0.3);
         }
       }
     `;
@@ -53,7 +58,7 @@ export default function KofiButton() {
       const frame = document.getElementById('kofi-widget-overlay');
       if (frame) frame.remove();
     };
-  }, []);
+  }, [isHome]);
 
   return null;
 }
