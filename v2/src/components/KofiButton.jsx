@@ -24,6 +24,11 @@ export default function KofiButton() {
         transform: scale(0.8);
         transform-origin: bottom left;
       }
+      @media (max-width: 640px) {
+        .floatingchat-container-wrap {
+          transform: scale(0.45);
+        }
+      }
     `;
     document.head.appendChild(style);
 
