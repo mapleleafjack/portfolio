@@ -107,6 +107,8 @@ export default function ThreeBackground() {
         baseColor: baseColor.clone(),
         baseOpacity: opacity,
         hoverLerp: 0,       // 0 = idle, 1 = fully hovered
+        hitLerp: 0,         // 0 = normal, 1 = just hit by laser
+        hitSpin: new THREE.Vector3(),
       };
 
       sceneGroup.add(cube);
@@ -287,7 +289,7 @@ export default function ThreeBackground() {
     const galaxyManager = new GalaxyManager(sceneGroup);
 
     // Flying saucer orbiting the scene
-    const saucer = new FlyingSaucer(sceneGroup);
+    const saucer = new FlyingSaucer(sceneGroup, cubes);
 
     const handleClick = (e) => {
       if (e.button !== 0) return;
@@ -347,20 +349,37 @@ export default function ThreeBackground() {
         const hoverTarget = isHovered ? 1 : 0;
         d.hoverLerp += (hoverTarget - d.hoverLerp) * (isHovered ? 0.12 : 0.06);
 
-        // Spin — faster on hover
-        const spinSpeed = d.spinSpeed + d.hoverLerp * 0.04;
+        // Decay hit reaction
+        if (d.hitLerp > 0.001) {
+          d.hitLerp *= 0.94; // smooth decay
+          // Apply tumble kick from laser hit
+          const hq = new THREE.Quaternion().setFromEuler(
+            new THREE.Euler(
+              d.hitSpin.x * d.hitLerp,
+              d.hitSpin.y * d.hitLerp,
+              d.hitSpin.z * d.hitLerp,
+            )
+          );
+          cube.quaternion.multiply(hq);
+        } else {
+          d.hitLerp = 0;
+        }
+
+        // Spin — faster on hover or hit
+        const spinSpeed = d.spinSpeed + d.hoverLerp * 0.04 + d.hitLerp * 0.06;
         const q = new THREE.Quaternion().setFromAxisAngle(d.spinAxis, spinSpeed);
         cube.quaternion.multiply(q);
 
-        // Scale — subtle grow on hover
-        const s = 1 + d.hoverLerp * 0.35;
+        // Scale — grow on hover, pop on hit
+        const s = 1 + d.hoverLerp * 0.35 + d.hitLerp * 0.5;
         cube.scale.setScalar(s);
 
-        // Colour — lerp toward accent on hover
-        cube.material.color.copy(d.baseColor).lerp(accent, d.hoverLerp * 0.7);
+        // Colour — lerp toward accent on hover or hit
+        const accentBlend = Math.max(d.hoverLerp * 0.7, d.hitLerp);
+        cube.material.color.copy(d.baseColor).lerp(accent, accentBlend);
 
-        // Opacity — brighten on hover
-        cube.material.opacity = d.baseOpacity + d.hoverLerp * 0.35;
+        // Opacity — brighten on hover or hit
+        cube.material.opacity = d.baseOpacity + d.hoverLerp * 0.35 + d.hitLerp * 0.5;
 
         // Gentle idle sway
         cube.position.x = d.basePosition.x + Math.sin(t * d.idleSpeed * 0.4 + d.idlePhase) * 0.05;
@@ -372,7 +391,7 @@ export default function ThreeBackground() {
       galaxyManager.update(t, dt);
 
       // Update flying saucer
-      saucer.update(t);
+      saucer.update(t, dt);
 
       // Camera shake from galaxy collapse (temporary offset, restored after render)
       const shake = galaxyManager.getShake();

@@ -132,7 +132,7 @@ function RotatingPhrase() {
 function InteractionHint() {
   return (
     <p className="text-xs text-gray-400 mt-10" style={{ animation: 'hintFlash 4s ease-in-out infinite' }}>
-      ✦ tap to spawn galaxies · drag &amp; scroll to explore
+      ✦ tap to spawn galaxies · ⌘+drag · middle‑click · two‑finger drag to orbit · scroll to zoom
     </p>
   );
 }
