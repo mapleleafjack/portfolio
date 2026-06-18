@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import GalaxyManager from './GalaxyEffect';
 
 const NUM_CUBES = 35;
 
@@ -204,6 +205,16 @@ export default function ThreeBackground() {
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
+    // Galaxy effect
+    const galaxyManager = new GalaxyManager(sceneGroup);
+
+    const handleClick = (e) => {
+      if (e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey) return;
+      galaxyManager.spawn(pointer, camera);
+    };
+    window.addEventListener('click', handleClick);
+
     // Animation loop
     let animationId;
     let t = 0;
@@ -264,7 +275,26 @@ export default function ThreeBackground() {
         cube.position.z = d.basePosition.z + Math.cos(t * d.idleSpeed * 0.3 + d.idlePhase * 1.5) * 0.04;
       });
 
+      // Update galaxies
+      galaxyManager.update(t, dt);
+
+      // Camera shake from galaxy collapse (temporary offset, restored after render)
+      const shake = galaxyManager.getShake();
+      let shakeX = 0, shakeY = 0;
+      if (shake > 0.001) {
+        shakeX = (Math.random() - 0.5) * 2 * shake;
+        shakeY = (Math.random() - 0.5) * 2 * shake;
+        camera.position.x += shakeX;
+        camera.position.y += shakeY;
+      }
+
       renderer.render(scene, camera);
+
+      // Restore camera position
+      if (shake > 0.001) {
+        camera.position.x -= shakeX;
+        camera.position.y -= shakeY;
+      }
     };
 
     animate();
@@ -288,6 +318,8 @@ export default function ThreeBackground() {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('click', handleClick);
+      galaxyManager.dispose();
       cubes.forEach((cube) => {
         cube.geometry.dispose();
         cube.material.dispose();
