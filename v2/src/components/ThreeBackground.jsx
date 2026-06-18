@@ -237,7 +237,7 @@ export default function ThreeBackground() {
     // ── Logo 3D model + PNG texture on front ─────────
     const logoGroup = new THREE.Group();
     const isMobile = window.innerWidth < 640;
-    const logoY = 0;
+    const logoY = 0.4;
     const logoScale = isMobile ? 0.75 : 1;
     logoGroup.position.set(0, logoY, 0);
     scene.add(logoGroup);
@@ -423,7 +423,7 @@ export default function ThreeBackground() {
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
       const mobile = window.innerWidth < 640;
-      logoGroup.position.y = 0;
+      logoGroup.position.y = 0.4;
     };
     window.addEventListener('resize', handleResize);
 
