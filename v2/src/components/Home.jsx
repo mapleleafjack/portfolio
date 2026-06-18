@@ -144,13 +144,8 @@ export default function Home() {
     >
       {/* Hero */}
       <div className="flex flex-col items-center text-center">
-        <h1 className="mb-6 select-none leading-none">
-          <img
-            src="/images/jackmusajo_black.png"
-            alt="Jack Musajo"
-            className="h-32 sm:h-44 w-auto"
-          />
-        </h1>
+        {/* Logo rendered as 3D billboard sprite in ThreeBackground */}
+        <div className="h-32 sm:h-44 mb-6" />
         <p className="text-base sm:text-lg text-gray-500 leading-relaxed mb-0.5">
           Software engineer
         </p>

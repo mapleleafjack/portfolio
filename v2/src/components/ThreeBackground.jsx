@@ -1,6 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import GalaxyManager from './GalaxyEffect';
+import FlyingSaucer from './FlyingSaucer';
 
 const NUM_CUBES = 35;
 
@@ -13,6 +15,7 @@ function getAccentColor() {
 
 export default function ThreeBackground() {
   const containerRef = useRef(null);
+  const [showHint, setShowHint] = useState(true);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -38,8 +41,12 @@ export default function ThreeBackground() {
     // Scene group — we rotate this on drag instead of moving the camera
     const sceneGroup = new THREE.Group();
     scene.add(sceneGroup);
-    const sceneRotation = { x: 0, y: 0 };       // target rotation
+    const sceneRotation = { x: 0, y: 0 };       // target rotation (drift + user)
     const smoothRotation = { x: 0, y: 0 };      // current (lerped)
+    const userRotation = { x: 0, y: 0 };         // user-driven rotation only
+    const smoothUserRotation = { x: 0, y: 0 };   // current (lerped)
+    let lastDragTime = 0;                          // timestamp of last drag input
+    const RETURN_DELAY = 2.0;                      // seconds before returning to center
     let targetZoom = camera.position.z;           // pinch-zoom target
     const ZOOM_MIN = 2;
     const ZOOM_MAX = 12;
@@ -119,7 +126,7 @@ export default function ThreeBackground() {
     const lastDrag = { x: 0, y: 0 };
 
     const handlePointerDown = (e) => {
-      if (e.button === 0 && (e.metaKey || e.ctrlKey)) {
+      if ((e.button === 0 && (e.metaKey || e.ctrlKey)) || e.button === 1) {
         isDragging = true;
         lastDrag.x = e.clientX;
         lastDrag.y = e.clientY;
@@ -133,13 +140,22 @@ export default function ThreeBackground() {
       const dy = e.clientY - lastDrag.y;
       sceneRotation.y += dx * 0.005;
       sceneRotation.x += dy * 0.005;
+      userRotation.y += dx * 0.005;
+      userRotation.x += dy * 0.005;
+      lastDragTime = performance.now() / 1000;
       lastDrag.x = e.clientX;
       lastDrag.y = e.clientY;
     };
 
+    // Prevent default middle-click auto-scroll
+    const handleAuxClick = (e) => { if (e.button === 1) e.preventDefault(); };
+    const handleMouseDown = (e) => { if (e.button === 1) e.preventDefault(); };
+
     window.addEventListener('pointerdown', handlePointerDown);
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointermove', handleDragMove, { passive: true });
+    window.addEventListener('auxclick', handleAuxClick);
+    window.addEventListener('mousedown', handleMouseDown);
 
     // ── Two-finger drag (touch) ───────────────────────────
     // Distinguishes drag from pinch: only rotates when the midpoint
@@ -189,8 +205,13 @@ export default function ThreeBackground() {
 
       // Drag → rotate the scene (only when spread is mostly stable)
       if (spreadDelta < midDelta * 0.8) {
-        sceneRotation.y += (mid.x - lastTouch.x) * 0.005;
-        sceneRotation.x += (mid.y - lastTouch.y) * 0.005;
+        const dxR = (mid.x - lastTouch.x) * 0.005;
+        const dyR = (mid.y - lastTouch.y) * 0.005;
+        sceneRotation.y += dxR;
+        sceneRotation.x += dyR;
+        userRotation.y += dxR;
+        userRotation.x += dyR;
+        lastDragTime = performance.now() / 1000;
       }
 
       lastTouch.x = mid.x;
@@ -205,8 +226,62 @@ export default function ThreeBackground() {
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
+    // ── Logo 3D model + PNG texture on front ─────────
+    const logoGroup = new THREE.Group();
+    logoGroup.position.set(0, 0.3, 0);
+    scene.add(logoGroup);
+    const logoMaterial = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
+    // PNG texture for the detailed artwork
+    const logoTexture = new THREE.TextureLoader().load('/images/jackmusajo_black.png');
+    logoTexture.colorSpace = THREE.SRGBColorSpace;
+    const overlayMat = new THREE.MeshBasicMaterial({
+      map: logoTexture,
+      transparent: true,
+      alphaTest: 0.05,
+      side: THREE.DoubleSide,
+    });
+    const gltfLoader = new GLTFLoader();
+    let logoMesh = null;
+    let overlayGeo = null;
+    let overlayFront = null;
+    let overlayBack = null;
+    gltfLoader.load('/images/jackmusajo_logo_3d_model/jackmusajo_logo_extruded_160mm.glb', (gltf) => {
+      logoMesh = gltf.scene;
+      const box = new THREE.Box3().setFromObject(logoMesh);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      const targetWidth = 2.4;
+      const scaleFactor = targetWidth / size.x;
+      logoMesh.scale.set(scaleFactor, scaleFactor, scaleFactor * 0.15);
+      // Center the model
+      box.setFromObject(logoMesh);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      logoMesh.position.sub(center);
+      logoMesh.traverse((child) => {
+        if (child.isMesh) {
+          child.material = logoMaterial;
+        }
+      });
+      // Measure the scaled model to size the PNG overlay correctly
+      const finalBox = new THREE.Box3().setFromObject(logoMesh);
+      const finalSize = new THREE.Vector3();
+      finalBox.getSize(finalSize);
+      overlayGeo = new THREE.PlaneGeometry(finalSize.x, finalSize.y);
+      overlayFront = new THREE.Mesh(overlayGeo, overlayMat);
+      overlayBack = new THREE.Mesh(overlayGeo, overlayMat);
+      overlayFront.position.set(0, 0, finalBox.max.z + 0.002);
+      overlayBack.position.set(0, 0, finalBox.min.z - 0.002);
+      logoGroup.add(logoMesh);
+      logoGroup.add(overlayFront);
+      logoGroup.add(overlayBack);
+    });
+
     // Galaxy effect
     const galaxyManager = new GalaxyManager(sceneGroup);
+
+    // Flying saucer orbiting the scene
+    const saucer = new FlyingSaucer(sceneGroup);
 
     const handleClick = (e) => {
       if (e.button !== 0) return;
@@ -237,6 +312,18 @@ export default function ThreeBackground() {
       smoothRotation.y += (sceneRotation.y - smoothRotation.y) * 0.08;
       sceneGroup.rotation.x = smoothRotation.x;
       sceneGroup.rotation.y = smoothRotation.y;
+
+      // Logo follows only user-driven rotation (no auto-drift)
+      // Decay back to center after RETURN_DELAY seconds of no input
+      const now = performance.now() / 1000;
+      if (!isDragging && !touchDragging && now - lastDragTime > RETURN_DELAY) {
+        userRotation.x += (0 - userRotation.x) * 0.03;
+        userRotation.y += (0 - userRotation.y) * 0.03;
+      }
+      smoothUserRotation.x += (userRotation.x - smoothUserRotation.x) * 0.08;
+      smoothUserRotation.y += (userRotation.y - smoothUserRotation.y) * 0.08;
+      logoGroup.rotation.x = smoothUserRotation.x;
+      logoGroup.rotation.y = smoothUserRotation.y;
 
       // Smoothly lerp camera zoom
       camera.position.z += (targetZoom - camera.position.z) * 0.08;
@@ -277,6 +364,9 @@ export default function ThreeBackground() {
 
       // Update galaxies
       galaxyManager.update(t, dt);
+
+      // Update flying saucer
+      saucer.update(t);
 
       // Camera shake from galaxy collapse (temporary offset, restored after render)
       const shake = galaxyManager.getShake();
@@ -319,12 +409,28 @@ export default function ThreeBackground() {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('click', handleClick);
+      window.removeEventListener('auxclick', handleAuxClick);
+      window.removeEventListener('mousedown', handleMouseDown);
       galaxyManager.dispose();
+      saucer.dispose();
       cubes.forEach((cube) => {
         cube.geometry.dispose();
         cube.material.dispose();
         sceneGroup.remove(cube);
       });
+      if (logoMesh) {
+        logoGroup.remove(logoMesh);
+        logoMesh.traverse((child) => {
+          if (child.isMesh) child.geometry.dispose();
+        });
+      }
+      if (overlayFront) logoGroup.remove(overlayFront);
+      if (overlayBack) logoGroup.remove(overlayBack);
+      if (overlayGeo) overlayGeo.dispose();
+      overlayMat.dispose();
+      logoTexture.dispose();
+      scene.remove(logoGroup);
+      logoMaterial.dispose();
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
@@ -332,15 +438,49 @@ export default function ThreeBackground() {
     };
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setShowHint(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div
-      ref={containerRef}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 0,
-        pointerEvents: 'none',
-      }}
-    />
+    <>
+      <div
+        ref={containerRef}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
+      />
+      {showHint && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '1.5rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: '1.2rem',
+            alignItems: 'center',
+            fontFamily: "'SF Mono', 'Fira Code', 'Cascadia Code', monospace",
+            fontSize: '0.65rem',
+            color: 'rgba(150, 150, 150, 0.7)',
+            letterSpacing: '0.04em',
+            pointerEvents: 'none',
+            animation: 'hintFade 3s ease-in-out forwards',
+            whiteSpace: 'nowrap',
+            zIndex: 10,
+          }}
+        >
+          <span>🖱 click to spawn galaxies</span>
+          <span style={{ opacity: 0.4 }}>·</span>
+          <span>⌘+drag or middle‑click to orbit</span>
+          <span style={{ opacity: 0.4 }}>·</span>
+          <span>pinch to zoom</span>
+        </div>
+      )}
+    </>
   );
 }
