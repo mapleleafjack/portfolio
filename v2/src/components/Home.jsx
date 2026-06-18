@@ -151,10 +151,10 @@ export default function Home() {
       style={{ height: navH ? `calc(100dvh - ${navH}px)` : '100dvh' }}
     >
       {/* Hero */}
-      <div className="flex flex-col items-center text-center">
+      <div className="flex flex-col items-center text-center px-6">
         {/* Logo rendered as 3D billboard sprite in ThreeBackground */}
-        <div className="h-32 sm:h-44 mb-6" />
-        <p className="text-base sm:text-lg text-gray-500 leading-relaxed mb-0.5">
+        <div className="h-52 sm:h-80 mb-6" />
+        <p className="text-base sm:text-lg text-gray-500 leading-relaxed mb-0.5 mt-8 sm:mt-4">
           Software engineer
         </p>
         <p className="text-base sm:text-lg text-gray-400 leading-relaxed min-h-[1.6em] mb-6">

@@ -236,7 +236,10 @@ export default function ThreeBackground() {
 
     // ── Logo 3D model + PNG texture on front ─────────
     const logoGroup = new THREE.Group();
-    logoGroup.position.set(0, 0.3, 0);
+    const isMobile = window.innerWidth < 640;
+    const logoY = 0;
+    const logoScale = isMobile ? 0.75 : 1;
+    logoGroup.position.set(0, logoY, 0);
     scene.add(logoGroup);
     const logoMaterial = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
     // PNG texture for the detailed artwork
@@ -258,7 +261,7 @@ export default function ThreeBackground() {
       const box = new THREE.Box3().setFromObject(logoMesh);
       const size = new THREE.Vector3();
       box.getSize(size);
-      const targetWidth = 2.4;
+      const targetWidth = 2.4 * logoScale;
       const scaleFactor = targetWidth / size.x;
       logoMesh.scale.set(scaleFactor, scaleFactor, scaleFactor * 0.15);
       // Center the model
@@ -419,6 +422,8 @@ export default function ThreeBackground() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      const mobile = window.innerWidth < 640;
+      logoGroup.position.y = 0;
     };
     window.addEventListener('resize', handleResize);
 
