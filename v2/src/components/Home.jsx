@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useLayoutEffect } from 'react';
+import { useRef, useEffect, useState, useLayoutEffect, useMemo } from 'react';
 import { ROTATING_PHRASES } from '../data';
 
 /* ── Magnetic letter name ─────────────────────────────── */
@@ -129,6 +129,14 @@ function RotatingPhrase() {
 
 /* ── Home ─────────────────────────────────────────────── */
 
+function InteractionHint() {
+  return (
+    <p className="text-xs text-gray-400 mt-10" style={{ animation: 'hintFlash 4s ease-in-out infinite' }}>
+      ✦ tap to spawn galaxies · drag &amp; scroll to explore
+    </p>
+  );
+}
+
 export default function Home() {
   const [navH, setNavH] = useState(0);
 
@@ -159,6 +167,7 @@ export default function Home() {
           <span className="text-gray-300">·</span>
           <a href="https://www.linkedin.com/in/chakri-musajo-somma" target="_blank" rel="noopener noreferrer" className="link-underline">LinkedIn</a>
         </div>
+        <InteractionHint />
       </div>
     </div>
   );

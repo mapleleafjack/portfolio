@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import GalaxyManager from './GalaxyEffect';
@@ -15,7 +15,6 @@ function getAccentColor() {
 
 export default function ThreeBackground() {
   const containerRef = useRef(null);
-  const [showHint, setShowHint] = useState(true);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -156,6 +155,13 @@ export default function ThreeBackground() {
     window.addEventListener('pointermove', handleDragMove, { passive: true });
     window.addEventListener('auxclick', handleAuxClick);
     window.addEventListener('mousedown', handleMouseDown);
+
+    // ── Scroll wheel zoom (desktop) ─────────────────────────
+    const handleWheel = (e) => {
+      e.preventDefault();
+      targetZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, targetZoom + e.deltaY * 0.005));
+    };
+    window.addEventListener('wheel', handleWheel, { passive: false });
 
     // ── Two-finger drag (touch) ───────────────────────────
     // Distinguishes drag from pinch: only rotates when the midpoint
@@ -411,6 +417,7 @@ export default function ThreeBackground() {
       window.removeEventListener('click', handleClick);
       window.removeEventListener('auxclick', handleAuxClick);
       window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('wheel', handleWheel);
       galaxyManager.dispose();
       saucer.dispose();
       cubes.forEach((cube) => {
@@ -438,49 +445,15 @@ export default function ThreeBackground() {
     };
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowHint(false), 3000);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
-    <>
-      <div
-        ref={containerRef}
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 0,
-          pointerEvents: 'none',
-        }}
-      />
-      {showHint && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '1.5rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            gap: '1.2rem',
-            alignItems: 'center',
-            fontFamily: "'SF Mono', 'Fira Code', 'Cascadia Code', monospace",
-            fontSize: '0.65rem',
-            color: 'rgba(150, 150, 150, 0.7)',
-            letterSpacing: '0.04em',
-            pointerEvents: 'none',
-            animation: 'hintFade 3s ease-in-out forwards',
-            whiteSpace: 'nowrap',
-            zIndex: 10,
-          }}
-        >
-          <span>🖱 click to spawn galaxies</span>
-          <span style={{ opacity: 0.4 }}>·</span>
-          <span>⌘+drag or middle‑click to orbit</span>
-          <span style={{ opacity: 0.4 }}>·</span>
-          <span>pinch to zoom</span>
-        </div>
-      )}
-    </>
+    <div
+      ref={containerRef}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: 'none',
+      }}
+    />
   );
 }
