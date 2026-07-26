@@ -36,6 +36,7 @@ export default function ThreeBackground() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
+    renderer.domElement.style.pointerEvents = 'none';
 
     // Scene group — we rotate this on drag instead of moving the camera
     const sceneGroup = new THREE.Group();
@@ -159,7 +160,15 @@ export default function ThreeBackground() {
     window.addEventListener('mousedown', handleMouseDown);
 
     // ── Scroll wheel zoom (desktop) ─────────────────────────
+    // Only intercept wheel events on the background — let content scroll normally
+    const isInteractiveTarget = (el) => {
+      const tag = el.tagName?.toLowerCase();
+      if (tag === 'a' || tag === 'button' || tag === 'input' ||
+          tag === 'select' || tag === 'textarea' || tag === 'video') return true;
+      return el.closest('nav, main, a, button, input, select, textarea, [role="button"]');
+    };
     const handleWheel = (e) => {
+      if (isInteractiveTarget(e.target)) return; // let content scroll normally
       e.preventDefault();
       targetZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, targetZoom + e.deltaY * 0.005));
     };
@@ -297,6 +306,8 @@ export default function ThreeBackground() {
     const handleClick = (e) => {
       if (e.button !== 0) return;
       if (e.metaKey || e.ctrlKey) return;
+      // Don't spawn galaxies when clicking interactive elements
+      if (isInteractiveTarget(e.target)) return;
       galaxyManager.spawn(pointer, camera);
     };
     window.addEventListener('click', handleClick);
