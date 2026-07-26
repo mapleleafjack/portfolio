@@ -440,6 +440,11 @@ export const SIDE_PROJECTS = [
     github: 'https://github.com/mapleleafjack/DnaVST',
     description: 'Audio-responsive DNA visualisation VST plugin — real-time 3D helix reacting to audio input, built with C++ and JUCE',
   },
+  {
+    name: 'Torus Knot — Lattice Field',
+    url: '/torus/',
+    description: 'Interactive 3D torus knot explorer — curvature-colored geometry, field lines, flowing particles, and physics presets from fusion reactors to DNA supercoiling',
+  },
 ];
 
 export const ALBUMS = [
