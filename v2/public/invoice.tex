@@ -1,0 +1,154 @@
+\documentclass[10.5pt]{article}
+\usepackage[a4paper,top=0cm,bottom=1.6cm,left=1.7cm,right=1.7cm]{geometry}
+\usepackage{fontspec}
+\usepackage{tikz}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{ragged2e}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+\usepackage{parskip}
+\usepackage{enumitem}
+
+\setmainfont{Carlito}
+\newfontfamily\headingfont{Poppins}
+
+\definecolor{ink}{HTML}{1F2430}
+\definecolor{navy}{HTML}{1B2A4A}
+\definecolor{slate}{HTML}{5B6472}
+\definecolor{hair}{HTML}{DDE1E7}
+\definecolor{tint}{HTML}{F4F6F9}
+\definecolor{gold}{HTML}{B08947}
+
+\color{ink}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+% ---- helpers ----
+\newcommand{\sectiontitle}[1]{%
+  {\headingfont\bfseries\fontsize{9.5}{9.5}\selectfont\color{navy}\MakeUppercase{#1}}\\[1pt]
+  {\color{gold}\rule{\linewidth}{0.9pt}}\\[7pt]
+}
+\newcommand{\lbl}[1]{{\color{slate}\footnotesize #1}}
+\newcommand{\ph}[1]{{\color{slate}\itshape #1}}
+
+\begin{document}
+
+% ================= HEADER BAND =================
+\begin{tikzpicture}[remember picture, overlay]
+  \fill[navy] (current page.north west) rectangle ([yshift=-2.85cm]current page.north east);
+\end{tikzpicture}
+\vspace*{0.4cm}
+\hspace*{-0.1cm}%
+\begin{minipage}[t]{0.55\textwidth}
+  \vspace{0.3cm}
+  \color{white}
+  {\headingfont\bfseries\fontsize{26}{26}\selectfont INVOICE}\\[3pt]
+  {\color{gold}\footnotesize\headingfont EGC CORE — MODULE 1 DEVELOPMENT}
+\end{minipage}%
+\begin{minipage}[t]{0.45\textwidth}
+  \vspace{0.35cm}
+  \RaggedLeft
+  \color{white}
+  \begin{tabular}{@{}rl@{}}
+    {\footnotesize\color{gold}Invoice No.} & \footnotesize INV-2026-001 \\
+    {\footnotesize\color{gold}Invoice date} & \footnotesize 26/07/2026 \\
+    {\footnotesize\color{gold}Date of supply} & \footnotesize 09/07/2026 \\
+    {\footnotesize\color{gold}Due date} & \footnotesize\bfseries 10/08/2026 \\
+    {\footnotesize\color{gold}Currency} & \footnotesize EUR \\
+  \end{tabular}
+\end{minipage}
+
+\vspace{0.65cm}
+
+% ================= FROM / BILL TO =================
+\begin{minipage}[t]{0.48\textwidth}
+  \sectiontitle{From}
+  \textbf{Chakri \ph{[SURNAME]}}\\
+  \ph{[Trading name, optional: Jack [SURNAME] / [business name]]}\\[3pt]
+  \ph{[Your full UK address]}\\
+  \ph{[City, Postcode]}\\
+  United Kingdom\\[3pt]
+  \ph{[your email]} \quad \ph{[phone --- optional]}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \sectiontitle{Bill to}
+  \textbf{European Grading Company --- EGC}\\
+  Società a responsabilità limitata semplificata\\[3pt]
+  Via Generale Armando Diaz, 6\\
+  26013 Crema (CR), Italy\\[3pt]
+  VAT: IT01832910192 \quad REA: CR-332494\\
+  PEC: egcpec@pec.it \quad Email: info@egccomics.com
+\end{minipage}
+
+\vspace{0.5cm}
+
+% ================= DESCRIPTION =================
+\sectiontitle{Description of services}
+\RaggedRight
+Development, online deployment and delivery of Module 1 of the EGC Core platform, including the initial trial period, bug support, import/export troubleshooting and minor adjustments, as agreed by email.
+
+\vspace{0.4cm}
+
+% ================= LINE ITEMS =================
+\renewcommand{\arraystretch}{1.6}
+\begin{tabularx}{\linewidth}{X r r r}
+  \rowcolor{navy}
+  {\headingfont\footnotesize\bfseries\color{white}\ Description} &
+  {\headingfont\footnotesize\bfseries\color{white} Qty} &
+  {\headingfont\footnotesize\bfseries\color{white} Unit price} &
+  {\headingfont\footnotesize\bfseries\color{white} Total\ } \\
+  Development and delivery of Module 1, EGC Core & 1 & €1,500.00 & €1,500.00\ \\
+  \arrayrulecolor{hair}\hline
+\end{tabularx}
+
+\vspace{0.35cm}
+
+% ================= TOTALS =================
+\begin{flushright}
+\begin{tabular}{@{}l r@{}}
+  \lbl{Subtotal} & €1,500.00 \\[2pt]
+  \lbl{UK VAT} & €0.00 \\[6pt]
+\end{tabular}
+
+\begin{tcolorbox}[
+    colback=navy, colframe=navy, arc=1pt,
+    left=10pt, right=10pt, top=6pt, bottom=6pt,
+    width=5.6cm, halign=right
+  ]
+  {\headingfont\footnotesize\color{gold}\bfseries AMOUNT DUE}\\[2pt]
+  {\headingfont\fontsize{16}{16}\selectfont\bfseries\color{white} €1,500.00}
+\end{tcolorbox}
+\end{flushright}
+
+\vspace{0.4cm}
+
+% ================= VAT NOTE =================
+\begin{tcolorbox}[
+    colback=tint, colframe=hair, boxrule=0.6pt, arc=1pt,
+    left=10pt, right=10pt, top=7pt, bottom=7pt
+  ]
+  {\headingfont\footnotesize\bfseries\color{navy}\MakeUppercase{VAT treatment}}\\[4pt]
+  \footnotesize Outside the scope of UK VAT. Reverse charge --- VAT to be accounted for by the customer under Articles 44 and 196 of Council Directive 2006/112/EC.
+\end{tcolorbox}
+
+\vspace{0.4cm}
+
+% ================= PAYMENT DETAILS =================
+\sectiontitle{Payment details}
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+  \lbl{Payment method} & Bank transfer \\[3pt]
+  \lbl{Account holder} & \ph{[account holder name]} \\[3pt]
+  \lbl{Bank} & \ph{[bank name or Wise]} \\[3pt]
+  \lbl{IBAN} & \ph{[your EUR account IBAN]} \\[3pt]
+  \lbl{BIC / SWIFT} & \ph{[BIC code]} \\[3pt]
+  \lbl{Payment reference} & \textbf{INV-2026-001} --- please use the invoice number as the payment reference \\
+\end{tabularx}
+
+\vfill
+{\color{slate}\footnotesize\centering\RaggedRight\ }
+
+\end{document}
