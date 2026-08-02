@@ -1,33 +1,59 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import GalaxyManager from './GalaxyEffect';
-import FlyingSaucer from './FlyingSaucer';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { getAccentColor } from './three/shared';
+import CubeField from './three/CubeField';
+import LogoTrio from './three/LogoTrio';
+import TorusKnot from './three/TorusKnot';
+import SceneCamera from './three/SceneCamera';
+import GalaxyManager from './three/GalaxyEffect';
+import FlyingSaucer from './three/FlyingSaucer';
 
-const NUM_CUBES = 35;
-
-// Read the current accent colour from CSS custom properties
-function getAccentColor() {
-  const style = getComputedStyle(document.documentElement);
-  const hex = style.getPropertyValue('--accent').trim() || '#f0c830';
-  return new THREE.Color(hex);
-}
-
-export default function ThreeBackground() {
+/**
+ * ThreeBackground — thin orchestrator for the full-screen 3D scene.
+ *
+ * Responsibilities:
+ *  - Create scene, camera, renderer, and sceneGroup
+ *  - Wire together all managers (CubeField, LogoTrio, TorusKnot,
+ *    SceneCamera, GalaxyManager, FlyingSaucer)
+ *  - Run the animation loop, calling each manager's update()
+ *  - Handle raycaster hover across cubes + torus
+ *  - Delegate torus clicks → zoom-in (preview) or marker drag (explore)
+ *  - Smooth camera zoom / rotation lerp on mode transitions
+ *  - Handle window resize
+ *  - Clean up all resources on unmount
+ */
+export default function ThreeBackground({
+  torusParams = null,
+  torusFocused = false,
+  onTorusClick = null,
+  onTorusParamsChange = null,
+}) {
   const containerRef = useRef(null);
+
+  // ── Stable refs (avoid re-running the Three.js effect) ──
+  const onTorusClickRef = useRef(onTorusClick);
+  const torusParamsRef = useRef(torusParams);
+  const torusFocusedRef = useRef(torusFocused);
+  const onTorusParamsChangeRef = useRef(onTorusParamsChange);
+
+  if (onTorusClickRef.current !== onTorusClick) onTorusClickRef.current = onTorusClick;
+  torusParamsRef.current = torusParams;
+  torusFocusedRef.current = torusFocused;
+  onTorusParamsChangeRef.current = onTorusParamsChange;
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Scene setup
+    // ── Scene setup ──────────────────────────────────────
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
       0.1,
-      1000
+      1000,
     );
     camera.position.z = 5;
 
@@ -38,378 +64,292 @@ export default function ThreeBackground() {
     container.appendChild(renderer.domElement);
     renderer.domElement.style.pointerEvents = 'none';
 
-    // Scene group — we rotate this on drag instead of moving the camera
+    // OrbitControls for torus explore mode (disabled in galaxy view)
+    const orbitControls = new OrbitControls(camera, renderer.domElement);
+    orbitControls.enabled = false;
+    orbitControls.enableDamping = true;
+    orbitControls.dampingFactor = 0.08;
+    orbitControls.minDistance = 2;
+    orbitControls.maxDistance = 12;
+
+    // Scene group — rotated on drag instead of moving the camera
     const sceneGroup = new THREE.Group();
     scene.add(sceneGroup);
-    const sceneRotation = { x: 0, y: 0 };       // target rotation (drift + user)
-    const smoothRotation = { x: 0, y: 0 };      // current (lerped)
-    const userRotation = { x: 0, y: 0 };         // user-driven rotation only
-    const smoothUserRotation = { x: 0, y: 0 };   // current (lerped)
-    let lastDragTime = 0;                          // timestamp of last drag input
-    const RETURN_DELAY = 2.0;                      // seconds before returning to center
-    let targetZoom = camera.position.z;           // pinch-zoom target
-    const ZOOM_MIN = 2;
-    const ZOOM_MAX = 12;
 
-    // Raycaster for hover detection
+    // ── Raycaster (shared for hover + click + marker drag) ──
     const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2(-999, -999);
     let hoveredCube = null;
 
-    // Create cubes
-    const cubes = [];
-    const accentColor = getAccentColor();
-
-    for (let i = 0; i < NUM_CUBES; i++) {
-      const size = 0.3 + Math.random() * 0.5;
-      const geometry = new THREE.BoxGeometry(size, size, size);
-
-      // ~20% of cubes get a hint of the accent colour
-      const hasAccent = Math.random() < 0.2;
-      const isLight = Math.random() > 0.5;
-      const baseColor = hasAccent
-        ? accentColor.clone().lerp(new THREE.Color(isLight ? '#555555' : '#0a0a0a'), 0.6)
-        : new THREE.Color(isLight ? '#555555' : '#0a0a0a');
-      const opacity = 0.15 + Math.random() * 0.35;
-
-      const material = new THREE.MeshBasicMaterial({
-        color: baseColor,
-        wireframe: true,
-        transparent: true,
-        opacity,
-      });
-
-      const cube = new THREE.Mesh(geometry, material);
-
-      // Spread cubes across a wide area, keeping a clear zone near centre
-      let x, y, z, tries = 0;
-      do {
-        x = (Math.random() - 0.5) * 14;
-        y = (Math.random() - 0.5) * 10;
-        z = (Math.random() - 0.5) * 14;
-        tries++;
-      } while (
-        Math.abs(x) < 3.5 && Math.abs(y) < 2.5 && Math.abs(z) < 3.5 && tries < 20
-      );
-
-      cube.position.set(x, y, z);
-
-      // Store per-cube animation data
-      cube.userData = {
-        spinAxis: new THREE.Vector3(
-          Math.random() - 0.5,
-          Math.random() - 0.5,
-          Math.random() - 0.5
-        ).normalize(),
-        spinSpeed: 0.002 + Math.random() * 0.004,
-        idlePhase: Math.random() * Math.PI * 2,
-        idleSpeed: 0.2 + Math.random() * 0.3,
-        basePosition: { x, y, z },
-        baseColor: baseColor.clone(),
-        baseOpacity: opacity,
-        hoverLerp: 0,       // 0 = idle, 1 = fully hovered
-        hitLerp: 0,         // 0 = normal, 1 = just hit by laser
-        hitSpin: new THREE.Vector3(),
-      };
-
-      sceneGroup.add(cube);
-      cubes.push(cube);
-    }
-
-    // ── Pointer tracking ──────────────────────────────────
-    const handlePointerMove = (e) => {
-      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
-      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
-    };
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
-
-    // ── Cmd/Ctrl + drag (desktop) ─────────────────────────
-    let isDragging = false;
-    const lastDrag = { x: 0, y: 0 };
-
-    const handlePointerDown = (e) => {
-      if ((e.button === 0 && (e.metaKey || e.ctrlKey)) || e.button === 1) {
-        isDragging = true;
-        lastDrag.x = e.clientX;
-        lastDrag.y = e.clientY;
-        e.preventDefault();
-      }
-    };
-    const handlePointerUp = () => { isDragging = false; };
-    const handleDragMove = (e) => {
-      if (!isDragging) return;
-      const dx = e.clientX - lastDrag.x;
-      const dy = e.clientY - lastDrag.y;
-      sceneRotation.y += dx * 0.005;
-      sceneRotation.x += dy * 0.005;
-      userRotation.y += dx * 0.005;
-      userRotation.x += dy * 0.005;
-      lastDragTime = performance.now() / 1000;
-      lastDrag.x = e.clientX;
-      lastDrag.y = e.clientY;
-    };
-
-    // Prevent default middle-click auto-scroll
-    const handleAuxClick = (e) => { if (e.button === 1) e.preventDefault(); };
-    const handleMouseDown = (e) => { if (e.button === 1) e.preventDefault(); };
-
-    window.addEventListener('pointerdown', handlePointerDown);
-    window.addEventListener('pointerup', handlePointerUp);
-    window.addEventListener('pointermove', handleDragMove, { passive: true });
-    window.addEventListener('auxclick', handleAuxClick);
-    window.addEventListener('mousedown', handleMouseDown);
-
-    // ── Scroll wheel zoom (desktop) ─────────────────────────
-    // Only intercept wheel events on the background — let content scroll normally
-    const isInteractiveTarget = (el) => {
-      const tag = el.tagName?.toLowerCase();
-      if (tag === 'a' || tag === 'button' || tag === 'input' ||
-          tag === 'select' || tag === 'textarea' || tag === 'video') return true;
-      return el.closest('nav, main, a, button, input, select, textarea, [role="button"]');
-    };
-    const handleWheel = (e) => {
-      if (isInteractiveTarget(e.target)) return; // let content scroll normally
-      e.preventDefault();
-      targetZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, targetZoom + e.deltaY * 0.005));
-    };
-    window.addEventListener('wheel', handleWheel, { passive: false });
-
-    // ── Two-finger drag (touch) ───────────────────────────
-    // Distinguishes drag from pinch: only rotates when the midpoint
-    // moves but the finger spread stays roughly constant.
-    let touchDragging = false;
-    const lastTouch = { x: 0, y: 0 };
-    let lastSpread = 0;
-
-    function midpoint(touches) {
-      return {
-        x: (touches[0].clientX + touches[1].clientX) / 2,
-        y: (touches[0].clientY + touches[1].clientY) / 2,
-      };
-    }
-
-    function spread(touches) {
-      const dx = touches[0].clientX - touches[1].clientX;
-      const dy = touches[0].clientY - touches[1].clientY;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    const handleTouchStart = (e) => {
-      if (e.touches.length === 2) {
-        touchDragging = true;
-        const mid = midpoint(e.touches);
-        lastTouch.x = mid.x;
-        lastTouch.y = mid.y;
-        lastSpread = spread(e.touches);
-      }
-    };
-    const handleTouchMove = (e) => {
-      if (!touchDragging || e.touches.length !== 2) return;
-      const mid = midpoint(e.touches);
-      const currentSpread = spread(e.touches);
-      const spreadDelta = Math.abs(currentSpread - lastSpread);
-      const midDelta = Math.sqrt(
-        (mid.x - lastTouch.x) ** 2 + (mid.y - lastTouch.y) ** 2
-      );
-
-      e.preventDefault();
-
-      // Pinch → zoom the camera
-      if (spreadDelta > 2) {
-        const zoomDelta = (currentSpread - lastSpread) * 0.012;
-        targetZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, targetZoom - zoomDelta));
-      }
-
-      // Drag → rotate the scene (only when spread is mostly stable)
-      if (spreadDelta < midDelta * 0.8) {
-        const dxR = (mid.x - lastTouch.x) * 0.005;
-        const dyR = (mid.y - lastTouch.y) * 0.005;
-        sceneRotation.y += dxR;
-        sceneRotation.x += dyR;
-        userRotation.y += dxR;
-        userRotation.x += dyR;
-        lastDragTime = performance.now() / 1000;
-      }
-
-      lastTouch.x = mid.x;
-      lastTouch.y = mid.y;
-      lastSpread = currentSpread;
-    };
-    const handleTouchEnd = (e) => {
-      if (e.touches.length < 2) touchDragging = false;
-    };
-
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
-
-    // ── Logo 3D model + PNG texture on front ─────────
-    const logoGroup = new THREE.Group();
-    const isMobile = window.innerWidth < 640;
-    const logoY = 0.4;
-    const logoScale = isMobile ? 0.75 : 1;
-    logoGroup.position.set(0, logoY, 0);
-    scene.add(logoGroup);
-    const logoMaterial = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
-    // PNG texture for the detailed artwork
-    const logoTexture = new THREE.TextureLoader().load('/images/jackmusajo_black.png');
-    logoTexture.colorSpace = THREE.SRGBColorSpace;
-    const overlayMat = new THREE.MeshBasicMaterial({
-      map: logoTexture,
-      transparent: true,
-      alphaTest: 0.05,
-      side: THREE.DoubleSide,
-    });
-    const gltfLoader = new GLTFLoader();
-    let logoMesh = null;
-    let overlayGeo = null;
-    let overlayFront = null;
-    let overlayBack = null;
-    gltfLoader.load('/images/jackmusajo_logo_3d_model/jackmusajo_logo_extruded_160mm.glb', (gltf) => {
-      logoMesh = gltf.scene;
-      const box = new THREE.Box3().setFromObject(logoMesh);
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      const targetWidth = 2.4 * logoScale;
-      const scaleFactor = targetWidth / size.x;
-      logoMesh.scale.set(scaleFactor, scaleFactor, scaleFactor * 0.15);
-      // Center the model
-      box.setFromObject(logoMesh);
-      const center = new THREE.Vector3();
-      box.getCenter(center);
-      logoMesh.position.sub(center);
-      logoMesh.traverse((child) => {
-        if (child.isMesh) {
-          child.material = logoMaterial;
-        }
-      });
-      // Measure the scaled model to size the PNG overlay correctly
-      const finalBox = new THREE.Box3().setFromObject(logoMesh);
-      const finalSize = new THREE.Vector3();
-      finalBox.getSize(finalSize);
-      overlayGeo = new THREE.PlaneGeometry(finalSize.x, finalSize.y);
-      overlayFront = new THREE.Mesh(overlayGeo, overlayMat);
-      overlayBack = new THREE.Mesh(overlayGeo, overlayMat);
-      overlayFront.position.set(0, 0, finalBox.max.z + 0.002);
-      overlayBack.position.set(0, 0, finalBox.min.z - 0.002);
-      logoGroup.add(logoMesh);
-      logoGroup.add(overlayFront);
-      logoGroup.add(overlayBack);
-    });
-
-    // Galaxy effect
+    // ── Instantiate all managers ────────────────────────
+    const cubeField = new CubeField(sceneGroup);
+    const logoTrio = new LogoTrio(scene);
+    const torusKnot = new TorusKnot(sceneGroup, torusParamsRef.current || {});
     const galaxyManager = new GalaxyManager(sceneGroup);
+    const saucer = new FlyingSaucer(sceneGroup, cubeField.getCubes(), galaxyManager);
 
-    // Flying saucer orbiting the scene
-    const saucer = new FlyingSaucer(sceneGroup, cubes);
+    // ── Focus transition state ──────────────────────────
+    let _wasFocused = false;
+    // Smooth camera targets — eliminates jump by interpolating both position + lookAt
+    const _smoothLookTarget = new THREE.Vector3(0, 0, 0);
+    const _smoothCamTarget = new THREE.Vector3(0, 0, 5);
+    // Zoom-in transition timer
+    let _transitionElapsed = 0;
+    // Zoom-out (exit) transition state — only active after first explore entry
+    let _hasEverEnteredExplore = false;
+    let _exitTransitionElapsed = 0;
+    const _exitStartCam = new THREE.Vector3();
+    const _exitStartLook = new THREE.Vector3();
+    // Zoom-in transition: captured start distance & approach direction
+    let _zoomStartDist = 7.5;
+    const _approachDir = new THREE.Vector3();
+
+    // ── Shared easing helper ──────────────────────────
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    // ── Click / marker-drag handler ────────────────────
+    let _markerDragging = false;
 
     const handleClick = (e) => {
-      if (e.button !== 0) return;
-      if (e.metaKey || e.ctrlKey) return;
-      // Don't spawn galaxies when clicking interactive elements
-      if (isInteractiveTarget(e.target)) return;
-      galaxyManager.spawn(pointer, camera);
-    };
-    window.addEventListener('click', handleClick);
+      const mx = (e.clientX / window.innerWidth) * 2 - 1;
+      const my = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(new THREE.Vector2(mx, my), camera);
 
-    // Animation loop
+      if (torusFocusedRef.current) {
+        // Explore mode — try marker drag on torus
+        const targets = torusKnot.getRayTargets();
+        if (targets.length === 0) return;
+        const hits = raycaster.intersectObjects(targets);
+        if (hits.length > 0) {
+          e.preventDefault();
+          e.stopPropagation();
+          _markerDragging = torusKnot.startMarkerDrag(hits[0].point);
+          // Disable OrbitControls while dragging marker
+          if (_markerDragging) orbitControls.enabled = false;
+        }
+      } else {
+        // Preview mode — click torus to zoom in
+        if (!onTorusClickRef.current) return;
+        const targets = torusKnot.getRayTargets();
+        if (targets.length === 0) return;
+        const hits = raycaster.intersectObjects(targets);
+        if (hits.length > 0) {
+          e.preventDefault();
+          e.stopPropagation();
+          onTorusClickRef.current();
+        }
+      }
+    };
+
+    // Additional pointer handlers for marker drag (outside SceneCamera)
+    const handlePointerMove = (e) => {
+      if (!_markerDragging) return;
+      const mx = (e.clientX / window.innerWidth) * 2 - 1;
+      const my = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(new THREE.Vector2(mx, my), camera);
+      const targets = torusKnot.getRayTargets();
+      if (targets.length === 0) return;
+      const hits = raycaster.intersectObjects(targets);
+      if (hits.length > 0) {
+        torusKnot.updateMarkerDrag(hits[0].point);
+      }
+    };
+
+    const handlePointerUp = () => {
+      if (_markerDragging) {
+        torusKnot.endMarkerDrag();
+        _markerDragging = false;
+        // Re-enable OrbitControls after marker drag
+        if (torusFocusedRef.current) {
+          orbitControls.enabled = true;
+        }
+      }
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerup', handlePointerUp);
+
+    const sceneCamera = new SceneCamera(camera, { onClick: handleClick });
+
+    // ── Animation loop ──────────────────────────────────
     let animationId;
     let t = 0;
     const clock = new THREE.Clock();
-    const accent = getAccentColor();
+    // Previous params for fast change detection (avoids JSON.stringify every frame)
+    const _initialParams = torusParamsRef.current || {};
+    const PARAMS_KEYS = ['p', 'q', 'color', 'radius', 'tube', 'metalness', 'roughness',
+      'spinSpeed', 'showWireframe', 'showFieldLines', 'showLattice',
+      'fieldLineCount', 'particleSpeed', 'morphValue'];
+    let prevParams = { ..._initialParams };
+
+    /** Fast shallow-compare of torus params — avoids JSON.stringify + GC every frame. */
+    function _paramsChanged(a, b) {
+      for (let i = 0; i < PARAMS_KEYS.length; i++) {
+        if (a[PARAMS_KEYS[i]] !== b[PARAMS_KEYS[i]]) return true;
+      }
+      return false;
+    }
 
     const animate = () => {
       animationId = requestAnimationFrame(animate);
-      const dt = clock.getDelta();
+      const dt = Math.min(clock.getDelta(), 0.1);
       t += dt;
 
-      // Gentle automatic drift (pauses while user is dragging)
-      if (!isDragging && !touchDragging) {
-        sceneRotation.y += 0.0008;
-        sceneRotation.x += Math.sin(t * 0.15) * 0.00012;
-      }
+      const focused = torusFocusedRef.current;
 
-      // Smoothly lerp scene rotation (with damping / inertia feel)
-      smoothRotation.x += (sceneRotation.x - smoothRotation.x) * 0.08;
-      smoothRotation.y += (sceneRotation.y - smoothRotation.y) * 0.08;
-      sceneGroup.rotation.x = smoothRotation.x;
-      sceneGroup.rotation.y = smoothRotation.y;
-
-      // Logo follows only user-driven rotation (no auto-drift)
-      // Decay back to center after RETURN_DELAY seconds of no input
-      const now = performance.now() / 1000;
-      if (!isDragging && !touchDragging && now - lastDragTime > RETURN_DELAY) {
-        userRotation.x += (0 - userRotation.x) * 0.03;
-        userRotation.y += (0 - userRotation.y) * 0.03;
-      }
-      smoothUserRotation.x += (userRotation.x - smoothUserRotation.x) * 0.08;
-      smoothUserRotation.y += (userRotation.y - smoothUserRotation.y) * 0.08;
-      logoGroup.rotation.x = smoothUserRotation.x;
-      logoGroup.rotation.y = smoothUserRotation.y;
-
-      // Smoothly lerp camera zoom
-      camera.position.z += (targetZoom - camera.position.z) * 0.08;
-
-      // Raycast for hover
-      raycaster.setFromCamera(pointer, camera);
-      const intersects = raycaster.intersectObjects(cubes);
-      hoveredCube = intersects.length > 0 ? intersects[0].object : null;
-
-      cubes.forEach((cube) => {
-        const d = cube.userData;
-        const isHovered = cube === hoveredCube;
-
-        // Smooth hover lerp
-        const hoverTarget = isHovered ? 1 : 0;
-        d.hoverLerp += (hoverTarget - d.hoverLerp) * (isHovered ? 0.12 : 0.06);
-
-        // Decay hit reaction
-        if (d.hitLerp > 0.001) {
-          d.hitLerp *= 0.94; // smooth decay
-          // Apply tumble kick from laser hit
-          const hq = new THREE.Quaternion().setFromEuler(
-            new THREE.Euler(
-              d.hitSpin.x * d.hitLerp,
-              d.hitSpin.y * d.hitLerp,
-              d.hitSpin.z * d.hitLerp,
-            )
-          );
-          cube.quaternion.multiply(hq);
+      // ── Mode transition: enable/disable drift ────────
+      if (focused !== _wasFocused) {
+        _wasFocused = focused;
+        sceneCamera.setDriftEnabled(!focused);
+        torusKnot.setMode(focused ? 'explore' : 'preview');
+        if (focused) {
+          // Disable OrbitControls during zoom-in transition
+          orbitControls.enabled = false;
+          _transitionElapsed = 0;
+          _hasEverEnteredExplore = true;
+          // Capture the approach direction from the user's current camera angle
+          // so the camera zooms toward the torus from wherever the user is looking.
+          const startTorusPos = torusKnot.getWorldPosition();
+          _zoomStartDist = camera.position.distanceTo(startTorusPos);
+          _approachDir.copy(camera.position).sub(startTorusPos).normalize();
+          // Clamp vertical approach to avoid degenerate top-down views
+          const maxVert = 0.85; // sin(≈58°) — keep camera within ±58° of horizontal
+          if (Math.abs(_approachDir.y) > maxVert) {
+            _approachDir.y = Math.sign(_approachDir.y) * maxVert;
+            _approachDir.normalize();
+          }
+          // Reset smooth target to current camera position so the lerp
+          // always starts from where the camera actually is (galaxy view).
+          _smoothCamTarget.copy(camera.position);
+          // Enable pointer events on canvas so OrbitControls can receive input
+          renderer.domElement.style.pointerEvents = 'auto';
         } else {
-          d.hitLerp = 0;
+          // Exit explore: disable OrbitControls, lerp camera back
+          orbitControls.enabled = false;
+          renderer.domElement.style.pointerEvents = 'none';
+          // Capture start state for smooth exit transition
+          _exitTransitionElapsed = 0;
+          _exitStartCam.copy(camera.position);
+          _exitStartLook.copy(_smoothLookTarget);
+        }
+        // Reset marker drag on mode change
+        if (_markerDragging) {
+          torusKnot.endMarkerDrag();
+          _markerDragging = false;
+        }
+      }
+
+      // ── Input & drift (galaxy view only — OrbitControls owns the camera in explore mode)
+      if (!focused) {
+        sceneCamera.update(t, dt);
+      } else {
+        // Minimal continuous drift so the universe never freezes during explore mode
+        sceneCamera.sceneRotation.y += 0.00015;
+      }
+
+      if (focused) {
+        const torusPos = torusKnot.getWorldPosition();
+
+        // Smoothly track lookAt target toward torus
+        _smoothLookTarget.lerp(torusPos, Math.min(4.5 * dt, 0.3));
+        // Only update orbit target during transition — let OrbitControls own it when active
+        if (!orbitControls.enabled && !_markerDragging) {
+          orbitControls.target.copy(_smoothLookTarget);
         }
 
-        // Spin — faster on hover or hit
-        const spinSpeed = d.spinSpeed + d.hoverLerp * 0.04 + d.hitLerp * 0.06;
-        const q = new THREE.Quaternion().setFromAxisAngle(d.spinAxis, spinSpeed);
-        cube.quaternion.multiply(q);
+        if (!orbitControls.enabled && !_markerDragging) {
+          // ── Zoom-in transition: zoom toward torus from user's current angle ──
+          _transitionElapsed += dt;
+          const endDist = 4.5;        // comfortable orbit distance
+          const duration = 0.85;      // transition duration in seconds
+          const raw = Math.min(_transitionElapsed / duration, 1.0);
+          const eased = easeInOutCubic(raw);
+          const dist = _zoomStartDist + (endDist - _zoomStartDist) * eased;
 
-        // Scale — grow on hover, pop on hit
-        const s = 1 + d.hoverLerp * 0.35 + d.hitLerp * 0.5;
-        cube.scale.setScalar(s);
+          // Zoom along the captured approach direction — preserves the user's
+          // viewing angle instead of snapping to a hardcoded direction.
+          const targetCam = torusPos.clone().addScaledVector(_approachDir, dist);
+          camera.position.copy(targetCam);
+          camera.lookAt(_smoothLookTarget);
 
-        // Colour — lerp toward accent on hover or hit
-        const accentBlend = Math.max(d.hoverLerp * 0.7, d.hitLerp);
-        cube.material.color.copy(d.baseColor).lerp(accent, accentBlend);
+          // Enable OrbitControls once transition is visually complete
+          if (raw >= 1.0 && !_markerDragging) {
+            orbitControls.enabled = true;
+            orbitControls.update();
+          }
+        } else {
+          // OrbitControls handles camera rotation & zoom
+          orbitControls.update();
+        }
+      } else {
+        // ── Return to default galaxy view ──
+        if (_hasEverEnteredExplore) {
+          // Timed + eased exit transition (only after user has entered explore)
+          _exitTransitionElapsed += dt;
+          const exitDuration = 0.7;
+          const raw = Math.min(_exitTransitionElapsed / exitDuration, 1.0);
+          const eased = easeInOutCubic(raw);
 
-        // Opacity — brighten on hover or hit
-        cube.material.opacity = d.baseOpacity + d.hoverLerp * 0.35 + d.hitLerp * 0.5;
+          const defaultPos = new THREE.Vector3(0, 0, 5);
+          camera.position.lerpVectors(_exitStartCam, defaultPos, eased);
 
-        // Gentle idle sway
-        cube.position.x = d.basePosition.x + Math.sin(t * d.idleSpeed * 0.4 + d.idlePhase) * 0.05;
-        cube.position.y = d.basePosition.y + Math.sin(t * d.idleSpeed + d.idlePhase) * 0.08;
-        cube.position.z = d.basePosition.z + Math.cos(t * d.idleSpeed * 0.3 + d.idlePhase * 1.5) * 0.04;
-      });
+          const defaultLook = new THREE.Vector3(0, 0, 0);
+          _smoothLookTarget.lerpVectors(_exitStartLook, defaultLook, eased);
+          camera.lookAt(_smoothLookTarget);
+        } else {
+          // Initial load — no transition, just set default view directly
+          camera.position.set(0, 0, 5);
+          camera.lookAt(0, 0, 0);
+        }
 
-      // Update galaxies
+        logoTrio.update(sceneCamera.smoothUserRotation);
+      }
+
+      // ── Scene group rotation — always applied so background never freezes
+      sceneGroup.rotation.x = sceneCamera.smoothRotation.x;
+      sceneGroup.rotation.y = sceneCamera.smoothRotation.y;
+
+      // Hide logo when zoomed into torus
+      logoTrio.group.visible = !focused;
+
+      // ── Hover detection (cubes + torus) ──────────────
+      raycaster.setFromCamera(sceneCamera.pointer, camera);
+      const visibleCubes = cubeField.getVisibleCubes();
+      const rayTargets = [...visibleCubes, ...torusKnot.getRayTargets()];
+      const intersects = raycaster.intersectObjects(rayTargets);
+      const firstHit = intersects.length > 0 ? intersects[0].object : null;
+      const hitTorus = torusKnot.isHit(firstHit);
+      hoveredCube = !hitTorus && firstHit ? firstHit : null;
+
+      torusKnot.applyHover(hitTorus && !focused); // hover effect only in preview mode
+      if (!hitTorus && !hoveredCube && !_markerDragging) {
+        document.body.style.cursor = '';
+      }
+      if (_markerDragging) {
+        document.body.style.cursor = 'grabbing';
+      }
+
+      // ── Update subsystems ────────────────────────────
+      const currentAccent = getAccentColor();
+      cubeField.update(t, dt, hoveredCube, currentAccent);
       galaxyManager.update(t, dt);
-
-      // Update flying saucer
+      torusKnot.update(t, dt);
       saucer.update(t, dt);
 
-      // Camera shake from galaxy collapse (temporary offset, restored after render)
+      // ── Torus params change detection (fast shallow compare, no JSON.stringify) ──
+      const current = torusParamsRef.current;
+      if (current && _paramsChanged(current, prevParams)) {
+        prevParams = { ...current };
+        torusKnot.rebuild(current);
+        // Notify React of the updated state from the 3D engine
+        onTorusParamsChangeRef.current?.(torusKnot.getState());
+      }
+
+      // ── Camera shake (from galaxy collapses) ─────────
       const shake = galaxyManager.getShake();
-      let shakeX = 0, shakeY = 0;
+      let shakeX = 0;
+      let shakeY = 0;
       if (shake > 0.001) {
         shakeX = (Math.random() - 0.5) * 2 * shake;
         shakeY = (Math.random() - 0.5) * 2 * shake;
@@ -419,7 +359,7 @@ export default function ThreeBackground() {
 
       renderer.render(scene, camera);
 
-      // Restore camera position
+      // Restore camera position after shake
       if (shake > 0.001) {
         camera.position.x -= shakeX;
         camera.position.y -= shakeY;
@@ -428,57 +368,33 @@ export default function ThreeBackground() {
 
     animate();
 
-    // Handle resize
+    // ── Resize handler ──────────────────────────────────
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      const mobile = window.innerWidth < 640;
-      logoGroup.position.y = 0.4;
     };
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
+    // ── Cleanup ─────────────────────────────────────────
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('pointerup', handlePointerUp);
-      window.removeEventListener('pointermove', handleDragMove);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('click', handleClick);
-      window.removeEventListener('auxclick', handleAuxClick);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('wheel', handleWheel);
+      sceneCamera.dispose();
+      orbitControls.dispose();
       galaxyManager.dispose();
       saucer.dispose();
-      cubes.forEach((cube) => {
-        cube.geometry.dispose();
-        cube.material.dispose();
-        sceneGroup.remove(cube);
-      });
-      if (logoMesh) {
-        logoGroup.remove(logoMesh);
-        logoMesh.traverse((child) => {
-          if (child.isMesh) child.geometry.dispose();
-        });
-      }
-      if (overlayFront) logoGroup.remove(overlayFront);
-      if (overlayBack) logoGroup.remove(overlayBack);
-      if (overlayGeo) overlayGeo.dispose();
-      overlayMat.dispose();
-      logoTexture.dispose();
-      scene.remove(logoGroup);
-      logoMaterial.dispose();
+      cubeField.dispose();
+      logoTrio.dispose();
+      torusKnot.dispose();
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div

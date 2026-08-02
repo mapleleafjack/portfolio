@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ALBUMS, HARDWARE_ITEMS, SIDE_PROJECTS } from '../data';
 import { Music, Fire, Cpu, Star } from 'pixelarticons/react';
+import { useTorus } from '../TorusContext';
 
 export default function Creative() {
+  const { openTorus } = useTorus();
   return (
     <div>
       {/* Header */}
@@ -70,12 +72,21 @@ export default function Creative() {
           Experiments
         </h2>
         <div className="space-y-2">
-          {SIDE_PROJECTS.map((p) => (
-            <div key={p.name} className="text-sm pl-0 sm:pl-3 border-l-2 border-gray-100 hover:border-accent transition-colors">
-              <a href={p.url} target="_blank" rel="noopener noreferrer" className="link-underline font-medium">{p.name}</a>
-              <p className="text-gray-500 text-xs mt-0.5">{p.description}</p>
-            </div>
-          ))}
+          {SIDE_PROJECTS.map((p) => {
+            const isTorus = p.url === '/torus/';
+            return (
+              <div key={p.name} className="text-sm pl-0 sm:pl-3 border-l-2 border-gray-100 hover:border-accent transition-colors">
+                {isTorus ? (
+                  <button onClick={openTorus} className="link-underline font-medium bg-transparent border-none cursor-pointer text-[length:inherit] p-0">
+                    {p.name}
+                  </button>
+                ) : (
+                  <a href={p.url} target="_blank" rel="noopener noreferrer" className="link-underline font-medium">{p.name}</a>
+                )}
+                <p className="text-gray-500 text-xs mt-0.5">{p.description}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>

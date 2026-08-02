@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { getAccentColor } from './shared';
 
 // 3 size tiers for varied rock debris
 const GEO_S = new THREE.BoxGeometry(0.06, 0.06, 0.06);
@@ -28,11 +29,6 @@ const _raycaster = new THREE.Raycaster();
 const _plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 const _intersect = new THREE.Vector3();
 
-function getAccentHex() {
-  const style = getComputedStyle(document.documentElement);
-  return style.getPropertyValue('--accent').trim() || '#f0c830';
-}
-
 function pickGeo() {
   const r = Math.random();
   if (r < 0.15) return GEO_L;
@@ -41,12 +37,12 @@ function pickGeo() {
 }
 
 class Galaxy {
-  constructor(parentGroup, origin) {
+  constructor(parentGroup, origin, explosionBoost = 1) {
     this.parentGroup = parentGroup;
     this.origin = origin.clone();
     this.elapsed = 0;
     this.phase = PHASE_SPIRAL;
-    this.explodeIntensity = 1;
+    this.explodeIntensity = explosionBoost;
     this.merged = false;
     this.shakenSolo = false;
 
@@ -84,7 +80,7 @@ class Galaxy {
       depthWrite: false,
     });
     this.accentMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(getAccentHex()),
+      color: getAccentColor(),
       wireframe: true,
       transparent: true,
       opacity: 0,
@@ -309,6 +305,12 @@ export default class GalaxyManager {
       );
     }
     this.galaxies.push(new Galaxy(this.sceneGroup, origin));
+  }
+
+  spawnAt(worldPos, explosionBoost = 1) {
+    // Create a galaxy directly at a given position in sceneGroup local space
+    const origin = worldPos.clone();
+    this.galaxies.push(new Galaxy(this.sceneGroup, origin, explosionBoost));
   }
 
   getShake() {
