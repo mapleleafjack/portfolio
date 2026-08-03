@@ -364,6 +364,19 @@ export default class FlyingSaucer {
     this.group.add(beam);
     this.beamMat = beamMat;
 
+    // ── Glow sphere (visible only on hover, accent colour) ──
+    const glowGeo = new THREE.SphereGeometry(0.50, 16, 16);
+    const glowMat = new THREE.MeshBasicMaterial({
+      color: accent.clone(),
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    });
+    this._glowMesh = new THREE.Mesh(glowGeo, glowMat);
+    this._glowMat = glowMat;
+    this._glowMesh.scale.set(1, 0.45, 1); // match saucer disc proportions
+    this.group.add(this._glowMesh);
+
     // ── Orbit parameters ──
     this.orbitRadiusX = 4.5 + Math.random() * 1.5;
     this.orbitRadiusZ = 3.5 + Math.random() * 1.5;
@@ -396,6 +409,7 @@ export default class FlyingSaucer {
     this._cubeWorldPos = new THREE.Vector3();
     this._fireGlow = 0; // 0 = normal, 1 = full glow
     this._chargeGlowTarget = 0; // target glow during charge-up
+    this._hovered = false;     // hover state for glow effect
     this._savedMoveState = null; // state to restore after shooting
 
     // ── Player control state ──
@@ -430,8 +444,8 @@ export default class FlyingSaucer {
     this.group.add(this._clickSphere);
 
     // Store materials for disposal
-    this._mats = [bodyMat, domeMat, beamMat, clickMat, ...this.lights.map(l => l.mat)];
-    this._geos = [bodyGeo, domeGeo, lightGeo, beamGeo, clickGeo];
+    this._mats = [bodyMat, domeMat, beamMat, glowMat, clickMat, ...this.lights.map(l => l.mat)];
+    this._geos = [bodyGeo, domeGeo, lightGeo, beamGeo, glowGeo, clickGeo];
   }
 
   update(t, dt) {
@@ -484,6 +498,13 @@ export default class FlyingSaucer {
         cube.material.opacity = d.baseOpacity;
         cube.material.color.copy(d.baseColor);
       }
+    }
+
+    // ── Apply hover glow (overrides per-frame AI/player rendering) ──
+    if (this._hovered) {
+      this._applyHoverVisuals();
+    } else {
+      this._glowMat.opacity = 0;
     }
   }
 
@@ -643,9 +664,39 @@ export default class FlyingSaucer {
     return [this._clickSphere];
   }
 
+  /**
+   * Apply hover visual feedback — glow ring and accent colour shift.
+   * Mirrors the torus glow-on-hover behaviour.
+   * Only sets/clears the state flag; actual rendering is applied at end of update().
+   * @param {boolean} hovered
+   */
+  applyHover(hovered) {
+    this._hovered = hovered;
+  }
+
+  /**
+   * Internal: apply hover visuals if the saucer is currently hovered.
+   * Called at the end of update() so it overrides per-frame AI/player rendering.
+   */
+  _applyHoverVisuals() {
+    if (!this._hovered) return;
+    const accent = getAccentColor();
+    this.bodyMat.color.set(0x888888).lerp(accent, 0.45);
+    this.bodyMat.opacity = 0.75;
+    this.domeMat.color.set(0xaaaaaa).lerp(accent, 0.4);
+    this.domeMat.opacity = 0.65;
+    this._glowMat.color.copy(accent);
+    this._glowMat.opacity = 0.12;
+  }
+
   /** Whether the saucer is currently player-controlled. */
   isPlayerControlled() {
     return this._playerControlled;
+  }
+
+  /** Maximum distance for laser targeting. */
+  getLaserRange() {
+    return this._laserRange;
   }
 
   /**
@@ -716,6 +767,9 @@ export default class FlyingSaucer {
       this._prevYaw = this.group.rotation.y;
       this._fireGlow = 0;
       this._chargeGlowTarget = 0;
+      // Clear any lingering hover glow from preview mode
+      this._hovered = false;
+      this._glowMat.opacity = 0;
     }
   }
 

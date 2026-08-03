@@ -466,6 +466,13 @@ body.cockpit-active {
   cursor: none !important;
 }
 
+/* On touch devices, don't hide cursor (there isn't one) */
+@media (hover: none) and (pointer: coarse) {
+  body.cockpit-active {
+    cursor: auto !important;
+  }
+}
+
 /* Crosshair — positioned at virtual cursor */
 .cockpit-crosshair {
   position: fixed;
@@ -541,4 +548,109 @@ body.cockpit-active {
   pointer-events: none;
   transition: opacity 1s ease;
   text-align: center;
+}
+
+/* ── Mobile cockpit HUD (on-screen controls) ── */
+.cockpit-mobile-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+}
+
+.cockpit-mobile-btn {
+  position: absolute;
+  pointer-events: auto;
+  font-family: 'Oxanium', sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.8);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.cockpit-mobile-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Exit button — top-left corner */
+.cockpit-mobile-exit {
+  top: 16px;
+  left: 16px;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  z-index: 310;
+}
+
+/* Fire button — large, bottom-right */
+.cockpit-mobile-fire {
+  bottom: 24px;
+  right: 24px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-color: rgba(255, 100, 80, 0.4);
+  background: rgba(180, 40, 20, 0.25);
+}
+
+.cockpit-mobile-fire:active {
+  background: rgba(255, 80, 50, 0.4);
+  border-color: rgba(255, 120, 100, 0.7);
+}
+
+/* Boost button — bottom-left */
+.cockpit-mobile-boost {
+  bottom: 24px;
+  left: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-color: rgba(100, 200, 255, 0.3);
+}
+
+.cockpit-mobile-boost:active {
+  background: rgba(100, 180, 255, 0.3);
+  border-color: rgba(120, 220, 255, 0.6);
+}
+
+/* Brake button — to the right of boost */
+.cockpit-mobile-brake {
+  bottom: 24px;
+  left: 92px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-color: rgba(255, 200, 100, 0.3);
+}
+
+.cockpit-mobile-brake:active {
+  background: rgba(255, 160, 60, 0.3);
+  border-color: rgba(255, 220, 120, 0.6);
+}
+
+/* Hide mobile HUD on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+  .cockpit-mobile-hud {
+    display: none;
+  }
 }
