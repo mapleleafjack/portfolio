@@ -62,10 +62,10 @@ export default function TorusControlsPanel({
         .tc-root { font-family:'Oxanium',sans-serif; color:#333; user-select:none; -webkit-user-select:none; }
         .tc-panel {
           position:fixed; bottom:0; left:50%; transform:translateX(-50%);
-          background:rgba(255,255,255,0.82); border-top:1px solid rgba(0,0,0,0.06);
+          background:rgba(255,255,255,0.78); border-top:1px solid rgba(0,0,0,0.08);
           border-radius:12px 12px 0 0; padding:6px 20px 6px; z-index:20;
           backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-          box-shadow:0 -4px 24px rgba(0,0,0,0.05);
+          box-shadow:0 -4px 24px rgba(0,0,0,0.08);
           display:flex; flex-direction:column; gap:2px; max-width:max-content;
         }
         .tc-panel.collapsed { padding:6px 20px 6px; }
@@ -80,10 +80,10 @@ export default function TorusControlsPanel({
           font-family:'Oxanium',sans-serif;
         }
         .tc-panel-toggle:hover { background:rgba(0,0,0,0.08); color:#333; }
-        .tc-section-label { font-size:7.5px; text-transform:uppercase; letter-spacing:0.12em; color:rgba(0,0,0,0.25); padding:0; line-height:1; margin-top:2px; }
+        .tc-section-label { font-size:7.5px; text-transform:uppercase; letter-spacing:0.12em; color:rgba(0,0,0,0.32); padding:0; line-height:1; margin-top:2px; }
         .tc-controls-grid { display:flex; flex-wrap:wrap; gap:4px 16px; align-items:flex-end; }
         .tc-group { display:flex; flex-direction:column; gap:1px; min-width:80px; max-width:130px; flex:1 0 auto; }
-        .tc-group label { font-size:9.5px; letter-spacing:0.03em; color:#999; white-space:nowrap; }
+        .tc-group label { font-size:9.5px; letter-spacing:0.03em; color:#777; white-space:nowrap; }
         .tc-group input[type="range"] { -webkit-appearance:none; width:100%; height:4px; background:rgba(0,0,0,0.08); border-radius:2px; outline:none; cursor:pointer; }
         .tc-group input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--accent); cursor:pointer; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,0.15); }
         .tc-group input[type="color"] { -webkit-appearance:none; width:100%; height:20px; border:1px solid rgba(0,0,0,0.1); border-radius:4px; cursor:pointer; background:transparent; padding:0; }

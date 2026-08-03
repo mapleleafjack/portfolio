@@ -754,7 +754,11 @@ export default class TorusKnot {
   /** Full rebuild from new parameter set. */
   rebuild(params = {}) {
     Object.assign(this._state, params);
-    this._activePreset = -1;
+    // Preserve activePreset from explicit React-driven updates;
+    // engine-internal calls (applyPreset, resetToDefaults) set it before rebuild().
+    if ('activePreset' in params) {
+      this._activePreset = params.activePreset;
+    }
 
     // Check if any geometry-affecting params changed
     const geoKeys = ['p', 'q', 'radius', 'tube'];

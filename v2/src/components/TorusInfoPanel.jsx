@@ -51,19 +51,19 @@ export default function TorusInfoPanel({ params = {}, activePreset = -1 }) {
     panel: {
       position: 'fixed', top: 12, right: 12, zIndex: 15, width: 330,
       maxHeight: 'calc(100vh - 180px)',
-      background: 'rgba(255,255,255,0.82)',
+      background: 'rgba(255,255,255,0.78)',
       backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-      border: '1px solid rgba(0,0,0,0.06)', borderRadius: 14,
-      boxShadow: '0 4px 32px rgba(0,0,0,0.06)',
+      border: '1px solid rgba(0,0,0,0.08)', borderRadius: 14,
+      boxShadow: '0 4px 32px rgba(0,0,0,0.08)',
       padding: '18px 18px 14px', overflowY: 'auto',
-      fontFamily: "'Oxanium', sans-serif", color: '#333', fontSize: 11, lineHeight: 1.55,
+      fontFamily: "'Oxanium', sans-serif", color: '#2a2a2a', fontSize: 11, lineHeight: 1.55,
     },
     close: { position: 'absolute', top: 6, right: 8, background: 'none', border: 'none', color: '#aaa', fontSize: 16, cursor: 'pointer', padding: '4px 8px', borderRadius: 4 },
     h3: { fontSize: 14, margin: '0 24px 2px 0', color: '#111', fontWeight: 700 },
-    sub: { fontSize: 10, color: '#999', marginBottom: 10 },
+    sub: { fontSize: 10, color: '#777', marginBottom: 10 },
     h4: { fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--accent)', margin: '14px 0 4px', fontWeight: 600 },
-    why: { background: 'rgba(0,0,0,0.025)', borderLeft: '2px solid var(--accent)', padding: '8px 10px', margin: '8px 0', borderRadius: '0 8px 8px 0', fontSize: 9.5, color: '#666', lineHeight: 1.5 },
-    real: { marginTop: 10, padding: '8px 10px', background: 'rgba(0,0,0,0.018)', borderRadius: 8, fontSize: 9.5, color: '#888', lineHeight: 1.45 },
+    why: { background: 'rgba(0,0,0,0.03)', borderLeft: '2px solid var(--accent)', padding: '8px 10px', margin: '8px 0', borderRadius: '0 8px 8px 0', fontSize: 9.5, color: '#555', lineHeight: 1.5 },
+    real: { marginTop: 10, padding: '8px 10px', background: 'rgba(0,0,0,0.025)', borderRadius: 8, fontSize: 9.5, color: '#777', lineHeight: 1.45 },
     row: { display: 'flex', justifyContent: 'space-between', padding: '2px 0', borderBottom: '1px solid rgba(0,0,0,0.04)', fontSize: 10 },
     dotRow: { margin: '3px 0', fontSize: 9.5, lineHeight: 1.4, paddingLeft: 3 },
     dot: { display: 'inline-block', width: 7, height: 7, borderRadius: '50%', marginRight: 5, flexShrink: 0, verticalAlign: 'middle' },
@@ -112,7 +112,7 @@ export default function TorusInfoPanel({ params = {}, activePreset = -1 }) {
 function PRow({ k, v }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', borderBottom: '1px solid rgba(0,0,0,0.04)', fontSize: 10 }}>
-      <span style={{ color: '#999' }}>{k}</span>
+      <span style={{ color: '#888' }}>{k}</span>
       <span style={{ color: 'var(--accent)', fontFamily: "'SF Mono','Fira Code',monospace", fontSize: 9.5, fontWeight: 500 }}>{v}</span>
     </div>
   );

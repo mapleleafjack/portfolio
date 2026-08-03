@@ -41,13 +41,12 @@ function AppContent() {
 
   // ── Engine state sync callback ──────────────────────
   const handleEngineStateChange = useCallback((engineState) => {
-    // Sync engine-driven state changes back to React (e.g. marker position)
-    // Only update fields the engine may have changed internally
+    // Sync engine-driven state changes back to React (e.g. marker-driven geometry).
+    // activePreset is a React-only UI concern — never synced from the engine.
     if (engineState) {
       updateTorusParams({
         p: engineState.p,
         q: engineState.q,
-        activePreset: engineState.activePreset,
       });
     }
   }, [updateTorusParams]);
@@ -135,8 +134,12 @@ function AppContent() {
           {/* Hint */}
           <div style={{
             position: 'fixed', top: 12, left: '50%', transform: 'translateX(-50%)',
-            fontSize: 9.5, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.03em',
+            fontSize: 9.5, color: 'rgba(0,0,0,0.42)', letterSpacing: '0.03em',
+            background: 'rgba(255,255,255,0.55)',
+            backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+            padding: '3px 14px', borderRadius: 20,
             pointerEvents: 'none', zIndex: 5, fontFamily: "'Oxanium', sans-serif",
+            whiteSpace: 'nowrap',
           }}>
             🖱 Drag the glowing marker on the torus · Cmd+drag to orbit · Scroll to zoom
           </div>
