@@ -200,6 +200,13 @@ class LaserBeam {
 }
 
 const RESPAWN_DELAY = 2.5; // seconds before a destroyed cube respawns
+const PLAYER_SPEED = 1.5;    // base forward speed (cruising)
+const PLAYER_BOOST = 3.0;   // boost speed
+const PLAYER_BRAKE = 0.6;   // brake speed
+const PLAYER_DODGE_SPEED = 1.2; // strafe/vertical dodge speed
+const PLAYER_COOLDOWN = 0.2; // seconds between player shots
+const MOUSE_SENSITIVITY = 0.0015; // rad/pixel (smoother game feel)
+const PITCH_CLAMP = 1.4;     // ~80° pitch limit
 
 // ── Impact flash (expanding rings + central burst at hit point) ──
 class ImpactFlash {
@@ -391,134 +398,52 @@ export default class FlyingSaucer {
     this._chargeGlowTarget = 0; // target glow during charge-up
     this._savedMoveState = null; // state to restore after shooting
 
+    // ── Player control state ──
+    this._playerControlled = false;
+    this._playerCooldown = 0;
+    this._playerPitch = 0;       // current pitch angle (applied to rotation.x)
+    this._playerShootHeld = false;
+    this._playerSpeed = PLAYER_SPEED;
+    // Crosshair-based targeting
+    this._playerCrosshairTarget = new THREE.Vector3(); // world-space target from crosshair raycast
+    this._playerCrosshairHasHit = false;               // whether crosshair ray hit a cube
+    this._playerCrosshairHitCube = null;               // the hit cube (if any)
+    // Turn-rate control (virtual cursor): continuous turn rates in rad/s
+    this._targetYawRate = 0;     // desired yaw rate (from cursor position)
+    this._targetPitchRate = 0;   // desired pitch rate
+    this._yawRate = 0;           // smoothed yaw rate
+    this._pitchRate = 0;         // smoothed pitch rate
+    this._roll = 0;              // bank angle (visual)
+    this._prevYaw = 0;
+
+    // ── Invisible click sphere (raycaster target) ──
+    const clickGeo = new THREE.SphereGeometry(0.45, 12, 12);
+    const clickMat = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      depthTest: false,
+    });
+    this._clickSphere = new THREE.Mesh(clickGeo, clickMat);
+    this._clickSphere.userData.isSaucer = true;
+    this._clickSphere.renderOrder = 999;
+    this.group.add(this._clickSphere);
+
     // Store materials for disposal
-    this._mats = [bodyMat, domeMat, beamMat, ...this.lights.map(l => l.mat)];
-    this._geos = [bodyGeo, domeGeo, lightGeo, beamGeo];
+    this._mats = [bodyMat, domeMat, beamMat, clickMat, ...this.lights.map(l => l.mat)];
+    this._geos = [bodyGeo, domeGeo, lightGeo, beamGeo, clickGeo];
   }
 
   update(t, dt) {
-    // ── Movement state machine ──
-    this._moveTimer -= dt;
-    if (this._moveTimer <= 0) {
-      switch (this._moveState) {
-        case 'cruising':
-          this._moveState = 'stopping';
-          this._targetSpeed = 0;
-          this._moveTimer = 0.8 + Math.random() * 0.4; // decel duration
-          break;
-        case 'stopping':
-          this._moveState = 'hovering';
-          this._currentSpeed = 0;
-          this._moveTimer = 0.8 + Math.random() * 1.2; // hover duration
-          break;
-        case 'hovering':
-          // Possibly reverse direction
-          if (Math.random() < 0.4) this.orbitDirection *= -1;
-          this._targetSpeed = this.orbitBaseSpeed * this.orbitDirection;
-          this._moveState = 'resuming';
-          this._moveTimer = 0.6 + Math.random() * 0.4; // accel duration
-          break;
-        case 'shooting':
-          // Fire the laser now (after charge-up)
-          this._tryShoot();
-          // Resume previous movement
-          this._targetSpeed = this.orbitBaseSpeed * this.orbitDirection;
-          this._moveState = 'resuming';
-          this._moveTimer = 0.6 + Math.random() * 0.3;
-          // Drop glow after firing
-          this._fireGlow = 0.3;
-          this._chargeGlowTarget = 0;
-          break;
-        case 'resuming':
-          this._moveState = 'cruising';
-          this._moveTimer = 4 + Math.random() * 6; // cruise duration
-          break;
-      }
-    }
-
-    // Smoothly lerp current speed toward target
-    const speedLerp = this._moveState === 'stopping' ? 0.04 : 0.06;
-    this._currentSpeed += (this._targetSpeed - this._currentSpeed) * speedLerp;
-
-    // Advance orbit angle by current speed
-    this.orbitAngle += this._currentSpeed * dt;
-
-    // Elliptical orbit
-    const angle = this.orbitAngle;
-    const x = Math.cos(angle) * this.orbitRadiusX;
-    const z = Math.sin(angle) * this.orbitRadiusZ;
-    // Tilt the orbit plane
-    const y = Math.sin(angle) * this.orbitRadiusZ * Math.sin(this.orbitTilt)
-            + Math.sin(t * this.bobSpeed) * this.bobAmount;
-
-    this.group.position.set(x, y, z);
-
-    // Face the direction of travel (tangent to the orbit)
-    const step = 0.01 * Math.sign(this._currentSpeed || this.orbitDirection);
-    const nextAngle = angle + step;
-    const nx = Math.cos(nextAngle) * this.orbitRadiusX;
-    const nz = Math.sin(nextAngle) * this.orbitRadiusZ;
-    const dx = nx - x;
-    const dz = nz - z;
-    const targetYaw = Math.atan2(dx, dz);
-    // Smooth yaw so direction changes don't snap
-    this._smoothYaw = this._lerpAngle(this._smoothYaw, targetYaw, 0.06);
-    this.group.rotation.y = this._smoothYaw;
-
-    // Slight banking into the turn (proportional to speed)
-    const speedRatio = this._currentSpeed / (this.orbitBaseSpeed || 0.15);
-    this.group.rotation.z = Math.sin(angle) * 0.15 * speedRatio;
-
-    // Subtle wobble
-    this.group.rotation.x = Math.sin(t * 1.2) * 0.05;
-
-    // Animate rim lights (sequential pulsing + glow boost)
-    for (const l of this.lights) {
-      const pulse = Math.sin(t * 4 + l.phase * Math.PI * 2) * 0.5 + 0.5;
-      l.mat.opacity = Math.min(0.3 + pulse * 0.7 + this._fireGlow * 0.3, 1.0);
-    }
-
-    // Beam opacity pulsing (brighter during glow)
-    this.beamMat.opacity = 0.06 + Math.sin(t * 2) * 0.06 + this._fireGlow * 0.25;
-
-    // ── Laser shooting logic ──
-    if (this._moveState !== 'shooting') {
-      this._shootTimer += dt;
-      if (this._shootTimer >= this._shootCooldown && this.cubes.length > 0) {
-        this._shootTimer = 0;
-        this._shootCooldown = 7.0 + Math.random() * 8.0; // 7-15s between shots
-        // Interrupt movement: stop, charge, fire
-        this._savedMoveState = this._moveState;
-        this._savedMoveTimer = this._moveTimer;
-        this._moveState = 'shooting';
-        this._moveTimer = 1.2; // charge-up time before firing
-        this._targetSpeed = 0;
-        this._chargeGlowTarget = 1.0; // ramp up glow during charge
-      }
-    }
-
-    // Gradual charge-up glow during shooting state
-    if (this._moveState === 'shooting') {
-      this._fireGlow += (this._chargeGlowTarget - this._fireGlow) * 0.04;
+    if (this._playerControlled) {
+      // ── Player-controlled mode ──────────────────
+      this._updatePlayerMode(t, dt);
     } else {
-      // Decay fire glow after firing
-      if (this._fireGlow > 0.001) {
-        this._fireGlow *= 0.92;
-      } else {
-        this._fireGlow = 0;
-      }
+      // ── AI orbit mode ───────────────────────────
+      this._updateAIMode(t, dt);
     }
 
-    // Apply glow to body and dome
-    const baseBodyOpacity = 0.5;
-    const baseDomeOpacity = 0.45;
-    this.bodyMat.opacity = baseBodyOpacity + this._fireGlow * 0.5;
-    this.domeMat.opacity = baseDomeOpacity + this._fireGlow * 0.55;
-    // Lerp body/dome color toward accent when glowing
-    this.bodyMat.color.set(0x888888).lerp(this._accent, this._fireGlow * 0.6);
-    this.domeMat.color.set(0xaaaaaa).lerp(this._accent, this._fireGlow * 0.5);
-
-    // Update active lasers
+    // ── Shared: update active lasers ──────────────────
     for (let i = this._lasers.length - 1; i >= 0; i--) {
       this._lasers[i].update(dt);
       if (this._lasers[i].done) {
@@ -527,7 +452,7 @@ export default class FlyingSaucer {
       }
     }
 
-    // Update active explosions
+    // ── Shared: update active explosions ──────────────
     for (let i = this._explosions.length - 1; i >= 0; i--) {
       this._explosions[i].update(dt);
       if (this._explosions[i].done) {
@@ -536,7 +461,7 @@ export default class FlyingSaucer {
       }
     }
 
-    // Update impact flash effects
+    // ── Shared: update impact flash effects ───────────
     for (let i = this._flashEffects.length - 1; i >= 0; i--) {
       this._flashEffects[i].update(dt);
       if (this._flashEffects[i].done) {
@@ -545,7 +470,7 @@ export default class FlyingSaucer {
       }
     }
 
-    // ── Cube respawn logic ──
+    // ── Shared: cube respawn logic ────────────────────
     const now = performance.now() / 1000;
     for (const cube of this.cubes) {
       const d = cube.userData;
@@ -554,12 +479,372 @@ export default class FlyingSaucer {
         d.respawnAt = 0;
         d.hitLerp = 0;
         d.hoverLerp = 0;
-        d.spawnLerp = 0; // start spawn-in animation
-        cube.scale.setScalar(0.001); // start as a point (prevents 1-frame flash at full size)
+        d.spawnLerp = 0;
+        cube.scale.setScalar(0.001);
         cube.material.opacity = d.baseOpacity;
         cube.material.color.copy(d.baseColor);
       }
     }
+  }
+
+  /** AI orbit movement: state machine, elliptical orbit, auto-shooting. */
+  _updateAIMode(t, dt) {
+    // ── Movement state machine ──
+    this._moveTimer -= dt;
+    if (this._moveTimer <= 0) {
+      switch (this._moveState) {
+        case 'cruising':
+          this._moveState = 'stopping';
+          this._targetSpeed = 0;
+          this._moveTimer = 0.8 + Math.random() * 0.4;
+          break;
+        case 'stopping':
+          this._moveState = 'hovering';
+          this._currentSpeed = 0;
+          this._moveTimer = 0.8 + Math.random() * 1.2;
+          break;
+        case 'hovering':
+          if (Math.random() < 0.4) this.orbitDirection *= -1;
+          this._targetSpeed = this.orbitBaseSpeed * this.orbitDirection;
+          this._moveState = 'resuming';
+          this._moveTimer = 0.6 + Math.random() * 0.4;
+          break;
+        case 'shooting':
+          this._tryShoot();
+          this._targetSpeed = this.orbitBaseSpeed * this.orbitDirection;
+          this._moveState = 'resuming';
+          this._moveTimer = 0.6 + Math.random() * 0.3;
+          this._fireGlow = 0.3;
+          this._chargeGlowTarget = 0;
+          break;
+        case 'resuming':
+          this._moveState = 'cruising';
+          this._moveTimer = 4 + Math.random() * 6;
+          break;
+      }
+    }
+
+    const speedLerp = this._moveState === 'stopping' ? 0.04 : 0.06;
+    this._currentSpeed += (this._targetSpeed - this._currentSpeed) * speedLerp;
+    this.orbitAngle += this._currentSpeed * dt;
+
+    const angle = this.orbitAngle;
+    const x = Math.cos(angle) * this.orbitRadiusX;
+    const z = Math.sin(angle) * this.orbitRadiusZ;
+    const y = Math.sin(angle) * this.orbitRadiusZ * Math.sin(this.orbitTilt)
+            + Math.sin(t * this.bobSpeed) * this.bobAmount;
+    this.group.position.set(x, y, z);
+
+    const step = 0.01 * Math.sign(this._currentSpeed || this.orbitDirection);
+    const nextAngle = angle + step;
+    const nx = Math.cos(nextAngle) * this.orbitRadiusX;
+    const nz = Math.sin(nextAngle) * this.orbitRadiusZ;
+    const dx = nx - x;
+    const dz = nz - z;
+    const targetYaw = Math.atan2(dx, dz);
+    this._smoothYaw = this._lerpAngle(this._smoothYaw, targetYaw, 0.06);
+    this.group.rotation.y = this._smoothYaw;
+    this.group.rotation.z = Math.sin(angle) * 0.15 * (this._currentSpeed / (this.orbitBaseSpeed || 0.15));
+    this.group.rotation.x = Math.sin(t * 1.2) * 0.05;
+
+    for (const l of this.lights) {
+      const pulse = Math.sin(t * 4 + l.phase * Math.PI * 2) * 0.5 + 0.5;
+      l.mat.opacity = Math.min(0.3 + pulse * 0.7 + this._fireGlow * 0.3, 1.0);
+    }
+    this.beamMat.opacity = 0.06 + Math.sin(t * 2) * 0.06 + this._fireGlow * 0.25;
+
+    // ── AI laser shooting logic ──
+    if (this._moveState !== 'shooting') {
+      this._shootTimer += dt;
+      if (this._shootTimer >= this._shootCooldown && this.cubes.length > 0) {
+        this._shootTimer = 0;
+        this._shootCooldown = 7.0 + Math.random() * 8.0;
+        this._savedMoveState = this._moveState;
+        this._savedMoveTimer = this._moveTimer;
+        this._moveState = 'shooting';
+        this._moveTimer = 1.2;
+        this._targetSpeed = 0;
+        this._chargeGlowTarget = 1.0;
+      }
+    }
+
+    if (this._moveState === 'shooting') {
+      this._fireGlow += (this._chargeGlowTarget - this._fireGlow) * 0.04;
+    } else {
+      if (this._fireGlow > 0.001) { this._fireGlow *= 0.92; } else { this._fireGlow = 0; }
+    }
+
+    const baseBodyOpacity = 0.5;
+    const baseDomeOpacity = 0.45;
+    this.bodyMat.opacity = baseBodyOpacity + this._fireGlow * 0.5;
+    this.domeMat.opacity = baseDomeOpacity + this._fireGlow * 0.55;
+    this.bodyMat.color.set(0x888888).lerp(this._accent, this._fireGlow * 0.6);
+    this.domeMat.color.set(0xaaaaaa).lerp(this._accent, this._fireGlow * 0.5);
+  }
+
+  /** Player-controlled mode: chase cam with turn-rate control from virtual cursor. */
+  _updatePlayerMode(t, dt) {
+    if (this._playerCooldown > 0) {
+      this._playerCooldown -= dt;
+    }
+
+    if (this._playerShootHeld && this._playerCooldown <= 0) {
+      this._playerShoot();
+    }
+
+    // ── Smooth turn rates toward target (gives weight to controls) ──
+    const rateLerp = Math.min(12 * dt, 1);
+    this._yawRate += (this._targetYawRate - this._yawRate) * rateLerp;
+    this._pitchRate += (this._targetPitchRate - this._pitchRate) * rateLerp;
+
+    // Apply rotation
+    this.group.rotation.y += this._yawRate * dt;
+    this._playerPitch += this._pitchRate * dt;
+    this._playerPitch = Math.max(-PITCH_CLAMP, Math.min(PITCH_CLAMP, this._playerPitch));
+
+    // Banking: roll proportional to yaw rate
+    const targetRoll = -this._yawRate * 0.45;
+    this._roll += (targetRoll - this._roll) * Math.min(8 * dt, 1);
+    this._roll = Math.max(-1.0, Math.min(1.0, this._roll));
+
+    // ── Auto-forward flight ──
+    const worldFwd = new THREE.Vector3(0, 0, 1);
+    worldFwd.applyQuaternion(this.group.quaternion).normalize();
+    const speed = this._playerSpeed * dt;
+    this.group.position.x += worldFwd.x * speed;
+    this.group.position.y += worldFwd.y * speed;
+    this.group.position.z += worldFwd.z * speed;
+
+    // ── Glow ──
+    const boostRatio = Math.max(0, Math.min(1, (this._playerSpeed - PLAYER_BRAKE) / (PLAYER_BOOST - PLAYER_BRAKE)));
+    const idlePulse = Math.sin(t * 3) * 0.08 + 0.08;
+    this.bodyMat.opacity = 0.65 + idlePulse + boostRatio * 0.15;
+    this.domeMat.opacity = 0.6 + idlePulse + boostRatio * 0.12;
+    this.bodyMat.color.set(0x888888).lerp(this._accent, 0.15 + boostRatio * 0.35);
+    this.domeMat.color.set(0xaaaaaa).lerp(this._accent, 0.12 + boostRatio * 0.3);
+
+    for (const l of this.lights) {
+      const pulse = Math.sin(t * 6 + l.phase * Math.PI * 2) * 0.5 + 0.5;
+      l.mat.opacity = 0.5 + pulse * 0.5 + boostRatio * 0.2;
+    }
+    this.beamMat.opacity = 0.12 + Math.sin(t * 3) * 0.04 + boostRatio * 0.15;
+
+    // ── Final orientation ──
+    this.group.rotation.x = Math.sin(t * 1.8) * 0.02 + this._playerPitch;
+    this.group.rotation.z = this._roll;
+  }
+
+  // ═══════════════════════════════════════════════════════
+  //  PLAYER CONTROL API
+  // ═══════════════════════════════════════════════════════
+
+  /** Returns the raycaster targets for click detection. */
+  getRayTargets() {
+    return [this._clickSphere];
+  }
+
+  /** Whether the saucer is currently player-controlled. */
+  isPlayerControlled() {
+    return this._playerControlled;
+  }
+
+  /**
+   * Compute the cockpit world position (inside the dome).
+   * @param {THREE.Vector3} target — output vector
+   */
+  getCockpitWorldPosition(target) {
+    const localCockpit = new THREE.Vector3(0, 0.10, 0.08);
+    this.group.localToWorld(localCockpit);
+    target.copy(localCockpit);
+    return target;
+  }
+
+  /**
+   * Compute the saucer's forward direction in world space.
+   * Forward is local +Z (the direction the saucer faces).
+   * @param {THREE.Vector3} target — output vector
+   */
+  getForwardDirection(target) {
+    const localForward = new THREE.Vector3(0, 0, 1);
+    this.group.localToWorld(localForward);
+    target.copy(localForward).sub(this.group.getWorldPosition(new THREE.Vector3())).normalize();
+    return target;
+  }
+
+  /**
+   * Game-style third-person camera: locked behind the saucer.
+   * The ship stays centered on screen; the world rotates around it.
+   * @param {THREE.PerspectiveCamera} camera — the scene camera to position
+   */
+  applyGameCamera(camera) {
+    const saucerPos = this.group.getWorldPosition(new THREE.Vector3());
+    const fwd = this.getForwardDirection(new THREE.Vector3());
+
+    // Saucer's local up vector (for banking — camera rolls with the ship)
+    const saucerUp = new THREE.Vector3(0, 1, 0);
+    saucerUp.applyQuaternion(this.group.quaternion);
+
+    // Camera position: behind and above the saucer
+    camera.position.copy(saucerPos)
+      .addScaledVector(fwd, -5)
+      .addScaledVector(saucerUp, 3);
+
+    // Use saucer's up so the camera banks with the ship
+    camera.up.copy(saucerUp);
+    camera.lookAt(saucerPos);
+  }
+
+  /**
+   * Enable or disable player control.
+   * When enabling, cancels AI movement and resets state.
+   */
+  setPlayerControlled(enabled) {
+    this._playerControlled = enabled;
+    if (enabled) {
+      this._currentSpeed = 0;
+      this._targetSpeed = 0;
+      this._moveState = 'hovering';
+      this._playerCooldown = 0;
+      this._playerPitch = 0;
+      this._playerShootHeld = false;
+      this._playerSpeed = PLAYER_SPEED;
+      this._targetYawRate = 0;
+      this._targetPitchRate = 0;
+      this._yawRate = 0;
+      this._pitchRate = 0;
+      this._roll = 0;
+      this._prevYaw = this.group.rotation.y;
+      this._fireGlow = 0;
+      this._chargeGlowTarget = 0;
+    }
+  }
+
+  /**
+   * Set desired turn rates from virtual cursor position.
+   * Positive yawRate = turn right, positive pitchRate = pitch up.
+   * @param {number} yawRate   — desired yaw rate in rad/s (-1..1 mapped from cursor)
+   * @param {number} pitchRate — desired pitch rate in rad/s (-1..1 mapped from cursor)
+   */
+  applyPlayerTurn(yawRate, pitchRate) {
+    if (!this._playerControlled) return;
+    // Negate yaw: cursor right → positive yawRate → turn RIGHT in Three.js (negative rotation.y)
+    this._targetYawRate = -yawRate;
+    this._targetPitchRate = pitchRate;
+  }
+
+  /**
+   * Apply dodge (strafe left/right) and vertical movement.
+   * Forward flight is automatic (Starfox-style).
+   * @param {number} strafe — -1..1 (A/D dodge)
+   * @param {number} up     — -1..1 (Space/Ctrl)
+   * @param {number} dt     — delta time in seconds
+   */
+  applyPlayerDodge(strafe, up, dt) {
+    if (!this._playerControlled) return;
+
+    const speed = PLAYER_DODGE_SPEED * dt;
+
+    // Right direction (local +X in world space)
+    const worldRight = new THREE.Vector3(1, 0, 0);
+    worldRight.applyQuaternion(this.group.quaternion).normalize();
+
+    // World up
+    const worldUp = new THREE.Vector3(0, 1, 0);
+
+    this.group.position.x += (worldRight.x * strafe + worldUp.x * up) * speed;
+    this.group.position.y += (worldRight.y * strafe + worldUp.y * up) * speed;
+    this.group.position.z += (worldRight.z * strafe + worldUp.z * up) * speed;
+  }
+
+  /**
+   * Set boost (W held) or brake (S held).
+   * @param {boolean} boosting — W is held
+   * @param {boolean} braking  — S is held
+   */
+  setPlayerThrottle(boosting, braking) {
+    if (!this._playerControlled) return;
+    if (boosting) {
+      this._playerSpeed = PLAYER_BOOST;
+    } else if (braking) {
+      this._playerSpeed = PLAYER_BRAKE;
+    } else {
+      this._playerSpeed = PLAYER_SPEED;
+    }
+  }
+
+  /** Set whether the fire button is held (auto-fire handled in update). */
+  setPlayerShootHeld(held) {
+    this._playerShootHeld = held;
+  }
+
+  /**
+   * Set the world-space target point from the crosshair raycast.
+   * Called every frame in cockpit mode to update laser aim.
+   * @param {THREE.Vector3} worldPos — world-space point under the crosshair
+   * @param {boolean} hasHit — whether the crosshair ray hit a cube
+   * @param {THREE.Mesh|null} hitCube — the cube that was hit (if any)
+   */
+  setPlayerCrosshairTarget(worldPos, hasHit, hitCube) {
+    this._playerCrosshairTarget.copy(worldPos);
+    this._playerCrosshairHasHit = hasHit;
+    this._playerCrosshairHitCube = hitCube || null;
+  }
+
+  /** Player-initiated shot (respects cooldown, aims at crosshair target). */
+  _playerShoot() {
+    if (this._playerCooldown > 0) return;
+
+    // Get saucer world position
+    this.group.getWorldPosition(this._saucerWorldPos);
+
+    // Determine laser endpoint from crosshair target
+    let targetWorld;
+    if (this._playerCrosshairHasHit && this._playerCrosshairHitCube) {
+      // Crosshair is over a cube — aim at the hit point
+      targetWorld = this._playerCrosshairTarget.clone();
+    } else {
+      // No cube under crosshair — fire forward from saucer in crosshair direction
+      const crosshairDir = this._playerCrosshairTarget.clone()
+        .sub(this._saucerWorldPos).normalize();
+      // If crosshair target is too close or behind, default to saucer forward
+      if (crosshairDir.length() < 0.001 ||
+          crosshairDir.dot(this.getForwardDirection(new THREE.Vector3())) < -0.3) {
+        targetWorld = this._saucerWorldPos.clone()
+          .addScaledVector(this.getForwardDirection(new THREE.Vector3()), this._laserRange);
+      } else {
+        targetWorld = this._saucerWorldPos.clone()
+          .addScaledVector(crosshairDir, this._laserRange);
+      }
+    }
+
+    // Convert to sceneGroup local space
+    const targetLocal = this.parentGroup.worldToLocal(targetWorld.clone());
+    const fromLocal = this.parentGroup.worldToLocal(this._saucerWorldPos.clone());
+
+    // Spawn laser beam (visual always shows)
+    this._lasers.push(new LaserBeam(this.parentGroup, fromLocal, targetLocal, this._accent));
+
+    // Only destroy cube if crosshair actually hit one
+    if (this._playerCrosshairHasHit && this._playerCrosshairHitCube) {
+      const cube = this._playerCrosshairHitCube;
+      const hitLocal = this.parentGroup.worldToLocal(this._playerCrosshairTarget.clone());
+
+      this._flashEffects.push(new ImpactFlash(this.parentGroup, hitLocal, this._accent));
+
+      const d = cube.userData;
+      cube.visible = false;
+      d.respawnAt = performance.now() / 1000 + RESPAWN_DELAY;
+      d.hitLerp = 0;
+      d.hoverLerp = 0;
+
+      // Galaxy explosion
+      if (this._galaxyManager) {
+        this._galaxyManager.spawnAt(hitLocal, 2.0);
+      }
+    }
+
+    // Reset cooldown
+    this._playerCooldown = PLAYER_COOLDOWN;
   }
 
   _lerpAngle(current, target, factor) {

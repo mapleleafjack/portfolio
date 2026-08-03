@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Nav from './components/Nav';
 import Home from './components/Home';
@@ -30,6 +30,11 @@ function AppContent() {
     applyPreset,
     resetTorusParams,
   } = useTorus();
+
+  // ── Saucer cockpit state ─────────────────────────
+  const [saucerFocused, setSaucerFocused] = useState(false);
+  const enterSaucerCockpit = useCallback(() => setSaucerFocused(true), []);
+  const exitSaucerCockpit = useCallback(() => setSaucerFocused(false), []);
 
   // ── ESC key to exit torus focus ──────────────────────
   useEffect(() => {
@@ -83,6 +88,9 @@ function AppContent() {
         torusFocused={torusFocused}
         onTorusClick={openTorus}
         onTorusParamsChange={handleEngineStateChange}
+        saucerFocused={saucerFocused}
+        onSaucerEnter={enterSaucerCockpit}
+        onSaucerExit={exitSaucerCockpit}
       />
       {/* Subtle vignette behind torus in explore mode */}
       <div style={{
@@ -95,9 +103,9 @@ function AppContent() {
 
       <CursorTrail />
       <div style={{
-        opacity: torusFocused ? 0 : 1,
+        opacity: (torusFocused || saucerFocused) ? 0 : 1,
         transition: 'opacity 0.35s',
-        pointerEvents: torusFocused ? 'none' : 'auto',
+        pointerEvents: (torusFocused || saucerFocused) ? 'none' : 'auto',
       }}>
         <Nav />
       </div>

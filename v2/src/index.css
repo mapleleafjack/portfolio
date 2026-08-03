@@ -457,3 +457,88 @@ a:hover {
     transform: none;
   }
 }
+
+/* ============================================
+   Cockpit crosshair & HUD
+   ============================================ */
+
+body.cockpit-active {
+  cursor: none !important;
+}
+
+/* Crosshair — positioned at virtual cursor */
+.cockpit-crosshair {
+  position: fixed;
+  z-index: 200;
+  pointer-events: none;
+  width: 36px;
+  height: 36px;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+}
+
+.cockpit-crosshair::before,
+.cockpit-crosshair::after {
+  content: '';
+  position: absolute;
+  background: #fff;
+}
+
+.cockpit-crosshair::before {
+  top: 50%;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  transform: translateY(-50%);
+  border-radius: 1px;
+}
+
+.cockpit-crosshair::after {
+  left: 50%;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  transform: translateX(-50%);
+  border-radius: 1px;
+}
+
+/* Center dot — bright and visible */
+.cockpit-crosshair-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 6px rgba(255,255,255,0.6);
+}
+
+/* Outer ring for visibility */
+.cockpit-crosshair-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Cockpit HUD hint */
+.cockpit-hint {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'Oxanium', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  transition: opacity 1s ease;
+  text-align: center;
+}
