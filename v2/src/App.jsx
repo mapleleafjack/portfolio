@@ -169,9 +169,9 @@ function AppContent() {
         </>
       )}
       <div style={{
-        opacity: torusFocused ? 0 : 1,
+        opacity: (torusFocused || saucerFocused) ? 0 : 1,
         transition: 'opacity 0.35s',
-        pointerEvents: torusFocused ? 'none' : 'auto',
+        pointerEvents: (torusFocused || saucerFocused) ? 'none' : 'auto',
       }}>
         <Routes>
         <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />

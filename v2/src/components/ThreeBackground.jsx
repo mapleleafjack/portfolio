@@ -186,6 +186,8 @@ export default function ThreeBackground({
       _cursorY = window.innerHeight / 2;
       // Restore normal camera
       sceneCamera.setDriftEnabled(true);
+      sceneCamera.resetRotation();
+      camera.up.set(0, 1, 0); // reset roll introduced by applyGameCamera
       renderer.domElement.style.pointerEvents = 'none';
       // Smooth return transition
       _exitTransitionElapsed = 0;
