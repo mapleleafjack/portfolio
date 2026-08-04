@@ -97,6 +97,34 @@ export default function ThreeBackground({
     const torusKnot = new TorusKnot(sceneGroup, torusParamsRef.current || {});
     const galaxyManager = new GalaxyManager(sceneGroup);
     const saucer = new FlyingSaucer(sceneGroup, cubeField.getCubes(), galaxyManager);
+
+    // ── Score system + logo hit tracking ────────────────
+    let _score = 0;
+    let _scoreEl = null;
+    let _logoUnderCrosshair = false;
+
+    saucer.setOnCubeDestroyed((cube) => {
+      _score += cube.userData.pointValue || 10;
+      if (_scoreEl) {
+        _scoreEl.textContent = String(_score);
+        // Brief pop animation
+        _scoreEl.classList.add('cockpit-score-pop');
+        clearTimeout(_scoreEl._popTimeout);
+        _scoreEl._popTimeout = setTimeout(() => {
+          _scoreEl?.classList.remove('cockpit-score-pop');
+        }, 150);
+      }
+    });
+
+    saucer.setOnPlayerLaserFired((_targetWorldPos, hitCube) => {
+      if (!hitCube && _logoUnderCrosshair && logoTrio.ready) {
+        // Laser hit the logo — trigger dramatic spin
+        const saucerWorldPos = new THREE.Vector3();
+        saucer.group.getWorldPosition(saucerWorldPos);
+        const hitDir = _targetWorldPos.clone().sub(saucerWorldPos).normalize();
+        logoTrio.hit(hitDir);
+      }
+    });
     const cockpit = new CockpitController({
       rendererDomElement: renderer.domElement,
       saucer,
@@ -216,11 +244,27 @@ export default function ThreeBackground({
           cockpit.enter();
           // Capture exit-start state for smooth return
           zoomTransition.startZoomOut(camera.position, zoomTransition.smoothLookTarget);
+
+          // ── Score HUD ──────────────────────────────
+          _score = 0;
+          _logoUnderCrosshair = false;
+          _scoreEl = document.createElement('div');
+          _scoreEl.className = 'cockpit-score';
+          _scoreEl.textContent = '0';
+          document.body.appendChild(_scoreEl);
         } else {
           // Exit cockpit
           cockpit.exit();
           sceneCamera.setDriftEnabled(true);
           sceneCamera.resetRotation();
+
+          // ── Remove score HUD ───────────────────────
+          if (_scoreEl) { _scoreEl.remove(); _scoreEl = null; }
+          _score = 0;
+          _logoUnderCrosshair = false;
+
+          // Reset logo to default pose
+          logoTrio.reset();
         }
       }
 
@@ -259,21 +303,33 @@ export default function ThreeBackground({
         const mx = (cockpit.cursorX / window.innerWidth) * 2 - 1;
         const my = -(cockpit.cursorY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(new THREE.Vector2(mx, my), camera);
+
+        // Check cubes first (priority over logo)
         const cockpitCubes = cubeField.getVisibleCubes();
         const crosshairHits = raycaster.intersectObjects(cockpitCubes);
         if (crosshairHits.length > 0 && crosshairHits[0].object.visible) {
           saucer.setPlayerCrosshairTarget(crosshairHits[0].point, true, crosshairHits[0].object);
+          _logoUnderCrosshair = false;
         } else {
-          // Compute far point from saucer (not camera) so laser fires toward cursor
-          const saucerWorldPos = new THREE.Vector3();
-          saucer.group.getWorldPosition(saucerWorldPos);
-          const farPoint = saucerWorldPos.clone()
-            .addScaledVector(raycaster.ray.direction, saucer.getLaserRange());
-          saucer.setPlayerCrosshairTarget(farPoint, false, null);
+          // Check logo meshes
+          const logoTargets = logoTrio.getRayTargets();
+          const logoHits = logoTargets.length > 0 ? raycaster.intersectObjects(logoTargets) : [];
+          if (logoHits.length > 0 && logoTrio.group.visible) {
+            saucer.setPlayerCrosshairTarget(logoHits[0].point, true, null);
+            _logoUnderCrosshair = true;
+          } else {
+            // Compute far point from saucer (not camera) so laser fires toward cursor
+            const saucerWorldPos = new THREE.Vector3();
+            saucer.group.getWorldPosition(saucerWorldPos);
+            const farPoint = saucerWorldPos.clone()
+              .addScaledVector(raycaster.ray.direction, saucer.getLaserRange());
+            saucer.setPlayerCrosshairTarget(farPoint, false, null);
+            _logoUnderCrosshair = false;
+          }
         }
 
-        // Hide logo in cockpit
-        logoTrio.group.visible = false;
+        // Logo stays visible in cockpit — update game-mode spin physics
+        logoTrio.updateGameMode(dt);
 
         // Update subsystems
         const currentAccent = getAccentColor();
@@ -384,6 +440,7 @@ export default function ThreeBackground({
       logoTrio.dispose();
       torusKnot.dispose();
       renderer.dispose();
+      if (_scoreEl) { _scoreEl.remove(); _scoreEl = null; }
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }

@@ -411,6 +411,8 @@ export default class FlyingSaucer {
     this._chargeGlowTarget = 0; // target glow during charge-up
     this._hovered = false;     // hover state for glow effect
     this._savedMoveState = null; // state to restore after shooting
+    this._onCubeDestroyed = null; // callback(cube) when any cube is destroyed
+    this._onPlayerLaserFired = null; // callback(targetWorldPos, hitCubeOrNull) when player fires
 
     // ── Player control state ──
     this._playerControlled = false;
@@ -700,6 +702,23 @@ export default class FlyingSaucer {
   }
 
   /**
+   * Set a callback invoked whenever a cube is destroyed by any laser.
+   * @param {(cube: THREE.Mesh) => void} fn
+   */
+  setOnCubeDestroyed(fn) {
+    this._onCubeDestroyed = fn;
+  }
+
+  /**
+   * Set a callback invoked every time the player fires a laser.
+   * Receives the world-space target point and the hit cube (if any).
+   * @param {(targetWorldPos: THREE.Vector3, hitCube: THREE.Mesh|null) => void} fn
+   */
+  setOnPlayerLaserFired(fn) {
+    this._onPlayerLaserFired = fn;
+  }
+
+  /**
    * Compute the cockpit world position (inside the dome).
    * @param {THREE.Vector3} target — output vector
    */
@@ -891,6 +910,9 @@ export default class FlyingSaucer {
       d.hitLerp = 0;
       d.hoverLerp = 0;
 
+      // Notify score system
+      this._onCubeDestroyed?.(cube);
+
       // Galaxy explosion
       if (this._galaxyManager) {
         this._galaxyManager.spawnAt(hitLocal, 2.0);
@@ -899,6 +921,9 @@ export default class FlyingSaucer {
 
     // Reset cooldown
     this._playerCooldown = PLAYER_COOLDOWN;
+
+    // Notify orchestrator (for logo hit detection, etc.)
+    this._onPlayerLaserFired?.(targetWorld, this._playerCrosshairHasHit ? this._playerCrosshairHitCube : null);
   }
 
   _lerpAngle(current, target, factor) {
@@ -945,6 +970,9 @@ export default class FlyingSaucer {
     d.respawnAt = performance.now() / 1000 + RESPAWN_DELAY;
     d.hitLerp = 0;
     d.hoverLerp = 0;
+
+    // Notify score system
+    this._onCubeDestroyed?.(closest);
 
     // Spawn galaxy destruction effect at cube position (boosted explosion)
     if (this._galaxyManager) {
