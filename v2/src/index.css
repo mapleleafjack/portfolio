@@ -777,3 +777,55 @@ body.cockpit-active {
     display: none;
   }
 }
+
+/* ============================================
+   3D hover labels — star-map style (CSS2DRenderer)
+   ============================================ */
+
+.label-3d {
+  font-family: 'Oxanium', 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  /* color + text-shadow set dynamically by LabelManager per theme */
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: opacity 0.15s ease;
+}
+
+.label-3d-dot {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent, #f0c830);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px var(--accent, #f0c830),
+              0 0 12px rgba(240, 200, 48, 0.4);
+}
+
+.label-3d-text {
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Appear animation — slides text up + fades in as the line draws */
+.label-3d--appearing {
+  animation: labelSlideUp 0.35s ease-out both;
+}
+
+@keyframes labelSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

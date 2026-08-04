@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { getAccentColor, paramsChanged, renderWithShake } from './three/shared';
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { getAccentColor, paramsChanged, renderWithShake, cycleGalaxyColor } from './three/shared';
 import CubeField from './three/CubeField';
 import LogoTrio from './three/LogoTrio';
 import TorusKnot from './three/TorusKnot';
@@ -11,6 +12,7 @@ import FlyingSaucer from './three/FlyingSaucer';
 import CockpitController from './three/CockpitController';
 import ZoomTransition from './three/ZoomTransition';
 import HoverManager from './three/HoverManager';
+import LabelManager from './three/LabelManager';
 import ThemeToggle from './three/ThemeToggle';
 import { useTheme } from '../ThemeContext';
 
@@ -81,6 +83,15 @@ export default function ThreeBackground({
     container.appendChild(renderer.domElement);
     renderer.domElement.style.pointerEvents = 'none';
 
+    // CSS2DRenderer for 3D hover labels (constant-size text)
+    const css2DRenderer = new CSS2DRenderer();
+    css2DRenderer.setSize(window.innerWidth, window.innerHeight);
+    css2DRenderer.domElement.style.position = 'absolute';
+    css2DRenderer.domElement.style.top = '0';
+    css2DRenderer.domElement.style.left = '0';
+    css2DRenderer.domElement.style.pointerEvents = 'none';
+    container.appendChild(css2DRenderer.domElement);
+
     // OrbitControls for torus explore mode (disabled in galaxy view)
     const orbitControls = new OrbitControls(camera, renderer.domElement);
     orbitControls.enabled = false;
@@ -131,6 +142,26 @@ export default function ThreeBackground({
         logoTrio.hit(hitDir);
       }
     });
+
+    // ── Galaxy boundary crossing (colour switch) ────────
+    saucer.setOnGalaxyBoundaryCrossed((worldPos) => {
+      cycleGalaxyColor();
+
+      // Convert world position to sceneGroup local space for explosions
+      const localPos = sceneGroup.worldToLocal(worldPos.clone());
+
+      // Dramatic burst at the transition point
+      galaxyManager.spawnAt(localPos, 4.0);
+      for (let i = 0; i < 3; i++) {
+        const offset = new THREE.Vector3(
+          (Math.random() - 0.5) * 2.5,
+          (Math.random() - 0.5) * 2.0,
+          (Math.random() - 0.5) * 2.5,
+        );
+        galaxyManager.spawnAt(localPos.clone().add(offset), 1.5);
+      }
+    });
+
     const cockpit = new CockpitController({
       rendererDomElement: renderer.domElement,
       saucer,
@@ -138,6 +169,7 @@ export default function ThreeBackground({
     });
     const zoomTransition = new ZoomTransition();
     const hoverManager = new HoverManager(raycaster, cubeField, torusKnot, saucer, themeToggle);
+    const labelManager = new LabelManager(torusKnot, saucer, themeToggle, scene, camera);
 
     // ── Wire cockpit callbacks ──────────────────────────
     cockpit.setOnRequestExit(() => onSaucerExitRef.current?.());
@@ -176,6 +208,7 @@ export default function ThreeBackground({
       if (toggleHits.length > 0) {
         e.preventDefault();
         e.stopPropagation();
+        labelManager.dismissAll();
         themeToggle.handleClick();
         return;
       }
@@ -185,6 +218,7 @@ export default function ThreeBackground({
       if (saucerHits.length > 0) {
         e.preventDefault();
         e.stopPropagation();
+        labelManager.dismissAll();
         // Request pointer lock (desktop only — mobile enters directly)
         if (!cockpit.isMobile) {
           renderer.domElement.requestPointerLock();
@@ -201,6 +235,7 @@ export default function ThreeBackground({
       if (torusHits.length > 0) {
         e.preventDefault();
         e.stopPropagation();
+        labelManager.dismissAll();
         onTorusClickRef.current();
       }
     };
@@ -256,6 +291,10 @@ export default function ThreeBackground({
           // Enter cockpit
           sceneCamera.setDriftEnabled(false);
           orbitControls.enabled = false;
+
+          // Save cube positions so we can restore on exit
+          cubeField.saveOriginalState();
+
           cockpit.enter();
           // Capture exit-start state for smooth return
           zoomTransition.startZoomOut(camera.position, zoomTransition.smoothLookTarget);
@@ -280,6 +319,10 @@ export default function ThreeBackground({
 
           // Reset logo to default pose
           logoTrio.reset();
+
+          // Restore cube field to original positions (in case
+          // galaxy switches moved them during the session)
+          cubeField.restoreOriginals();
         }
       }
 
@@ -349,6 +392,14 @@ export default function ThreeBackground({
         // Update subsystems
         const currentAccent = getAccentColor();
         cubeField.update(t, dt, null, currentAccent);
+
+        // ── Circular cube recycling — cubes behind the saucer
+        //     are silently moved ahead for an infinite galaxy feel
+        const saucerLocalPos = saucer.group.position;
+        const saucerLocalFwd = new THREE.Vector3(0, 0, 1)
+          .applyQuaternion(saucer.group.quaternion).normalize();
+        cubeField.recycleAroundSaucer(saucerLocalPos, saucerLocalFwd);
+
         galaxyManager.update(t, dt);
         torusKnot.update(t, dt);
         saucer.update(t, dt);
@@ -409,8 +460,15 @@ export default function ThreeBackground({
       logoTrio.group.visible = !focused;
 
       // ── Hover detection ──
-      const { hoveredCube } = hoverManager.update(
+      const { hoveredCube, hitTorus, hitSaucer, hitToggle } = hoverManager.update(
         sceneCamera.pointer, camera, focused, _markerDragging, cockpit.isActive,
+      );
+
+      // ── 3D hover labels (star-map style) ──
+      labelManager.update(
+        { hitTorus, hitSaucer, hitToggle },
+        dt,
+        focused || cockpit.isActive,
       );
 
       // ── Update subsystems ──
@@ -432,6 +490,7 @@ export default function ThreeBackground({
 
       // ── Render with shake ──
       renderWithShake(camera, galaxyManager.getShake(), scene, renderer);
+      css2DRenderer.render(labelManager.getScene(), camera);
     };
 
     animate();
@@ -441,6 +500,7 @@ export default function ThreeBackground({
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      css2DRenderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', handleResize);
 
@@ -459,10 +519,14 @@ export default function ThreeBackground({
       logoTrio.dispose();
       torusKnot.dispose();
       themeToggle.dispose();
+      labelManager.dispose();
       renderer.dispose();
       if (_scoreEl) { _scoreEl.remove(); _scoreEl = null; }
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
+      }
+      if (container.contains(css2DRenderer.domElement)) {
+        container.removeChild(css2DRenderer.domElement);
       }
     };
   }, []);

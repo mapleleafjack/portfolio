@@ -86,6 +86,63 @@ export function onThemeChange(callback) {
   return () => observer.disconnect();
 }
 
+// ── Galaxy colour state ──────────────────────────────
+// Tracks which galaxy colour is active.  The saucer crossing the
+// scene boundary cycles to the next colour, giving the impression
+// of warping into a new galaxy.
+
+const GALAXY_COLORS = [
+  { hex: '#f0c830', name: 'Solar' },
+  { hex: '#e05a2b', name: 'Ember' },
+  { hex: '#d946ef', name: 'Nebula' },
+  { hex: '#3b82f6', name: 'Azure' },
+  { hex: '#10b981', name: 'Verdant' },
+  { hex: '#8b5cf6', name: 'Void' },
+  { hex: '#ef4444', name: 'Crimson' },
+];
+
+let _galaxyColorIndex = -1; // -1 means "not yet initialised"
+
+/** @returns {{ hex: string, name: string }} current galaxy colour info */
+export function getGalaxyColor() {
+  if (_galaxyColorIndex < 0) {
+    // First call — read whatever accent is currently applied
+    const hex = document.documentElement.style.getPropertyValue('--accent').trim() || '#f0c830';
+    const idx = GALAXY_COLORS.findIndex(c => c.hex.toLowerCase() === hex.toLowerCase());
+    _galaxyColorIndex = idx >= 0 ? idx : 0;
+  }
+  return GALAXY_COLORS[_galaxyColorIndex];
+}
+
+/**
+ * Cycle to the next galaxy colour.  Updates CSS custom properties
+ * and flushes the accent-colour cache so every Three.js material
+ * picks up the change next frame.
+ * @returns {{ hex: string, name: string }} the newly-active galaxy colour
+ */
+export function cycleGalaxyColor() {
+  // Ensure index is initialised from current CSS value before cycling
+  if (_galaxyColorIndex < 0) getGalaxyColor();
+  _galaxyColorIndex = (_galaxyColorIndex + 1) % GALAXY_COLORS.length;
+  const c = GALAXY_COLORS[_galaxyColorIndex];
+
+  // Update CSS custom properties
+  const root = document.documentElement;
+  root.style.setProperty('--accent', c.hex);
+  const r = parseInt(c.hex.slice(1, 3), 16);
+  const g = parseInt(c.hex.slice(3, 5), 16);
+  const b = parseInt(c.hex.slice(5, 7), 16);
+  root.style.setProperty('--accent-r', r);
+  root.style.setProperty('--accent-g', g);
+  root.style.setProperty('--accent-b', b);
+
+  // Force accent-colour cache refresh
+  _cachedColor = new THREE.Color(c.hex);
+  _lastColorRead = performance.now();
+
+  return c;
+}
+
 // ── Torus params diffing ──────────────────────────────
 
 const PARAMS_KEYS = ['p', 'q', 'color', 'radius', 'tube', 'metalness', 'roughness',

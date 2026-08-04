@@ -207,6 +207,8 @@ const PLAYER_DODGE_SPEED = 1.2; // strafe/vertical dodge speed
 const PLAYER_COOLDOWN = 0.2; // seconds between player shots
 const MOUSE_SENSITIVITY = 0.0015; // rad/pixel (smoother game feel)
 const PITCH_CLAMP = 1.4;     // ~80° pitch limit
+const GALAXY_BOUNDARY = 6.0;       // distance from origin to trigger galaxy switch
+const GALAXY_SWITCH_COOLDOWN = 4.0; // seconds between galaxy switches
 
 // ── Impact flash (expanding rings + central burst at hit point) ──
 class ImpactFlash {
@@ -422,6 +424,8 @@ export default class FlyingSaucer {
     this._savedMoveState = null; // state to restore after shooting
     this._onCubeDestroyed = null; // callback(cube) when any cube is destroyed
     this._onPlayerLaserFired = null; // callback(targetWorldPos, hitCubeOrNull) when player fires
+    this._onGalaxyBoundaryCrossed = null; // callback(worldPos) when saucer crosses galaxy boundary
+    this._galaxySwitchTimer = 0;          // cooldown timer for boundary crossing
 
     // ── Player control state ──
     this._playerControlled = false;
@@ -647,6 +651,15 @@ export default class FlyingSaucer {
     this.group.position.y += worldFwd.y * speed;
     this.group.position.z += worldFwd.z * speed;
 
+    // ── Galaxy boundary detection ──
+    this._galaxySwitchTimer -= dt;
+    const distFromOrigin = this.group.position.length();
+    if (distFromOrigin > GALAXY_BOUNDARY && this._galaxySwitchTimer <= 0 && this._onGalaxyBoundaryCrossed) {
+      this._galaxySwitchTimer = GALAXY_SWITCH_COOLDOWN;
+      this.group.getWorldPosition(this._saucerWorldPos);
+      this._onGalaxyBoundaryCrossed(this._saucerWorldPos.clone());
+    }
+
     // ── Glow ──
     const boostRatio = Math.max(0, Math.min(1, (this._playerSpeed - PLAYER_BRAKE) / (PLAYER_BOOST - PLAYER_BRAKE)));
     const idlePulse = Math.sin(t * 3) * 0.08 + 0.08;
@@ -725,6 +738,15 @@ export default class FlyingSaucer {
    */
   setOnPlayerLaserFired(fn) {
     this._onPlayerLaserFired = fn;
+  }
+
+  /**
+   * Set a callback invoked when the saucer crosses the galaxy boundary
+   * in player-controlled mode (distance from origin exceeds threshold).
+   * @param {(worldPos: THREE.Vector3) => void} fn
+   */
+  setOnGalaxyBoundaryCrossed(fn) {
+    this._onGalaxyBoundaryCrossed = fn;
   }
 
   /**

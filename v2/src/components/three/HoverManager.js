@@ -32,7 +32,7 @@ export default class HoverManager {
    * @param {boolean} isFocused — whether torus explore mode is active
    * @param {boolean} isMarkerDragging — whether a marker drag is in progress
    * @param {boolean} isCockpitActive — whether cockpit mode is active
-   * @returns {{ hoveredCube: THREE.Object3D|null, hitTorus: boolean, hitSaucer: boolean }}
+   * @returns {{ hoveredCube: THREE.Object3D|null, hitTorus: boolean, hitSaucer: boolean, hitToggle: boolean }}
    */
   update(pointer, camera, isFocused, isMarkerDragging, isCockpitActive) {
     this._raycaster.setFromCamera(pointer, camera);
@@ -70,6 +70,6 @@ export default class HoverManager {
       document.body.style.cursor = '';
     }
 
-    return { hoveredCube, hitTorus, hitSaucer };
+    return { hoveredCube, hitTorus, hitSaucer, hitToggle };
   }
 }
