@@ -25,6 +25,67 @@ export function getAccentColor() {
   return _cachedColor.clone();
 }
 
+// ── Theme helpers ─────────────────────────────────────
+
+let _cachedDark = null;
+let _lastDarkRead = 0;
+
+/**
+ * Returns true if dark mode is currently active.
+ * Cached at the same interval as accent colour.
+ */
+export function isDarkMode() {
+  const now = performance.now();
+  if (_cachedDark !== null && now - _lastDarkRead < COLOR_CACHE_MS) {
+    return _cachedDark;
+  }
+  _cachedDark = document.documentElement.classList.contains('dark');
+  _lastDarkRead = now;
+  return _cachedDark;
+}
+
+/**
+ * Returns a THREE.Color appropriate for the current theme.
+ * @param {string} lightHex — hex colour for light mode
+ * @param {string} darkHex  — hex colour for dark mode
+ * @returns {THREE.Color}
+ */
+export function getThemeColor(lightHex, darkHex) {
+  return new THREE.Color(isDarkMode() ? darkHex : lightHex);
+}
+
+/**
+ * Pre-defined theme-aware colour pairs for Three.js materials.
+ * Each key maps to { light, dark } hex strings.
+ */
+export const THEME = {
+  cubeDark:     { light: '#0a0a0a', dark: '#e0e0e0' },
+  cubeGray:     { light: '#555555', dark: '#aaaaaa' },
+  logoMaterial: { light: '#1a1a1a', dark: '#e5e5e5' },
+  saucerBody:   { light: '#aaaaaa', dark: '#cccccc' },
+  saucerRing:   { light: '#ffffff', dark: '#dddddd' },
+  saucerEngine: { light: '#888888', dark: '#bbbbbb' },
+};
+
+/**
+ * Register a callback to be invoked when the theme changes.
+ * Uses a MutationObserver on <html> classList.
+ * @param {() => void} callback
+ * @returns {() => void} dispose function
+ */
+export function onThemeChange(callback) {
+  const observer = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.attributeName === 'class') {
+        callback();
+        return;
+      }
+    }
+  });
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  return () => observer.disconnect();
+}
+
 // ── Torus params diffing ──────────────────────────────
 
 const PARAMS_KEYS = ['p', 'q', 'color', 'radius', 'tube', 'metalness', 'roughness',

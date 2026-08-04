@@ -22,7 +22,7 @@ import {
 } from './TorusKnotMath';
 import TorusKnotParticles from './TorusKnotParticles';
 import TorusKnotMarker from './TorusKnotMarker';
-import { getAccentColor } from './shared';
+import { getAccentColor, isDarkMode } from './shared';
 
 export default class TorusKnot {
   /**
@@ -163,8 +163,8 @@ export default class TorusKnot {
     const { radius, tube } = this._state;
     const accent = getAccentColor();
 
-    // ── Base wireframe colour (grayscale, like the background cubes) ──
-    const baseGray = new THREE.Color('#888888');
+    // ── Base wireframe colour (grayscale, theme-aware) ──
+    const baseGray = new THREE.Color(isDarkMode() ? '#aaaaaa' : '#888888');
     this._previewBaseColor = baseGray.clone();
 
     // ── Wireframe-only torus knot (no solid fill) ──────────

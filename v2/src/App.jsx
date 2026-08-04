@@ -14,6 +14,7 @@ import TorusInfoPanel from './components/TorusInfoPanel';
 import TorusControlsPanel from './components/TorusControlsPanel';
 import { PRESETS as TORUS_PRESETS } from './components/three/TorusKnotData';
 import { TorusProvider, useTorus } from './TorusContext';
+import { ThemeProvider } from './ThemeContext';
 
 function PageWrapper({ children }) {
   const location = useLocation();
@@ -95,7 +96,7 @@ function AppContent() {
       {/* Subtle vignette behind torus in explore mode */}
       <div style={{
         position: 'fixed', inset: 0, zIndex: 0,
-        background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.07) 0%, rgba(0,0,0,0) 70%)',
+        background: 'radial-gradient(ellipse at center, var(--vignette-from) 0%, var(--vignette-to) 70%)',
         opacity: torusFocused ? 1 : 0,
         transition: 'opacity 0.35s',
         pointerEvents: 'none',
@@ -118,9 +119,9 @@ function AppContent() {
             onClick={closeTorus}
             style={{
               position: 'fixed', top: 12, left: 16, zIndex: 125,
-              fontSize: 11, color: '#888',
-              background: 'rgba(255,255,255,0.7)',
-              border: '1px solid rgba(0,0,0,0.08)',
+              fontSize: 11, color: 'var(--overlay-text)',
+              background: 'var(--overlay-bg)',
+              border: '1px solid var(--border)',
               padding: '5px 12px', borderRadius: 8, cursor: 'pointer',
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
@@ -128,12 +129,12 @@ function AppContent() {
               fontFamily: "'Oxanium', sans-serif",
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.9)';
-              e.currentTarget.style.color = '#222';
+              e.currentTarget.style.background = 'var(--overlay-bg-hover)';
+              e.currentTarget.style.color = 'var(--overlay-text-hover)';
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.7)';
-              e.currentTarget.style.color = '#888';
+              e.currentTarget.style.background = 'var(--overlay-bg)';
+              e.currentTarget.style.color = 'var(--overlay-text)';
             }}
           >
             ← Back to Galaxy
@@ -142,8 +143,8 @@ function AppContent() {
           {/* Hint */}
           <div style={{
             position: 'fixed', top: 12, left: '50%', transform: 'translateX(-50%)',
-            fontSize: 9.5, color: 'rgba(0,0,0,0.42)', letterSpacing: '0.03em',
-            background: 'rgba(255,255,255,0.55)',
+            fontSize: 9.5, color: 'var(--hint-text)', letterSpacing: '0.03em',
+            background: 'var(--hint-bg)',
             backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
             padding: '3px 14px', borderRadius: 20,
             pointerEvents: 'none', zIndex: 5, fontFamily: "'Oxanium', sans-serif",
@@ -189,9 +190,11 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <TorusProvider>
-        <AppContent />
-      </TorusProvider>
+      <ThemeProvider>
+        <TorusProvider>
+          <AppContent />
+        </TorusProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

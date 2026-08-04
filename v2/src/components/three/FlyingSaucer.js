@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getAccentColor } from './shared';
+import { getAccentColor, THEME, onThemeChange } from './shared';
 
 // ── Shared geometry for explosion debris ──
 const DEBRIS_GEO = new THREE.BoxGeometry(0.05, 0.05, 0.05);
@@ -305,7 +305,7 @@ export default class FlyingSaucer {
     // ── Body: flattened sphere (classic saucer disc) ──
     const bodyGeo = new THREE.SphereGeometry(0.35, 16, 8);
     const bodyMat = new THREE.MeshBasicMaterial({
-      color: 0x888888,
+      color: THEME.saucerBody.light,
       wireframe: true,
       transparent: true,
       opacity: 0.5,
@@ -318,7 +318,7 @@ export default class FlyingSaucer {
     // ── Dome: half-sphere on top ──
     const domeGeo = new THREE.SphereGeometry(0.15, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
     const domeMat = new THREE.MeshBasicMaterial({
-      color: 0xaaaaaa,
+      color: THEME.saucerRing.light,
       wireframe: true,
       transparent: true,
       opacity: 0.45,
@@ -327,6 +327,15 @@ export default class FlyingSaucer {
     const dome = new THREE.Mesh(domeGeo, domeMat);
     dome.position.y = 0.06;
     this.group.add(dome);
+
+    // ── Theme-aware base colour refs (updated on theme change) ──
+    this._bodyBaseHex = THEME.saucerBody.light;
+    this._domeBaseHex = THEME.saucerRing.light;
+    this._themeCleanup = onThemeChange(() => {
+      const dark = document.documentElement.classList.contains('dark');
+      this._bodyBaseHex = dark ? THEME.saucerBody.dark : THEME.saucerBody.light;
+      this._domeBaseHex = dark ? THEME.saucerRing.dark : THEME.saucerRing.light;
+    });
 
     // ── Ring of lights around the rim ──
     this.lights = [];
@@ -601,8 +610,8 @@ export default class FlyingSaucer {
     const baseDomeOpacity = 0.45;
     this.bodyMat.opacity = baseBodyOpacity + this._fireGlow * 0.5;
     this.domeMat.opacity = baseDomeOpacity + this._fireGlow * 0.55;
-    this.bodyMat.color.set(0x888888).lerp(this._accent, this._fireGlow * 0.6);
-    this.domeMat.color.set(0xaaaaaa).lerp(this._accent, this._fireGlow * 0.5);
+    this.bodyMat.color.set(this._bodyBaseHex).lerp(this._accent, this._fireGlow * 0.6);
+    this.domeMat.color.set(this._domeBaseHex).lerp(this._accent, this._fireGlow * 0.5);
   }
 
   /** Player-controlled mode: chase cam with turn-rate control from virtual cursor. */
@@ -643,8 +652,8 @@ export default class FlyingSaucer {
     const idlePulse = Math.sin(t * 3) * 0.08 + 0.08;
     this.bodyMat.opacity = 0.65 + idlePulse + boostRatio * 0.15;
     this.domeMat.opacity = 0.6 + idlePulse + boostRatio * 0.12;
-    this.bodyMat.color.set(0x888888).lerp(this._accent, 0.15 + boostRatio * 0.35);
-    this.domeMat.color.set(0xaaaaaa).lerp(this._accent, 0.12 + boostRatio * 0.3);
+    this.bodyMat.color.set(this._bodyBaseHex).lerp(this._accent, 0.15 + boostRatio * 0.35);
+    this.domeMat.color.set(this._domeBaseHex).lerp(this._accent, 0.12 + boostRatio * 0.3);
 
     for (const l of this.lights) {
       const pulse = Math.sin(t * 6 + l.phase * Math.PI * 2) * 0.5 + 0.5;
@@ -683,9 +692,9 @@ export default class FlyingSaucer {
   _applyHoverVisuals() {
     if (!this._hovered) return;
     const accent = getAccentColor();
-    this.bodyMat.color.set(0x888888).lerp(accent, 0.45);
+    this.bodyMat.color.set(this._bodyBaseHex).lerp(accent, 0.45);
     this.bodyMat.opacity = 0.75;
-    this.domeMat.color.set(0xaaaaaa).lerp(accent, 0.4);
+    this.domeMat.color.set(this._domeBaseHex).lerp(accent, 0.4);
     this.domeMat.opacity = 0.65;
     this._glowMat.color.copy(accent);
     this._glowMat.opacity = 0.12;
@@ -981,6 +990,10 @@ export default class FlyingSaucer {
   }
 
   dispose() {
+    if (this._themeCleanup) {
+      this._themeCleanup();
+      this._themeCleanup = null;
+    }
     for (const laser of this._lasers) laser.dispose();
     for (const exp of this._explosions) exp.dispose();
     for (const flash of this._flashEffects) flash.dispose();

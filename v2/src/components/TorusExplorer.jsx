@@ -96,7 +96,7 @@ export default function TorusExplorer({ isOpen, onClose, initialParams = {}, onP
       <div
         style={{
           position: 'fixed', inset: 0, zIndex: 99,
-          background: 'rgba(0,0,0,0.72)',
+          background: 'var(--backdrop)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
           opacity: active ? 1 : 0,

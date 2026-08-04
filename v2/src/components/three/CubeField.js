@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getAccentColor } from './shared';
+import { getAccentColor, getThemeColor, THEME, onThemeChange } from './shared';
 
 const NUM_CUBES = 35;
 const CLEAR_ZONE_X = 3.5;
@@ -15,7 +15,7 @@ const _axisPool = new THREE.Vector3();
 /**
  * Manages the field of floating wireframe cubes in the 3D scene.
  * Handles creation, per-frame animation (spin, hover, hit reactions,
- * spawn-in), and disposal.
+ * spawn-in), and disposal. Supports theme-aware colour swapping.
  *
  * Follows the same vanilla-JS-class pattern as GalaxyEffect / FlyingSaucer.
  */
@@ -37,13 +37,21 @@ export default class CubeField {
       // ~20% of cubes get a hint of the accent colour
       const hasAccent = Math.random() < 0.2;
       const isLight = Math.random() > 0.5;
-      const baseColor = hasAccent
-        ? accentColor.clone().lerp(new THREE.Color(isLight ? '#555555' : '#0a0a0a'), 0.6)
-        : new THREE.Color(isLight ? '#555555' : '#0a0a0a');
+
+      // Build both light and dark variants so we can swap on theme change
+      const darkHex = isLight ? THEME.cubeGray.dark : THEME.cubeDark.dark;
+      const lightHex = isLight ? THEME.cubeGray.light : THEME.cubeDark.light;
+      const colorLight = hasAccent
+        ? accentColor.clone().lerp(new THREE.Color(lightHex), 0.6)
+        : new THREE.Color(lightHex);
+      const colorDark = hasAccent
+        ? accentColor.clone().lerp(new THREE.Color(darkHex), 0.6)
+        : new THREE.Color(darkHex);
+
       const opacity = 0.15 + Math.random() * 0.35;
 
       const material = new THREE.MeshBasicMaterial({
-        color: baseColor,
+        color: colorLight.clone(),
         wireframe: true,
         transparent: true,
         opacity,
@@ -78,7 +86,8 @@ export default class CubeField {
         idlePhase: Math.random() * Math.PI * 2,
         idleSpeed: 0.2 + Math.random() * 0.3,
         basePosition: { x, y, z },
-        baseColor: baseColor.clone(),
+        colorLight: colorLight.clone(),
+        colorDark: colorDark.clone(),
         baseOpacity: opacity,
         hoverLerp: 0,       // 0 = idle, 1 = fully hovered
         hitLerp: 0,         // 0 = normal, 1 = just hit by laser
@@ -87,6 +96,20 @@ export default class CubeField {
 
       parentGroup.add(cube);
       this.cubes.push(cube);
+    }
+
+    // ── Theme change listener ──────────────────────────
+    this._themeCleanup = onThemeChange(() => this._applyTheme());
+    // Apply correct initial colour
+    this._applyTheme();
+  }
+
+  /** Swap all cube base colours to match current theme. */
+  _applyTheme() {
+    const dark = document.documentElement.classList.contains('dark');
+    for (const cube of this.cubes) {
+      const d = cube.userData;
+      d._currentBase = dark ? d.colorDark : d.colorLight;
     }
   }
 
@@ -146,7 +169,8 @@ export default class CubeField {
 
       // Colour — lerp toward accent on hover or hit
       const accentBlend = Math.max(d.hoverLerp * 0.7, d.hitLerp);
-      cube.material.color.copy(d.baseColor).lerp(currentAccent, accentBlend);
+      const base = d._currentBase || d.colorLight;
+      cube.material.color.copy(base).lerp(currentAccent, accentBlend);
 
       // Opacity — brighten on hover or hit
       cube.material.opacity = d.baseOpacity + d.hoverLerp * 0.35 + d.hitLerp * 0.5;
@@ -160,6 +184,10 @@ export default class CubeField {
 
   /** Dispose all cube geometries and materials, remove from parent. */
   dispose() {
+    if (this._themeCleanup) {
+      this._themeCleanup();
+      this._themeCleanup = null;
+    }
     for (const cube of this.cubes) {
       cube.geometry.dispose();
       cube.material.dispose();

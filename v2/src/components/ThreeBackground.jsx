@@ -11,6 +11,8 @@ import FlyingSaucer from './three/FlyingSaucer';
 import CockpitController from './three/CockpitController';
 import ZoomTransition from './three/ZoomTransition';
 import HoverManager from './three/HoverManager';
+import ThemeToggle from './three/ThemeToggle';
+import { useTheme } from '../ThemeContext';
 
 /**
  * ThreeBackground — thin orchestrator for the full-screen 3D scene.
@@ -36,6 +38,7 @@ export default function ThreeBackground({
   onSaucerExit = null,
 }) {
   const containerRef = useRef(null);
+  const { toggleTheme } = useTheme();
 
   // ── Stable refs (avoid re-running the Three.js effect) ──
   const onTorusClickRef = useRef(onTorusClick);
@@ -45,6 +48,7 @@ export default function ThreeBackground({
   const saucerFocusedRef = useRef(saucerFocused);
   const onSaucerEnterRef = useRef(onSaucerEnter);
   const onSaucerExitRef = useRef(onSaucerExit);
+  const toggleThemeRef = useRef(toggleTheme);
 
   if (onTorusClickRef.current !== onTorusClick) onTorusClickRef.current = onTorusClick;
   torusParamsRef.current = torusParams;
@@ -53,6 +57,7 @@ export default function ThreeBackground({
   saucerFocusedRef.current = saucerFocused;
   onSaucerEnterRef.current = onSaucerEnter;
   onSaucerExitRef.current = onSaucerExit;
+  toggleThemeRef.current = toggleTheme;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -97,6 +102,7 @@ export default function ThreeBackground({
     const torusKnot = new TorusKnot(sceneGroup, torusParamsRef.current || {});
     const galaxyManager = new GalaxyManager(sceneGroup);
     const saucer = new FlyingSaucer(sceneGroup, cubeField.getCubes(), galaxyManager);
+    const themeToggle = new ThemeToggle(sceneGroup, () => toggleThemeRef.current?.());
 
     // ── Score system + logo hit tracking ────────────────
     let _score = 0;
@@ -131,7 +137,7 @@ export default function ThreeBackground({
       camera,
     });
     const zoomTransition = new ZoomTransition();
-    const hoverManager = new HoverManager(raycaster, cubeField, torusKnot, saucer);
+    const hoverManager = new HoverManager(raycaster, cubeField, torusKnot, saucer, themeToggle);
 
     // ── Wire cockpit callbacks ──────────────────────────
     cockpit.setOnRequestExit(() => onSaucerExitRef.current?.());
@@ -164,7 +170,16 @@ export default function ThreeBackground({
         return;
       }
 
-      // ── Preview mode: check saucer first, then torus ──
+      // ── Preview mode: check theme toggle first, then saucer, then torus ──
+      const toggleTargets = themeToggle.getRayTargets();
+      const toggleHits = raycaster.intersectObjects(toggleTargets);
+      if (toggleHits.length > 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        themeToggle.handleClick();
+        return;
+      }
+
       const saucerTargets = saucer.getRayTargets();
       const saucerHits = saucerTargets.length > 0 ? raycaster.intersectObjects(saucerTargets) : [];
       if (saucerHits.length > 0) {
@@ -337,6 +352,8 @@ export default function ThreeBackground({
         galaxyManager.update(t, dt);
         torusKnot.update(t, dt);
         saucer.update(t, dt);
+        themeToggle.group.visible = false; // hide in cockpit
+        themeToggle.update(dt);
 
         // Render with shake
         renderWithShake(camera, galaxyManager.getShake(), scene, renderer);
@@ -402,6 +419,8 @@ export default function ThreeBackground({
       galaxyManager.update(t, dt);
       torusKnot.update(t, dt);
       saucer.update(t, dt);
+      themeToggle.group.visible = !focused; // hide during torus explore
+      themeToggle.update(dt);
 
       // ── Torus params change detection ──
       const current = torusParamsRef.current;
@@ -439,6 +458,7 @@ export default function ThreeBackground({
       cubeField.dispose();
       logoTrio.dispose();
       torusKnot.dispose();
+      themeToggle.dispose();
       renderer.dispose();
       if (_scoreEl) { _scoreEl.remove(); _scoreEl = null; }
       if (container.contains(renderer.domElement)) {

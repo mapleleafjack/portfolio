@@ -1,5 +1,5 @@
 /**
- * HoverManager — raycaster-based hover detection across cubes, torus, and saucer.
+ * HoverManager — raycaster-based hover detection across cubes, torus, saucer, and theme toggle.
  *
  * Handles:
  *  - Shared raycaster hit-testing across all scene objects
@@ -15,12 +15,14 @@ export default class HoverManager {
    * @param {import('./CubeField').default} cubeField
    * @param {import('./TorusKnot').default} torusKnot
    * @param {import('./FlyingSaucer').default} saucer
+   * @param {import('./ThemeToggle').default} [themeToggle]
    */
-  constructor(raycaster, cubeField, torusKnot, saucer) {
+  constructor(raycaster, cubeField, torusKnot, saucer, themeToggle = null) {
     this._raycaster = raycaster;
     this._cubeField = cubeField;
     this._torusKnot = torusKnot;
     this._saucer = saucer;
+    this._themeToggle = themeToggle;
   }
 
   /**
@@ -36,13 +38,15 @@ export default class HoverManager {
     this._raycaster.setFromCamera(pointer, camera);
     const visibleCubes = this._cubeField.getVisibleCubes();
     const saucerTargets = this._saucer.getRayTargets();
-    const rayTargets = [...visibleCubes, ...this._torusKnot.getRayTargets(), ...saucerTargets];
+    const toggleTargets = this._themeToggle ? this._themeToggle.getRayTargets() : [];
+    const rayTargets = [...visibleCubes, ...this._torusKnot.getRayTargets(), ...saucerTargets, ...toggleTargets];
     const intersects = this._raycaster.intersectObjects(rayTargets);
     const firstHit = intersects.length > 0 ? intersects[0].object : null;
 
     const hitTorus = this._torusKnot.isHit(firstHit);
     const hitSaucer = firstHit && firstHit.userData && firstHit.userData.isSaucer;
-    const hoveredCube = !hitTorus && !hitSaucer && firstHit ? firstHit : null;
+    const hitToggle = this._themeToggle && toggleTargets.includes(firstHit);
+    const hoveredCube = !hitTorus && !hitSaucer && !hitToggle && firstHit ? firstHit : null;
 
     // Apply torus hover effect (preview mode only)
     this._torusKnot.applyHover(hitTorus && !isFocused);
@@ -50,9 +54,16 @@ export default class HoverManager {
     // Apply saucer hover glow effect (preview mode only, not in cockpit)
     this._saucer.applyHover(hitSaucer && !isFocused && !isCockpitActive);
 
+    // Apply theme toggle hover glow (preview mode only)
+    if (this._themeToggle) {
+      this._themeToggle.applyHover(hitToggle && !isFocused && !isCockpitActive);
+    }
+
     // Cursor management
     if (isMarkerDragging) {
       document.body.style.cursor = 'grabbing';
+    } else if (hitToggle && !isFocused && !isCockpitActive) {
+      document.body.style.cursor = 'pointer';
     } else if (hitSaucer && !isFocused && !isCockpitActive) {
       document.body.style.cursor = 'pointer';
     } else if (!hitTorus && !hoveredCube) {

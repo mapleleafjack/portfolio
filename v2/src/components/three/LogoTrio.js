@@ -1,12 +1,45 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { onThemeChange, THEME } from './shared';
 
 const SPIN_DECAY = 0.94;       // per-frame decay factor for hit spin
 const GLOW_DECAY = 0.92;       // per-frame decay for hit glow
 
 /**
+ * Creates an inverted copy of a texture using a 2D canvas.
+ * Preserves alpha channel — only inverts RGB.
+ * @param {THREE.Texture} sourceTexture
+ * @returns {THREE.CanvasTexture}
+ */
+function createInvertedTexture(sourceTexture) {
+  const image = sourceTexture.image;
+  if (!image || !image.width) return sourceTexture;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i]     = 255 - data[i];     // R
+    data[i + 1] = 255 - data[i + 1]; // G
+    data[i + 2] = 255 - data[i + 2]; // B
+    // Alpha (i+3) unchanged
+  }
+  ctx.putImageData(imageData, 0, 0);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/**
  * Manages the 3D extruded logo model (GLB) with a PNG texture overlay
- * on the front and back faces.
+ * on the front and back faces. Supports theme-aware material swapping
+ * and programmatic texture inversion for dark mode.
  *
  * The logo follows only user-driven rotation (no auto-drift) and
  * decays back to center after inactivity.
@@ -31,12 +64,13 @@ export default class LogoTrio {
     this.group.position.set(0, logoY, 0);
     scene.add(this.group);
 
-    // Dark material for the 3D extruded model
-    this._logoMaterial = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
+    // Dark material for the 3D extruded model (theme-aware)
+    this._logoMaterial = new THREE.MeshBasicMaterial({ color: THEME.logoMaterial.light });
 
     // PNG texture for the detailed artwork overlay
     this._logoTexture = new THREE.TextureLoader().load('/images/jackmusajo_black.png');
     this._logoTexture.colorSpace = THREE.SRGBColorSpace;
+    this._logoTextureInverted = null; // created lazily on first dark-mode switch
     this._overlayMat = new THREE.MeshBasicMaterial({
       map: this._logoTexture,
       transparent: true,
@@ -109,8 +143,37 @@ export default class LogoTrio {
         this.group.add(this._hitGlowMesh);
 
         this._ready = true;
+
+        // Apply initial theme
+        this._applyTheme();
       }
     );
+
+    // ── Theme change listener ──────────────────────────
+    this._themeCleanup = onThemeChange(() => this._applyTheme());
+  }
+
+  /**
+   * Swap logo material colour and PNG overlay between light and dark.
+   * Creates an inverted texture lazily on first dark-mode switch.
+   */
+  _applyTheme() {
+    const dark = document.documentElement.classList.contains('dark');
+
+    // Swap 3D extruded model material
+    const matColor = dark ? THEME.logoMaterial.dark : THEME.logoMaterial.light;
+    this._logoMaterial.color.set(matColor);
+
+    // Swap PNG overlay texture
+    if (dark) {
+      if (!this._logoTextureInverted) {
+        this._logoTextureInverted = createInvertedTexture(this._logoTexture);
+      }
+      this._overlayMat.map = this._logoTextureInverted;
+    } else {
+      this._overlayMat.map = this._logoTexture;
+    }
+    this._overlayMat.needsUpdate = true;
   }
 
   /** Whether the GLTF model has finished loading. */
@@ -231,6 +294,14 @@ export default class LogoTrio {
 
   /** Full cleanup of GLTF model, textures, materials, and geometries. */
   dispose() {
+    if (this._themeCleanup) {
+      this._themeCleanup();
+      this._themeCleanup = null;
+    }
+    if (this._logoTextureInverted) {
+      this._logoTextureInverted.dispose();
+      this._logoTextureInverted = null;
+    }
     if (this._logoMesh) {
       this.group.remove(this._logoMesh);
       this._logoMesh.traverse((child) => {

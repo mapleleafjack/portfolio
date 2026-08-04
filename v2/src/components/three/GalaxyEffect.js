@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getAccentColor } from './shared';
+import { getAccentColor, onThemeChange, THEME } from './shared';
 
 // 3 size tiers for varied rock debris
 const GEO_S = new THREE.BoxGeometry(0.06, 0.06, 0.06);
@@ -73,7 +73,7 @@ class Galaxy {
     this.group.position.copy(origin);
 
     this.neutralMat = new THREE.MeshBasicMaterial({
-      color: 0xaaaaaa,
+      color: THEME.saucerBody.light,
       wireframe: true,
       transparent: true,
       opacity: 0,
@@ -85,6 +85,12 @@ class Galaxy {
       transparent: true,
       opacity: 0,
       depthWrite: false,
+    });
+
+    // ── Theme change listener ──
+    this._themeCleanup = onThemeChange(() => {
+      const dark = document.documentElement.classList.contains('dark');
+      this.neutralMat.color.set(dark ? THEME.saucerBody.dark : THEME.saucerBody.light);
     });
 
     this._createParticles();
@@ -272,6 +278,10 @@ class Galaxy {
   }
 
   dispose() {
+    if (this._themeCleanup) {
+      this._themeCleanup();
+      this._themeCleanup = null;
+    }
     for (let i = this.meshes.length - 1; i >= 0; i--) {
       this.group.remove(this.meshes[i]);
     }

@@ -64,7 +64,7 @@ export default function CursorTrail() {
       }
 
       ctx.beginPath();
-      ctx.strokeStyle = '#111';
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text').trim() || '#0a0a0a';
       ctx.lineWidth = LINE_WIDTH;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
