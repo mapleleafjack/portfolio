@@ -62,9 +62,9 @@ export const THEME = {
   cubeDark:     { light: '#0a0a0a', dark: '#e0e0e0' },
   cubeGray:     { light: '#555555', dark: '#aaaaaa' },
   logoMaterial: { light: '#1a1a1a', dark: '#e5e5e5' },
-  saucerBody:   { light: '#aaaaaa', dark: '#cccccc' },
-  saucerRing:   { light: '#ffffff', dark: '#dddddd' },
-  saucerEngine: { light: '#888888', dark: '#bbbbbb' },
+  saucerBody:   { light: '#666666', dark: '#cccccc' },
+  saucerRing:   { light: '#888888', dark: '#dddddd' },
+  saucerEngine: { light: '#555555', dark: '#bbbbbb' },
 };
 
 /**

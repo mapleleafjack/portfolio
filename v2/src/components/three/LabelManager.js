@@ -1,7 +1,7 @@
 /**
  * LabelManager — star-map-style 3D hover labels via CSS2DRenderer.
  *
- * Each interactive object (torus, saucer, theme toggle) gets:
+ * Each interactive object (torus, saucer, theme toggle, planets) gets:
  *   - A thin connector line (THREE.Line) from the object to an offset point below
  *   - A CSS2DObject label with constant-size readable text
  *   - A tiny anchor dot at the object's position
@@ -13,7 +13,7 @@
  */
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { getAccentColor, isDarkMode } from './shared';
+import { getAccentColor, isDarkMode, onThemeChange } from './shared';
 
 // ── Per-label configuration ──────────────────────────────
 const H_OFFSET = 0.25;       // horizontal nudge (world-space X) before vertical drop
@@ -124,6 +124,13 @@ export default class LabelManager {
     for (const def of LABEL_DEFS) {
       this._buildLabel(def);
     }
+
+    // ── Theme change listener ─────────────────────────
+    this._themeCleanup = onThemeChange(() => {
+      for (const [, label] of this._labels) {
+        this._applyThemeColors(label);
+      }
+    });
   }
 
   // ═══════════════════════════════════════════════════════
@@ -152,6 +159,20 @@ export default class LabelManager {
     const cssObj = new CSS2DObject(el);
     cssObj.visible = false;
     el.style.opacity = '0';
+
+    // Apply planet-specific dot colour via CSS variable
+    if (def.dotColor) {
+      const dotEl = el.querySelector('.label-3d-dot');
+      if (dotEl) {
+        const colorHex = typeof def.dotColor === 'number'
+          ? '#' + new THREE.Color(def.dotColor).getHexString()
+          : def.dotColor;
+        dotEl.style.setProperty('--accent', colorHex);
+        dotEl.style.background = colorHex;
+        dotEl.style.boxShadow = `0 0 6px ${colorHex}, 0 0 12px ${colorHex}66`;
+      }
+    }
+
     this._cssScene.add(cssObj);
 
     // ── Store state ───────────────────────────────────
@@ -176,7 +197,39 @@ export default class LabelManager {
   // ═══════════════════════════════════════════════════════
 
   /**
-   * @param {{ hitTorus: boolean, hitSaucer: boolean, hitToggle: boolean }} hoverState
+   * Register planet data for on-hover labels.
+   * Creates label infrastructure for each planet (line, dot, CSS2DObject).
+   * @param {Array<{ id: string, name: string, colorHex: string, group: THREE.Group }>} planetData
+   */
+  setPlanets(planetData) {
+    // Remove any previously registered planet labels
+    for (const key of this._labels.keys()) {
+      if (key.startsWith('planet-')) {
+        const label = this._labels.get(key);
+        this._mainScene.remove(label.line);
+        this._mainScene.remove(label.dot);
+        this._cssScene.remove(label.cssObj);
+        label.line.geometry.dispose();
+        label.lineMat.dispose();
+        this._labels.delete(key);
+      }
+    }
+
+    for (const pd of planetData) {
+      const key = `planet-${pd.id}`;
+      this._objects[key] = pd.group;
+      const def = {
+        key,
+        name: pd.name,
+        offsetY: -0.40,
+        dotColor: pd.colorHex,
+      };
+      this._buildLabel(def);
+    }
+  }
+
+  /**
+   * @param {{ hitTorus: boolean, hitSaucer: boolean, hitToggle: boolean, hitPlanet?: boolean, planetId?: string|null }} hoverState
    * @param {number} dt — delta time in seconds
    * @param {boolean} hideAll — force-hide all labels (explore mode / cockpit)
    */
@@ -186,6 +239,11 @@ export default class LabelManager {
       saucer: hoverState.hitSaucer,
       toggle: hoverState.hitToggle,
     };
+
+    // Planet hover — only the specific planet that is hovered
+    if (hoverState.hitPlanet && hoverState.planetId) {
+      hoverMap[`planet-${hoverState.planetId}`] = true;
+    }
 
     for (const [key, label] of this._labels) {
       const hovered = hoverMap[key] && !hideAll;
@@ -284,7 +342,13 @@ export default class LabelManager {
 
     // ── Get world position ────────────────────────────
     const worldPos = new THREE.Vector3();
-    obj.group.getWorldPosition(worldPos);
+    if (obj.isObject3D) {
+      // Direct THREE.Object3D (planet groups)
+      obj.getWorldPosition(worldPos);
+    } else {
+      // Wrapper object with .group (torus, saucer, toggle)
+      obj.group.getWorldPosition(worldPos);
+    }
 
     // ── L-shape points ───────────────────────────────
     //   anchor → horizontal nudge → vertical drop → label
@@ -432,5 +496,9 @@ export default class LabelManager {
       // (they'll be garbage-collected when the module unloads)
     }
     this._labels.clear();
+    if (this._themeCleanup) {
+      this._themeCleanup();
+      this._themeCleanup = null;
+    }
   }
 }

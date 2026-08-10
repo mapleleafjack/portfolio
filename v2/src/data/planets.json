@@ -1,0 +1,85 @@
+{
+  "planets": [
+    {
+      "id": "work",
+      "name": "Work",
+      "position": [-5.5, 0, -2.0],
+      "orbitRadius": 3.8,
+      "orbitSpeed": 0.10,
+      "orbitPhase": 0,
+      "orbitTilt": 0.25,
+      "color": "#f0c830",
+      "size": 0.28,
+      "ringWidth": 0.05,
+      "constellation": [
+        { "type": "gem", "label": "LPA Extractor", "detail": "RAG-powered legal document extraction. Python + LangChain + Snowflake pipeline that cut LPA review time from 6 hours to 1. Deployed at BlackRock.", "link": "/work/lpa-extractor", "color": "#f0c830" },
+        { "type": "gem", "label": "Term Intelligence", "detail": "Fund term analysis platform replacing a PowerBI prototype. React + FastAPI + GraphQL. Real-time comparison across 1,000+ private market funds.", "link": "/work/term-intelligence", "color": "#f0c830" },
+        { "type": "gem", "label": "Contact Profiles", "detail": "Micro-frontend contact system spanning 6+ services via Module Federation. .NET backend with SharePoint, MongoDB, and Snowflake integration.", "link": "/work/contact-profiles", "color": "#f0c830" },
+        { "type": "gem", "label": "AI Dev Workflows", "detail": "Adapted BlackRock's BreadKit AI framework for Preqin. Built 8+ reusable workflows — /dev-deploy, /pr-review, /save-investigation. Custom Atlassian MCP integration from scratch.", "link": "/work/breadkit", "color": "#f0c830" },
+        { "type": "gem", "label": "Housing Repairs SaaS", "detail": "Made Tech's first SaaS product for UK local councils. GOV.UK Design System. Django + React. Live in production across multiple boroughs.", "link": "/work/housing-repairs", "color": "#3b82f6" },
+        { "type": "gem", "label": "Hackney Social Care", "detail": "Emergency restoration of Hackney Council's social care systems after a major cyberattack. Vulnerable adults and children depended on this service.", "link": "/work/hackney-social-care", "color": "#3b82f6" },
+        { "type": "gem", "label": "EGC Comic Certifier", "detail": "Full grading management system for CGC Comics Italy. Barcode scanning → grading workflow → certification. React 19 + FastAPI + PostgreSQL. €5,000+ freelance project.", "link": "/work/egc", "color": "#ef4444" }
+      ]
+    },
+    {
+      "id": "craft",
+      "name": "Craft",
+      "position": [0, -3.0, -2.0],
+      "orbitRadius": 3.5,
+      "orbitSpeed": 0.13,
+      "orbitPhase": 1.5708,
+      "orbitTilt": 0.25,
+      "color": "#10b981",
+      "size": 0.28,
+      "ringWidth": 0.05,
+      "constellation": [
+        { "type": "chip", "label": "EsPoi — LED Poi", "detail": "Custom ESP32 LED juggling prop. Gyro + accelerometer reactive effects. Custom PCB designed in EasyEDA, BLE control, POV animations. Open source.", "link": "https://github.com/mapleleafjack/EsPoi", "color": "#10b981" },
+        { "type": "chip", "label": "BMO", "detail": "Desktop AI companion. ESP32 hardware running GPT conversations, Spotify control, OLED facial expressions, RAG knowledge base, and a macOS menu bar app.", "link": "https://github.com/mapleleafjack/BMO", "color": "#10b981" },
+        { "type": "chip", "label": "Reactive Bus Installation", "detail": "Multi-sensory AV across two double-decker buses — 4 unique environments. LED acrylic pipes, cloud ceiling, UV neon, starry night grid. PIR → Raspberry Pi → Arduino → LEDs + audio. £900 budget.", "color": "#10b981" },
+        { "type": "chip", "label": "Burning Tech", "detail": "On-site tech tent for Burning Mountain Festival. Centralized LED prop configuration, performer troubleshooting, live logo display, juggler support point.", "color": "#10b981" },
+        { "type": "chip", "label": "Custom PCB Design", "detail": "End-to-end PCB workflow. EasyEDA schematic + layout, 0603 SMD hand assembly with hot air, BOM cost reduction of 40–60%. BQ24074 + MT3608 + AP2112K power stack.", "color": "#10b981" },
+        { "type": "chip", "label": "Addressable LEDs", "detail": "APA102 / SK9822 reactive lighting systems. Gyro and audio-driven patterns, BLE wireless control, OTA firmware updates, power-efficient animation engine.", "color": "#10b981" }
+      ]
+    },
+    {
+      "id": "music",
+      "name": "Music",
+      "position": [5.5, 0, -2.0],
+      "orbitRadius": 3.8,
+      "orbitSpeed": 0.16,
+      "orbitPhase": 3.1416,
+      "orbitTilt": 0.25,
+      "color": "#d946ef",
+      "size": 0.28,
+      "ringWidth": 0.05,
+      "constellation": [
+        { "type": "disc", "label": "The Cloud", "detail": "6-track psytrance album as Jack Sonagli. Featuring collaborations with Psyranga and The Bad Fucoz. Tracks incl. Tunnel Vision, Sea of Clouds, r̴̂͜i̴̗̊t̶̮͈́͠u̶̞̓͒a̶̳͖͝l̸͍͎̃.", "link": "/creative/the-cloud", "color": "#f0c830" },
+        { "type": "disc", "label": "Remixed", "detail": "5-track remix album for Bob Warley and the Haters. Genre-spanning electronic reworks with full stem production.", "link": "/creative/remixed", "color": "#d946ef" },
+        { "type": "disc", "label": "OctoBits and Pieces", "detail": "9 experimental electronic tracks. Genre-hopping from chiptune to ambient. A playground for sound design and unconventional arrangements.", "link": "/creative/octobits-and-pieces", "color": "#3b82f6" },
+        { "type": "chip", "label": "DnaVST", "detail": "Real-time 3D DNA helix that reacts to incoming audio. Built with C++ and JUCE. Audio feature extraction drives helix twist, base pair colors, and camera movement.", "link": "https://github.com/mapleleafjack/DnaVST", "color": "#10b981" },
+        { "type": "tetra", "label": "Ableton Live Set", "detail": "Live performance on Ableton Push. Tracks rebuilt from Arrangement to Session View with custom scene mapping, MIDI assignments, and performance-ready clip launching.", "color": "#d946ef" },
+        { "type": "tetra", "label": "Audio Production", "detail": "Diploma in Audio Engineering from Nuova Audio Multimedia, Milan. Sound design, studio mixing, mastering — the foundation behind every music project here.", "color": "#d946ef" }
+      ]
+    },
+    {
+      "id": "play",
+      "name": "Play",
+      "position": [0, 3.0, -2.0],
+      "orbitRadius": 3.5,
+      "orbitSpeed": 0.19,
+      "orbitPhase": 4.7124,
+      "orbitTilt": 0.25,
+      "color": "#f97316",
+      "size": 0.28,
+      "ringWidth": 0.05,
+      "constellation": [
+        { "type": "tetra", "label": "SlimeChan", "detail": "Interactive web colony where every slime has a distinct LLM-powered personality. Chat, feed, and watch them interact. React + AI APIs. Live at slimechan.xyz.", "link": "https://www.slimechan.xyz/", "color": "#f97316" },
+        { "type": "tetra", "label": "Obsidian Productivity OS", "detail": "ADHD-informed productivity system. Live DataviewJS dashboards for Jira, Bitbucket & TeamCity. Automated daily logs via AI. 7+ custom AI workflows. Built on years of neurodiversity research and self-experimentation.", "color": "#f97316" },
+        { "type": "tetra", "label": "JackDir", "detail": "Open-source CLI for packaging codebase context for LLMs. Extracts directory trees, file contents, and metadata into shareable snapshots. My daily driver for AI-assisted development.", "link": "https://github.com/mapleleafjack/jackdir", "color": "#f97316" },
+        { "type": "tetra", "label": "BioSwitch", "detail": "Biotech startup MVP. Full statement of work, system architecture diagram, prototype plan, and commercial proposal. Exploring the software–biology interface.", "color": "#f97316" },
+        { "type": "tetra", "label": "Mushroom Cultivation", "detail": "Home mycology lab. Agar plate inoculation, Still Air Box construction, substrate preparation. Active strain selection and vendor research for gourmet mushrooms.", "color": "#f97316" },
+        { "type": "tetra", "label": "Ginger Bug Lab", "detail": "Wild fermentation with ginger bug starter. Flavour trials across lemon, orange, grapefruit + lime, and chamomile. Fully documented process from zero to bottle.", "color": "#f97316" }
+      ]
+    }
+  ]
+}

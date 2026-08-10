@@ -6,40 +6,9 @@ const SPIN_DECAY = 0.94;       // per-frame decay factor for hit spin
 const GLOW_DECAY = 0.92;       // per-frame decay for hit glow
 
 /**
- * Creates an inverted copy of a texture using a 2D canvas.
- * Preserves alpha channel — only inverts RGB.
- * @param {THREE.Texture} sourceTexture
- * @returns {THREE.CanvasTexture}
- */
-function createInvertedTexture(sourceTexture) {
-  const image = sourceTexture.image;
-  if (!image || !image.width) return sourceTexture;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = image.width;
-  canvas.height = image.height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(image, 0, 0);
-
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
-  for (let i = 0; i < data.length; i += 4) {
-    data[i]     = 255 - data[i];     // R
-    data[i + 1] = 255 - data[i + 1]; // G
-    data[i + 2] = 255 - data[i + 2]; // B
-    // Alpha (i+3) unchanged
-  }
-  ctx.putImageData(imageData, 0, 0);
-
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-/**
  * Manages the 3D extruded logo model (GLB) with a PNG texture overlay
  * on the front and back faces. Supports theme-aware material swapping
- * and programmatic texture inversion for dark mode.
+ * using real light/dark texture variants.
  *
  * The logo follows only user-driven rotation (no auto-drift) and
  * decays back to center after inactivity.
@@ -67,12 +36,15 @@ export default class LogoTrio {
     // Dark material for the 3D extruded model (theme-aware)
     this._logoMaterial = new THREE.MeshBasicMaterial({ color: THEME.logoMaterial.light });
 
-    // PNG texture for the detailed artwork overlay
-    this._logoTexture = new THREE.TextureLoader().load('/images/jackmusajo_black.png');
-    this._logoTexture.colorSpace = THREE.SRGBColorSpace;
-    this._logoTextureInverted = null; // created lazily on first dark-mode switch
+    // PNG textures for the detailed artwork overlay (light & dark variants)
+    const loader = new THREE.TextureLoader();
+    this._logoTextureLight = loader.load('/images/jackmusajo_black.png');
+    this._logoTextureLight.colorSpace = THREE.SRGBColorSpace;
+    this._logoTextureDark = loader.load('/images/jackmusajo_white.png');
+    this._logoTextureDark.colorSpace = THREE.SRGBColorSpace;
+
     this._overlayMat = new THREE.MeshBasicMaterial({
-      map: this._logoTexture,
+      map: this._logoTextureLight,
       transparent: true,
       alphaTest: 0.05,
       side: THREE.DoubleSide,
@@ -155,7 +127,7 @@ export default class LogoTrio {
 
   /**
    * Swap logo material colour and PNG overlay between light and dark.
-   * Creates an inverted texture lazily on first dark-mode switch.
+   * Uses real white/black texture assets instead of runtime inversion.
    */
   _applyTheme() {
     const dark = document.documentElement.classList.contains('dark');
@@ -164,15 +136,8 @@ export default class LogoTrio {
     const matColor = dark ? THEME.logoMaterial.dark : THEME.logoMaterial.light;
     this._logoMaterial.color.set(matColor);
 
-    // Swap PNG overlay texture
-    if (dark) {
-      if (!this._logoTextureInverted) {
-        this._logoTextureInverted = createInvertedTexture(this._logoTexture);
-      }
-      this._overlayMat.map = this._logoTextureInverted;
-    } else {
-      this._overlayMat.map = this._logoTexture;
-    }
+    // Swap PNG overlay texture — use the real white/black variants
+    this._overlayMat.map = dark ? this._logoTextureDark : this._logoTextureLight;
     this._overlayMat.needsUpdate = true;
   }
 
@@ -298,9 +263,13 @@ export default class LogoTrio {
       this._themeCleanup();
       this._themeCleanup = null;
     }
-    if (this._logoTextureInverted) {
-      this._logoTextureInverted.dispose();
-      this._logoTextureInverted = null;
+    if (this._logoTextureDark) {
+      this._logoTextureDark.dispose();
+      this._logoTextureDark = null;
+    }
+    if (this._logoTextureLight) {
+      this._logoTextureLight.dispose();
+      this._logoTextureLight = null;
     }
     if (this._logoMesh) {
       this.group.remove(this._logoMesh);
@@ -313,7 +282,6 @@ export default class LogoTrio {
     if (this._hitGlowMesh) this.group.remove(this._hitGlowMesh);
     if (this._overlayGeo) this._overlayGeo.dispose();
     this._overlayMat.dispose();
-    this._logoTexture.dispose();
     if (this._hitGlowMat) this._hitGlowMat.dispose();
     this.scene.remove(this.group);
     this._logoMaterial.dispose();

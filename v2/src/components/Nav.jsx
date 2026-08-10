@@ -1,21 +1,23 @@
-import { Link, useLocation } from 'react-router-dom';
 import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../ThemeContext';
 
-export default function Nav() {
-  const { pathname } = useLocation();
+export default function Nav({ onNavClick, activePlanet, onHomeClick }) {
   const { resolvedTheme, toggleTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
+  const navItemClass = (planetId) =>
+    `link-underline cursor-pointer${activePlanet === planetId ? ' font-medium' : ''}`;
+
   return (
     <nav className="px-6 sm:px-10 pt-4 sm:pt-6 pb-4 flex items-center gap-x-6 text-sm">
-      <Link to="/" className="font-semibold link-underline mr-auto flex items-center gap-2">
-        <img src="/images/octopus_bw.png" alt="" className="w-5 h-5 opacity-70 invert" />
+      <button onClick={onHomeClick} className="font-semibold link-underline mr-auto flex items-center gap-2 cursor-pointer">
+        <img src={isDark ? '/images/octopus_white.png' : '/images/octopus_bw.png'} alt="" className="w-5 h-5 opacity-70" />
         Jack Musajo
-      </Link>
-      <Link to="/work" className={`link-underline${pathname === '/work' ? ' font-medium' : ''}`}>Work</Link>
-      <Link to="/about" className={`link-underline${pathname === '/about' ? ' font-medium' : ''}`}>About</Link>
-      <Link to="/creative" className={`link-underline${pathname === '/creative' ? ' font-medium' : ''}`}>Creative</Link>
+      </button>
+      <button onClick={() => onNavClick?.('work')} className={navItemClass('work')}>Work</button>
+      <button onClick={() => onNavClick?.('craft')} className={navItemClass('craft')}>Craft</button>
+      <button onClick={() => onNavClick?.('music')} className={navItemClass('music')}>Music</button>
+      <button onClick={() => onNavClick?.('play')} className={navItemClass('play')}>Play</button>
       <button
         onClick={toggleTheme}
         className="p-1.5 rounded-full transition-all duration-300 hover:bg-[var(--input-bg)]"

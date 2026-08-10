@@ -35,6 +35,8 @@
   --shadow: rgba(0, 0, 0, 0.04);
   --shadow-lg: rgba(0, 0, 0, 0.08);
   --glass-bg: rgba(255, 255, 255, 0.82);
+  --chart-panel-bg: rgba(255, 255, 255, 0.42);
+  --chart-panel-glow: rgba(0, 0, 0, 0.04);
   --overlay-bg: rgba(255, 255, 255, 0.7);
   --overlay-bg-hover: rgba(255, 255, 255, 0.9);
   --overlay-text: #888888;
@@ -80,6 +82,8 @@
   --shadow: rgba(0, 0, 0, 0.3);
   --shadow-lg: rgba(0, 0, 0, 0.5);
   --glass-bg: rgba(10, 10, 10, 0.82);
+  --chart-panel-bg: rgba(10, 10, 10, 0.42);
+  --chart-panel-glow: rgba(255, 255, 255, 0.03);
   --overlay-bg: rgba(20, 20, 20, 0.7);
   --overlay-bg-hover: rgba(30, 30, 30, 0.9);
   --overlay-text: #888888;
@@ -516,7 +520,7 @@ a:hover {
    ============================================ */
 
 @keyframes hintFlash {
-  0%, 100% { opacity: 0.15; }
+  0%, 100% { opacity: 0.35; }
   50%      { opacity: 1; }
 }
 
@@ -784,7 +788,7 @@ body.cockpit-active {
 
 .label-3d {
   font-family: 'Oxanium', 'Courier New', monospace;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
   /* color + text-shadow set dynamically by LabelManager per theme */
   white-space: nowrap;
@@ -792,7 +796,7 @@ body.cockpit-active {
   letter-spacing: 0.06em;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   user-select: none;
   -webkit-user-select: none;
   transition: opacity 0.15s ease;
@@ -800,8 +804,8 @@ body.cockpit-active {
 
 .label-3d-dot {
   display: inline-block;
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--accent, #f0c830);
   flex-shrink: 0;

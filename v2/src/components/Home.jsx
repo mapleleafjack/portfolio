@@ -131,7 +131,17 @@ function RotatingPhrase() {
 
 function InteractionHint() {
   return (
-    <p className="text-xs text-gray-400 mt-10" style={{ animation: 'hintFlash 4s ease-in-out infinite' }}>
+    <p className="text-xs mt-10" style={{
+      color: 'var(--hint-text)',
+      background: 'var(--hint-bg)',
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
+      padding: '6px 18px',
+      borderRadius: '20px',
+      display: 'inline-block',
+      border: '1px solid var(--border)',
+      animation: 'hintFlash 4s ease-in-out infinite',
+    }}>
       ✦ tap to spawn galaxies · ⌘+drag · middle‑click · two‑finger drag to orbit · scroll to zoom
     </p>
   );
@@ -153,18 +163,19 @@ export default function Home() {
       {/* Hero */}
       <div className="flex flex-col items-center text-center px-6">
         {/* Logo rendered as 3D billboard sprite in ThreeBackground */}
-        <div className="h-52 sm:h-80 mb-6" />
-        <p className="text-base sm:text-lg text-gray-500 leading-relaxed mb-0.5 mt-8 sm:mt-4">
+        <div className="h-52 sm:h-80 mb-4" />
+
+        <p className="text-base sm:text-lg leading-relaxed mb-0" style={{ color: 'var(--text-muted)' }}>
           Software engineer
         </p>
-        <p className="text-base sm:text-lg text-gray-400 leading-relaxed min-h-[1.6em] mb-6">
+        <p className="text-base sm:text-lg leading-relaxed min-h-[1.6em] mb-4" style={{ color: 'var(--text-subtle)' }}>
           <RotatingPhrase />
         </p>
-        <div className="flex gap-4 text-sm text-gray-400">
+        <div className="flex gap-4 text-sm" style={{ color: 'var(--text-subtle)' }}>
           <a href="mailto:jack.musajo@gmail.com" className="link-underline">Email</a>
-          <span className="text-gray-300">·</span>
+          <span style={{ color: 'var(--border-strong)' }}>·</span>
           <a href="https://github.com/mapleleafjack" target="_blank" rel="noopener noreferrer" className="link-underline">GitHub</a>
-          <span className="text-gray-300">·</span>
+          <span style={{ color: 'var(--border-strong)' }}>·</span>
           <a href="https://www.linkedin.com/in/chakri-musajo-somma" target="_blank" rel="noopener noreferrer" className="link-underline">LinkedIn</a>
         </div>
         <InteractionHint />

@@ -96,8 +96,8 @@ export const PRESETS = [
 ];
 
 // ── Preview orbit constants ────────────────────────────
-export const ORBIT_RADIUS = 3.8;
-export const ORBIT_PERIOD = 32;
+export const ORBIT_RADIUS = 5.0;
+export const ORBIT_PERIOD = 50;
 export const ORBIT_Y_AMP = 0.6;
 export const ORBIT_Y_PERIOD = 18;
 export const PREVIEW_SCALE = 0.18;

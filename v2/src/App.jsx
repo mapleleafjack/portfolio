@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useState, useRef } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
 import Nav from './components/Nav';
 import Home from './components/Home';
 import Work from './components/Work';
@@ -37,13 +37,76 @@ function AppContent() {
   const enterSaucerCockpit = useCallback(() => setSaucerFocused(true), []);
   const exitSaucerCockpit = useCallback(() => setSaucerFocused(false), []);
 
-  // ── ESC key to exit torus focus ──────────────────────
+  // ── Planet constellation detail overlay ──────────
+  const [planetDetail, setPlanetDetail] = useState(null);
+  const handlePlanetItemClick = useCallback((data) => {
+    setPlanetDetail(data);
+  }, []);
+
+  // ── Planet zoom state (drives Nav visibility + ESC, replaced ChartPanel) ──
+  const [planetZoomed, setPlanetZoomed] = useState(false);
+  const [activePlanet, setActivePlanet] = useState(null); // 'work' | 'craft' | 'music' | 'play' | null
+  const [planetZoomOutSignal, setPlanetZoomOutSignal] = useState(0);
+  const [planetZoomInSignal, setPlanetZoomInSignal] = useState(0);
+  const planetZoomInTargetRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleConstellationHover = useCallback((data) => {
+    // Hover data flows to the 3D billboard via ThreeBackground, no React state needed
+  }, []);
+
+  const handlePlanetZoomChange = useCallback((data) => {
+    if (data && data.phase === 'open' && data.planetId) {
+      setPlanetZoomed(true);
+      setActivePlanet(data.planetId);
+    } else if (data && data.phase === 'none') {
+      setPlanetZoomed(false);
+      setActivePlanet(null);
+    }
+  }, []);
+
+  // ── Nav click: zoom to planet (or toggle if already zoomed) ──
+  const handleNavClick = useCallback((planetId) => {
+    // If on a sub-page, navigate home first — planet zoom will follow
+    if (window.location.pathname !== '/') {
+      navigate('/');
+    }
+    // Signal ThreeBackground to zoom to this planet (counter pattern for re-trigger)
+    planetZoomInTargetRef.current = planetId;
+    setPlanetZoomInSignal(s => s + 1);
+    setPlanetDetail(null);
+  }, [navigate]);
+
+  const requestZoomOut = useCallback(() => {
+    setPlanetZoomOutSignal(s => s + 1);
+  }, []);
+
+  const handleBillboardClick = useCallback((link) => {
+    navigate(link);
+  }, [navigate]);
+
+  // ── Home/logo click: zoom out to galaxy view ──────
+  const handleHomeClick = useCallback(() => {
+    if (window.location.pathname !== '/') {
+      navigate('/');
+    }
+    if (planetZoomed) {
+      requestZoomOut();
+    }
+  }, [navigate, planetZoomed, requestZoomOut]);
+
+  // ── ESC key to exit torus focus / planet zoom ──────
   useEffect(() => {
-    if (!torusFocused) return;
-    const onKey = (e) => { if (e.key === 'Escape') closeTorus(); };
+    if (!torusFocused && !planetZoomed) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        if (torusFocused) closeTorus();
+        else if (planetZoomed) requestZoomOut();
+      }
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [torusFocused, closeTorus]);
+  }, [torusFocused, closeTorus, planetZoomed, requestZoomOut]);
 
   // ── Engine state sync callback ──────────────────────
   const handleEngineStateChange = useCallback((engineState) => {
@@ -92,6 +155,13 @@ function AppContent() {
         saucerFocused={saucerFocused}
         onSaucerEnter={enterSaucerCockpit}
         onSaucerExit={exitSaucerCockpit}
+        onPlanetItemClick={handlePlanetItemClick}
+        onConstellationHover={handleConstellationHover}
+        onPlanetZoomChange={handlePlanetZoomChange}
+        onBillboardClick={handleBillboardClick}
+        planetZoomOutSignal={planetZoomOutSignal}
+        planetZoomInSignal={planetZoomInSignal}
+        planetZoomInTarget={planetZoomInTargetRef.current}
       />
       {/* Subtle vignette behind torus in explore mode */}
       <div style={{
@@ -104,11 +174,11 @@ function AppContent() {
 
       <CursorTrail />
       <div style={{
-        opacity: (torusFocused || saucerFocused) ? 0 : 1,
+        opacity: (torusFocused || saucerFocused || planetZoomed) ? 0 : 1,
         transition: 'opacity 0.35s',
-        pointerEvents: (torusFocused || saucerFocused) ? 'none' : 'auto',
+        pointerEvents: (torusFocused || saucerFocused || planetZoomed) ? 'none' : 'auto',
       }}>
-        <Nav />
+        <Nav onNavClick={handleNavClick} activePlanet={activePlanet} onHomeClick={handleHomeClick} />
       </div>
 
       {/* ── Torus Explore Overlays ────────────────────── */}
@@ -169,10 +239,59 @@ function AppContent() {
           />
         </>
       )}
+
+      {/* ── Planet Detail Overlay (hidden when planet is zoomed) ── */}
+      {planetDetail && !planetZoomed && (
+        <div
+          style={{
+            position: 'fixed',
+            left: `${planetDetail.screenX}px`,
+            top: `${planetDetail.screenY}px`,
+            transform: 'translate(-50%, -115%)',
+            zIndex: 100,
+            maxWidth: 280,
+            background: 'var(--glass-bg)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid var(--border)',
+            borderRadius: 12,
+            padding: '14px 16px',
+            boxShadow: '0 8px 32px var(--shadow-lg)',
+            fontFamily: "'Oxanium', sans-serif",
+          }}
+          onClick={() => setPlanetDetail(null)}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs uppercase tracking-wider text-gray-400 font-medium">
+              {planetDetail.planetId}
+            </span>
+            <button
+              onClick={(e) => { e.stopPropagation(); setPlanetDetail(null); }}
+              className="text-gray-400 hover:text-gray-600 transition-colors text-sm leading-none"
+            >
+              ✕
+            </button>
+          </div>
+          <h3 className="font-semibold text-sm text-[var(--text)] mb-1">{planetDetail.label}</h3>
+          {planetDetail.detail && (
+            <p className="text-xs text-gray-500 leading-relaxed mb-2">{planetDetail.detail}</p>
+          )}
+          {planetDetail.link && (
+            <Link
+              to={planetDetail.link}
+              className="text-xs link-underline text-accent"
+              onClick={() => setPlanetDetail(null)}
+            >
+              View more →
+            </Link>
+          )}
+        </div>
+      )}
+
       <div style={{
-        opacity: (torusFocused || saucerFocused) ? 0 : 1,
+        opacity: (torusFocused || saucerFocused || planetZoomed) ? 0 : 1,
         transition: 'opacity 0.35s',
-        pointerEvents: (torusFocused || saucerFocused) ? 'none' : 'auto',
+        pointerEvents: (torusFocused || saucerFocused || planetZoomed) ? 'none' : 'auto',
       }}>
         <Routes>
         <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />

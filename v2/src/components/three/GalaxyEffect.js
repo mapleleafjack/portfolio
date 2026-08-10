@@ -384,4 +384,11 @@ export default class GalaxyManager {
     }
     this.galaxies.length = 0;
   }
+
+  /** Toggle visibility of all active galaxy groups (for planet zoom hide). */
+  setVisible(visible) {
+    for (let i = 0; i < this.galaxies.length; i++) {
+      this.galaxies[i].group.visible = visible;
+    }
+  }
 }

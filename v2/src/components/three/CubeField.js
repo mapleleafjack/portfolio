@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { getAccentColor, getThemeColor, THEME, onThemeChange } from './shared';
 
-const NUM_CUBES = 35;
-const CLEAR_ZONE_X = 3.5;
-const CLEAR_ZONE_Y = 2.5;
-const CLEAR_ZONE_Z = 3.5;
+const NUM_CUBES = 18;
+const CLEAR_ZONE_X = 6.0;
+const CLEAR_ZONE_Y = 5.0;
+const CLEAR_ZONE_Z = 6.0;
 const MAX_PLACEMENT_TRIES = 20;
 const MAX_SPAWN_DELAY = 3.0;  // seconds — cubes appear staggered over this window
 
@@ -23,7 +23,7 @@ const _axisPool = new THREE.Vector3();
 export default class CubeField {
   /**
    * @param {THREE.Group} parentGroup — sceneGroup to add cubes to
-   * @param {number} [count=35] — number of cubes to create
+   * @param {number} [count=18] — number of cubes to create
    */
   constructor(parentGroup, count = NUM_CUBES) {
     this.parentGroup = parentGroup;
@@ -49,7 +49,7 @@ export default class CubeField {
         ? accentColor.clone().lerp(new THREE.Color(darkHex), 0.6)
         : new THREE.Color(darkHex);
 
-      const opacity = 0.15 + Math.random() * 0.35;
+      const opacity = 0.08 + Math.random() * 0.17;
 
       const material = new THREE.MeshBasicMaterial({
         color: colorLight.clone(),
@@ -63,9 +63,9 @@ export default class CubeField {
       // Spread cubes across a wide area, keeping a clear zone near centre
       let x, y, z, tries = 0;
       do {
-        x = (Math.random() - 0.5) * 14;
-        y = (Math.random() - 0.5) * 10;
-        z = (Math.random() - 0.5) * 14;
+        x = (Math.random() - 0.5) * 20;
+        y = (Math.random() - 0.5) * 16;
+        z = (Math.random() - 0.5) * 20;
         tries++;
       } while (
         Math.abs(x) < CLEAR_ZONE_X &&
@@ -83,12 +83,14 @@ export default class CubeField {
           Math.random() - 0.5,
           Math.random() - 0.5
         ).normalize(),
-        spinSpeed: 0.002 + Math.random() * 0.004,
+        spinSpeed: 0.001 + Math.random() * 0.002,
         idlePhase: Math.random() * Math.PI * 2,
-        idleSpeed: 0.2 + Math.random() * 0.3,
+        idleSpeed: 0.08 + Math.random() * 0.12,
         basePosition: { x, y, z },
         colorLight: colorLight.clone(),
         colorDark: colorDark.clone(),
+        baseOpacityDark: opacity,
+        baseOpacityLight: Math.min(opacity * 2.2, 0.55),
         baseOpacity: opacity,
         hoverLerp: 0,       // 0 = idle, 1 = fully hovered
         hitLerp: 0,         // 0 = normal, 1 = just hit by laser
@@ -106,12 +108,13 @@ export default class CubeField {
     this._applyTheme();
   }
 
-  /** Swap all cube base colours to match current theme. */
+  /** Swap all cube base colours and opacity to match current theme. */
   _applyTheme() {
     const dark = document.documentElement.classList.contains('dark');
     for (const cube of this.cubes) {
       const d = cube.userData;
       d._currentBase = dark ? d.colorDark : d.colorLight;
+      d.baseOpacity = dark ? d.baseOpacityDark : d.baseOpacityLight;
     }
   }
 
@@ -255,9 +258,9 @@ export default class CubeField {
           Math.random() - 0.5,
           Math.random() - 0.5,
         ).normalize();
-        d.spinSpeed = 0.002 + Math.random() * 0.004;
+        d.spinSpeed = 0.001 + Math.random() * 0.002;
         d.idlePhase = Math.random() * Math.PI * 2;
-        d.idleSpeed = 0.2 + Math.random() * 0.3;
+        d.idleSpeed = 0.08 + Math.random() * 0.12;
       }
     }
   }
@@ -339,9 +342,9 @@ export default class CubeField {
         Math.random() - 0.5,
         Math.random() - 0.5,
       ).normalize();
-      d.spinSpeed = 0.002 + Math.random() * 0.004;
+      d.spinSpeed = 0.001 + Math.random() * 0.002;
       d.idlePhase = Math.random() * Math.PI * 2;
-      d.idleSpeed = 0.2 + Math.random() * 0.3;
+      d.idleSpeed = 0.08 + Math.random() * 0.12;
 
       // Randomise accent-hint distribution (20% chance)
       const hasAccent = Math.random() < 0.2;
@@ -355,7 +358,7 @@ export default class CubeField {
         ? accentColor.clone().lerp(new THREE.Color(darkHex), 0.6)
         : new THREE.Color(darkHex);
       d._currentBase = dark ? d.colorDark : d.colorLight;
-      d.baseOpacity = 0.15 + Math.random() * 0.35;
+      d.baseOpacity = 0.08 + Math.random() * 0.17;
 
       // Reset state — cube stays hidden until _spawnDelay elapses
       cube.visible = false;

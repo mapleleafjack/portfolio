@@ -333,10 +333,16 @@ export default class FlyingSaucer {
     // ── Theme-aware base colour refs (updated on theme change) ──
     this._bodyBaseHex = THEME.saucerBody.light;
     this._domeBaseHex = THEME.saucerRing.light;
+    this._bodyOpacityDark = 0.50;
+    this._bodyOpacityLight = 0.70;
+    this._domeOpacityDark = 0.45;
+    this._domeOpacityLight = 0.65;
     this._themeCleanup = onThemeChange(() => {
       const dark = document.documentElement.classList.contains('dark');
       this._bodyBaseHex = dark ? THEME.saucerBody.dark : THEME.saucerBody.light;
       this._domeBaseHex = dark ? THEME.saucerRing.dark : THEME.saucerRing.light;
+      if (this.bodyMat) this.bodyMat.opacity = dark ? this._bodyOpacityDark : this._bodyOpacityLight;
+      if (this.domeMat) this.domeMat.opacity = dark ? this._domeOpacityDark : this._domeOpacityLight;
     });
 
     // ── Ring of lights around the rim ──

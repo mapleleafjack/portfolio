@@ -22,7 +22,7 @@ import {
 } from './TorusKnotMath';
 import TorusKnotParticles from './TorusKnotParticles';
 import TorusKnotMarker from './TorusKnotMarker';
-import { getAccentColor, isDarkMode } from './shared';
+import { getAccentColor, isDarkMode, onThemeChange } from './shared';
 
 export default class TorusKnot {
   /**
@@ -58,6 +58,9 @@ export default class TorusKnot {
     this._markerT = 0;
     this._markerS = Math.PI / 2;
 
+    // ── Theme change listener ──────────────────────────
+    this._themeCleanup = onThemeChange(() => this._applyThemeColors());
+
     // ── Knot samples (for field lines / frame lookups) ──
     this._knotSamples = [];
     this._knotArcLength = 0;
@@ -73,6 +76,9 @@ export default class TorusKnot {
 
     // ── Visibility cache (skip redundant _applyModeVisibility) ─
     this._lastVisibilityProgress = -1;
+
+    // ── External visibility override (planet zoom, etc.) ──
+    this._previewVisible = true;
 
     // ── References for rebuild / disposal ──────────────
     this._torusSolid = null;
@@ -120,6 +126,19 @@ export default class TorusKnot {
   /** Returns transition progress 0..1 for external camera lerp. */
   get modeProgress() {
     return this._modeProgress;
+  }
+
+  /**
+   * Show/hide only the preview elements (wireframe + click sphere).
+   * Used externally (e.g. planet zoom) to hide the torus without
+   * interfering with explore-mode visibility.
+   */
+  setPreviewVisible(visible) {
+    if (this._previewVisible === visible) return;
+    this._previewVisible = visible;
+    // Invalidate the per-frame visibility cache so _applyModeVisibility
+    // picks up the change even if modeProgress hasn't changed.
+    this._lastVisibilityProgress = -1;
   }
 
   // ═══════════════════════════════════════════════════════
@@ -177,7 +196,7 @@ export default class TorusKnot {
       color: baseGray,
       wireframe: true,
       transparent: true,
-      opacity: 0.30,
+      opacity: 0.20,
       depthWrite: false,
     });
     this._previewWire = new THREE.Mesh(wGeo, wMat);
@@ -600,12 +619,12 @@ export default class TorusKnot {
 
     // Preview gone by progress 0.12 — no overlap with explore
     const previewFade = Math.max(0, 1 - progress * 8.0);
-    if (this._previewWireMat) this._previewWireMat.opacity = 0.30 * previewFade;
+    if (this._previewWireMat) this._previewWireMat.opacity = 0.20 * previewFade;
     // Glow stays at 0 (only shows on hover, managed by _applyPreviewHoverState)
 
     // Completely remove preview meshes from the render pipeline once faded out,
     // so their depth writes don't occlude the finer explore solid geometry.
-    const previewVisible = previewFade > 0.001;
+    const previewVisible = previewFade > 0.001 && this._previewVisible;
     if (this._previewWire) this._previewWire.visible = previewVisible;
     if (this._glowMesh) this._glowMesh.visible = previewVisible;
     // Click sphere stays visible as long as preview is active (needed for raycasting)
@@ -672,7 +691,7 @@ export default class TorusKnot {
       this._glowMat.opacity = 0.12;
     } else {
       this._previewWireMat.color.copy(baseGray);
-      this._previewWireMat.opacity = 0.30;
+      this._previewWireMat.opacity = 0.20;
       this._glowMat.opacity = 0;
     }
   }
@@ -953,10 +972,35 @@ export default class TorusKnot {
   }
 
   // ═══════════════════════════════════════════════════════
+  //  THEME
+  // ═══════════════════════════════════════════════════════
+
+  /** Update preview wireframe and explore colours on theme change. */
+  _applyThemeColors() {
+    const dark = document.documentElement.classList.contains('dark');
+    const baseGray = new THREE.Color(dark ? '#aaaaaa' : '#888888');
+    this._previewBaseColor = baseGray.clone();
+    if (this._previewWireMat) {
+      this._previewWireMat.color.copy(baseGray);
+    }
+    // Update explore solid / wire colors if they exist and are theme-aware
+    if (this._exploreSolidMat) {
+      this._exploreSolidMat.color.copy(baseGray);
+    }
+    if (this._exploreWireMat) {
+      this._exploreWireMat.color.copy(baseGray);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════
   //  CLEANUP
   // ═══════════════════════════════════════════════════════
 
   dispose() {
+    if (this._themeCleanup) {
+      this._themeCleanup();
+      this._themeCleanup = null;
+    }
     const safeD = (obj) => { if (obj && typeof obj.dispose === 'function') obj.dispose(); };
 
     // Preview
