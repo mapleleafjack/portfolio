@@ -51,7 +51,7 @@ export default function TorusExplorer({ isOpen, onClose, initialParams = {}, onP
     if (!canvasRef.current || !containerRef.current) return;
     if (engineRef.current) return; // already running
 
-    import('../torus/TorusEngine').then(({ createTorusEngine }) => {
+    import('../../torus/TorusEngine').then(({ createTorusEngine }) => {
       if (cancelled || !canvasRef.current || !containerRef.current) return;
       const engine = createTorusEngine(canvasRef.current, containerRef.current, {
         initialParams,

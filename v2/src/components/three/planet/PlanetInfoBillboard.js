@@ -1,35 +1,9 @@
 import * as THREE from 'three';
+import planetConfig from '../../../data/planets.json';
 
-// ── Planet descriptions ────────────────────────────
-const PLANET_DESCS = {
-  work: 'Software I\'ve shipped — legal-tech AI, housing SaaS, comic certification. Built across micro-frontends, Python backends, and .NET services.',
-  craft: 'Things I build with my hands — custom PCBs, ESP32 devices, reactive LED installations, and festival tech. From schematic to solder.',
-  music: 'Music production & audio engineering — psytrance albums, VST plugin development, and live performance with Ableton Push.',
-  play: 'Experiments & side quests — LLM slime colonies, fermentation labs, mushroom cultivation, and the occasional biotech proposal.',
-};
-
-// ── Planet → page route mapping ────────────────────
-const PLANET_ROUTES = {
-  work: '/work',
-  craft: null,
-  music: '/creative',
-  play: null,
-};
-
-// ── Planet highlight stats (shown in billboard) ────
-const PLANET_HIGHLIGHTS = {
-  work: ['7 key projects', '5 companies', 'Legal-tech · Gov · Fintech'],
-  craft: ['6 hardware builds', 'PCB · ESP32 · LEDs', 'Installations · Festivals'],
-  music: ['3 albums', 'VST plugin', 'Audio engineering diploma'],
-  play: ['6 experiments', 'AI · CLI · Biotech', 'Mycology · Fermentation'],
-};
-
-const ORBIT_COUNTS = {
-  work: '7 projects in orbit',
-  craft: '6 builds in orbit',
-  music: '6 tracks in orbit',
-  play: '6 experiments in orbit',
-};
+// ── Planet lookup (built once from JSON) ───────────
+const PLANET_MAP = new Map();
+planetConfig.planets.forEach((p) => PLANET_MAP.set(p.id, p));
 
 // ── Canvas geometry ──────────────────────────────────
 const CANVAS_W = 1920;
@@ -112,7 +86,7 @@ export default class PlanetInfoBillboard {
     this._planetName = planetData.name;
     this._planetColor = planetData.color;
     this._hoveredItem = null;
-    this._currentLink = PLANET_ROUTES[planetData.id] ?? null;
+    this._currentLink = PLANET_MAP.get(planetData.id)?.route ?? null;
 
     // Position above the planet: separate distance along the camera
     // approach direction from screen-space vertical offset, so the
@@ -341,7 +315,7 @@ export default class PlanetInfoBillboard {
     ctx.fillText(this._planetName.toUpperCase(), x + dotR * 2 + 12, y + 4);
 
     // ── Description ─────────────────────────────────
-    const desc = PLANET_DESCS[this._planetId] || '';
+    const desc = PLANET_MAP.get(this._planetId)?.description || '';
     ctx.fillStyle = 'rgba(200, 200, 215, 0.85)';
     ctx.font = '400 13px "Oxanium", "SF Mono", monospace';
     const descLines = this._wrapText(ctx, desc, maxW - 20);
@@ -352,7 +326,7 @@ export default class PlanetInfoBillboard {
     }
 
     // ── Highlights (bullet points) ─────────────────
-    const highlights = PLANET_HIGHLIGHTS[this._planetId] || [];
+    const highlights = PLANET_MAP.get(this._planetId)?.highlights || [];
     if (highlights.length > 0) {
       ly += 4;
       ctx.fillStyle = 'rgba(180, 185, 200, 0.7)';
@@ -364,7 +338,7 @@ export default class PlanetInfoBillboard {
     }
 
     // ── Primary action badge ("OPEN WORK PAGE →") ──
-    const route = PLANET_ROUTES[this._planetId];
+    const route = PLANET_MAP.get(this._planetId)?.route;
     if (route) {
       const btnY = y + maxH - 60;
       const btnText = `OPEN ${this._planetName.toUpperCase()} PAGE  →`;
@@ -397,7 +371,7 @@ export default class PlanetInfoBillboard {
     }
 
     // ── Orbit count badge ──────────────────────────
-    const countText = ORBIT_COUNTS[this._planetId] || '';
+    const countText = PLANET_MAP.get(this._planetId)?.orbitLabel || '';
     if (countText) {
       const badgeY = y + maxH - 6;
       ctx.fillStyle = accent + '1a';

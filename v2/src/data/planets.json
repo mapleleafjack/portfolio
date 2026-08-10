@@ -11,6 +11,10 @@
       "color": "#f0c830",
       "size": 0.28,
       "ringWidth": 0.05,
+      "description": "Software I've shipped — legal-tech AI, housing SaaS, comic certification. Built across micro-frontends, Python backends, and .NET services.",
+      "route": "/work",
+      "highlights": ["7 key projects", "5 companies", "Legal-tech · Gov · Fintech"],
+      "orbitLabel": "7 projects in orbit",
       "constellation": [
         { "type": "gem", "label": "LPA Extractor", "detail": "RAG-powered legal document extraction. Python + LangChain + Snowflake pipeline that cut LPA review time from 6 hours to 1. Deployed at BlackRock.", "link": "/work/lpa-extractor", "color": "#f0c830" },
         { "type": "gem", "label": "Term Intelligence", "detail": "Fund term analysis platform replacing a PowerBI prototype. React + FastAPI + GraphQL. Real-time comparison across 1,000+ private market funds.", "link": "/work/term-intelligence", "color": "#f0c830" },
@@ -32,6 +36,10 @@
       "color": "#10b981",
       "size": 0.28,
       "ringWidth": 0.05,
+      "description": "Things I build with my hands — custom PCBs, ESP32 devices, reactive LED installations, and festival tech. From schematic to solder.",
+      "route": null,
+      "highlights": ["6 hardware builds", "PCB · ESP32 · LEDs", "Installations · Festivals"],
+      "orbitLabel": "6 builds in orbit",
       "constellation": [
         { "type": "chip", "label": "EsPoi — LED Poi", "detail": "Custom ESP32 LED juggling prop. Gyro + accelerometer reactive effects. Custom PCB designed in EasyEDA, BLE control, POV animations. Open source.", "link": "https://github.com/mapleleafjack/EsPoi", "color": "#10b981" },
         { "type": "chip", "label": "BMO", "detail": "Desktop AI companion. ESP32 hardware running GPT conversations, Spotify control, OLED facial expressions, RAG knowledge base, and a macOS menu bar app.", "link": "https://github.com/mapleleafjack/BMO", "color": "#10b981" },
@@ -52,6 +60,10 @@
       "color": "#d946ef",
       "size": 0.28,
       "ringWidth": 0.05,
+      "description": "Music production & audio engineering — psytrance albums, VST plugin development, and live performance with Ableton Push.",
+      "route": "/creative",
+      "highlights": ["3 albums", "VST plugin", "Audio engineering diploma"],
+      "orbitLabel": "6 tracks in orbit",
       "constellation": [
         { "type": "disc", "label": "The Cloud", "detail": "6-track psytrance album as Jack Sonagli. Featuring collaborations with Psyranga and The Bad Fucoz. Tracks incl. Tunnel Vision, Sea of Clouds, r̴̂͜i̴̗̊t̶̮͈́͠u̶̞̓͒a̶̳͖͝l̸͍͎̃.", "link": "/creative/the-cloud", "color": "#f0c830" },
         { "type": "disc", "label": "Remixed", "detail": "5-track remix album for Bob Warley and the Haters. Genre-spanning electronic reworks with full stem production.", "link": "/creative/remixed", "color": "#d946ef" },
@@ -72,6 +84,10 @@
       "color": "#f97316",
       "size": 0.28,
       "ringWidth": 0.05,
+      "description": "Experiments & side quests — LLM slime colonies, fermentation labs, mushroom cultivation, and the occasional biotech proposal.",
+      "route": null,
+      "highlights": ["6 experiments", "AI · CLI · Biotech", "Mycology · Fermentation"],
+      "orbitLabel": "6 experiments in orbit",
       "constellation": [
         { "type": "tetra", "label": "SlimeChan", "detail": "Interactive web colony where every slime has a distinct LLM-powered personality. Chat, feed, and watch them interact. React + AI APIs. Live at slimechan.xyz.", "link": "https://www.slimechan.xyz/", "color": "#f97316" },
         { "type": "tetra", "label": "Obsidian Productivity OS", "detail": "ADHD-informed productivity system. Live DataviewJS dashboards for Jira, Bitbucket & TeamCity. Automated daily logs via AI. 7+ custom AI workflows. Built on years of neurodiversity research and self-experimentation.", "color": "#f97316" },
@@ -83,3 +99,4 @@
     }
   ]
 }
+

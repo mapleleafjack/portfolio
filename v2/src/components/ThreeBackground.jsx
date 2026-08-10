@@ -1,23 +1,21 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { getAccentColor, paramsChanged, cycleGalaxyColor, onThemeChange } from './three/shared';
-import CubeField from './three/CubeField';
-import LogoTrio from './three/LogoTrio';
-import TorusKnot from './three/TorusKnot';
-import SceneCamera from './three/SceneCamera';
-import GalaxyManager from './three/GalaxyEffect';
-import FlyingSaucer from './three/FlyingSaucer';
-import CockpitController from './three/CockpitController';
-import ZoomTransition from './three/ZoomTransition';
-import HoverManager from './three/HoverManager';
-import LabelManager from './three/LabelManager';
-import ThemeToggle from './three/ThemeToggle';
-import PlanetSystem from './three/PlanetSystemV2';
-import PlanetInfoBillboard from './three/PlanetInfoBillboard';
-import PostProcessing from './three/PostProcessing';
-import { useTheme } from '../ThemeContext';
+import CubeField from './three/scene/CubeField';
+import LogoTrio from './three/scene/LogoTrio';
+import TorusKnot from './three/torus/TorusKnot';
+import SceneCamera from './three/scene/SceneCamera';
+import GalaxyManager from './three/scene/GalaxyEffect';
+import FlyingSaucer from './three/scene/FlyingSaucer';
+import CockpitController from './three/scene/CockpitController';
+import ZoomTransition from './three/interaction/ZoomTransition';
+import HoverManager from './three/interaction/HoverManager';
+import LabelManager from './three/interaction/LabelManager';
+import ThemeToggle from './three/scene/ThemeToggle';
+import PlanetSystem from './three/planet/PlanetSystem';
+import PlanetInfoBillboard from './three/planet/PlanetInfoBillboard';
+import { useTheme } from '../context/ThemeContext';
+import useThreeScene from '../hooks/useThreeScene';
 
 /**
  * ThreeBackground — thin orchestrator for the full-screen 3D scene.
@@ -51,6 +49,7 @@ export default function ThreeBackground({
 }) {
   const containerRef = useRef(null);
   const { toggleTheme } = useTheme();
+  const resourcesRef = useThreeScene(containerRef);
 
   // ── Stable refs (avoid re-running the Three.js effect) ──
   const onTorusClickRef = useRef(onTorusClick);
@@ -87,64 +86,21 @@ export default function ThreeBackground({
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    const resources = resourcesRef.current;
+    if (!container || !resources) return;
 
-    // ── Scene setup ──────────────────────────────────────
-    const scene = new THREE.Scene();
-
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000,
-    );
-    camera.position.z = 5;
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setClearColor(0x000000, 0);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.domElement.style.pointerEvents = 'none';
-    container.appendChild(renderer.domElement);
-
-    // ── Post-processing (bloom) ──
-    const bloomScene = new THREE.Scene();
-
-    // Set initial background colour from CSS theme
-    const _initialStyle = getComputedStyle(document.documentElement);
-    const _initialBg = _initialStyle.getPropertyValue('--bg').trim() || '#0a0a0a';
-    bloomScene.background = new THREE.Color(_initialBg);
-
-    const postProcessing = new PostProcessing(
-      renderer, bloomScene, camera,
-      window.innerWidth, window.innerHeight,
-    );
-
-    // CSS2DRenderer for 3D hover labels (constant-size text)
-    const css2DRenderer = new CSS2DRenderer();
-    css2DRenderer.setSize(window.innerWidth, window.innerHeight);
-    css2DRenderer.domElement.style.position = 'absolute';
-    css2DRenderer.domElement.style.top = '0';
-    css2DRenderer.domElement.style.left = '0';
-    css2DRenderer.domElement.style.pointerEvents = 'none';
-    container.appendChild(css2DRenderer.domElement);
-
-    // OrbitControls for torus explore mode (disabled in galaxy view)
-    const orbitControls = new OrbitControls(camera, renderer.domElement);
-    orbitControls.enabled = false;
-    orbitControls.enableDamping = true;
-    orbitControls.dampingFactor = 0.08;
-    orbitControls.minDistance = 2;
-    orbitControls.maxDistance = 12;
-
-    // Scene group — rotated on drag instead of moving the camera.
-    // Placed in bloomScene so planets/cubes/torus get bloom; logo
-    // (in `scene`) renders natively on top.
-    const sceneGroup = new THREE.Group();
-    bloomScene.add(sceneGroup);
-
-    // ── Raycaster (shared for hover + click + marker drag + crosshair) ──
-    const raycaster = new THREE.Raycaster();
+    const {
+      scene,
+      bloomScene,
+      camera,
+      renderer,
+      css2DRenderer,
+      orbitControls,
+      sceneGroup,
+      clock,
+      raycaster,
+      postProcessing,
+    } = resources;
 
     // ── Instantiate all managers ────────────────────────
     const cubeField = new CubeField(sceneGroup);
@@ -385,7 +341,6 @@ export default function ThreeBackground({
     // ── Animation loop ──────────────────────────────────
     let animationId;
     let t = 0;
-    const clock = new THREE.Clock();
     const _initialParams = torusParamsRef.current || {};
     let prevParams = { ..._initialParams };
     let _wasFocused = false;
@@ -680,25 +635,13 @@ export default function ThreeBackground({
 
     animate();
 
-    // ── Resize handler ──────────────────────────────────
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      postProcessing.setSize(window.innerWidth, window.innerHeight);
-      css2DRenderer.setSize(window.innerWidth, window.innerHeight);
-    };
-    window.addEventListener('resize', handleResize);
-
     // ── Cleanup ─────────────────────────────────────────
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', handleResize);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
       cockpit.dispose();
       sceneCamera.dispose();
-      orbitControls.dispose();
       galaxyManager.dispose();
       saucer.dispose();
       cubeField.dispose();
@@ -708,16 +651,8 @@ export default function ThreeBackground({
       labelManager.dispose();
       planetSystem.dispose();
       infoBillboard.dispose();
-      postProcessing.dispose();
       if (_themeCleanup) _themeCleanup();
-      renderer.dispose();
       if (_scoreEl) { _scoreEl.remove(); _scoreEl = null; }
-      if (container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement);
-      }
-      if (container.contains(css2DRenderer.domElement)) {
-        container.removeChild(css2DRenderer.domElement);
-      }
     };
   }, []);
 

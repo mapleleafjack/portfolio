@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getAccentColor, THEME, onThemeChange } from './shared';
+import { getAccentColor, THEME, onThemeChange } from '../shared';
 
 // ── Shared geometry for explosion debris ──
 const DEBRIS_GEO = new THREE.BoxGeometry(0.05, 0.05, 0.05);

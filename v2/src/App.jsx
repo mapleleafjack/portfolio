@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
-import Nav from './components/Nav';
-import Home from './components/Home';
-import Work from './components/Work';
-import Project from './components/Project';
-import Creative from './components/Creative';
-import About from './components/About';
-import Album from './components/Album';
-import CursorTrail from './components/CursorTrail';
-import ColorShift from './components/ColorShift';
+import Nav from './components/ui/Nav';
+import Home from './pages/Home';
+import Work from './pages/Work';
+import Project from './pages/Project';
+import Creative from './pages/Creative';
+import About from './pages/About';
+import Album from './pages/Album';
+import CursorTrail from './components/ui/CursorTrail';
+import ColorShift from './components/ui/ColorShift';
 import ThreeBackground from './components/ThreeBackground';
-import TorusInfoPanel from './components/TorusInfoPanel';
-import TorusControlsPanel from './components/TorusControlsPanel';
-import { PRESETS as TORUS_PRESETS } from './components/three/TorusKnotData';
-import { TorusProvider, useTorus } from './TorusContext';
-import { ThemeProvider } from './ThemeContext';
+import TorusInfoPanel from './components/ui/TorusInfoPanel';
+import TorusControlsPanel from './components/ui/TorusControlsPanel';
+import { PRESETS as TORUS_PRESETS } from './components/three/torus/TorusKnotData';
+import { TorusProvider, useTorus } from './context/TorusContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 function PageWrapper({ children }) {
   const location = useLocation();

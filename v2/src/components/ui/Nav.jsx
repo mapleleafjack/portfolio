@@ -1,5 +1,5 @@
 import { Sun, Moon } from 'lucide-react';
-import { useTheme } from '../ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Nav({ onNavClick, activePlanet, onHomeClick }) {
   const { resolvedTheme, toggleTheme } = useTheme();

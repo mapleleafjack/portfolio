@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getAccentColor, onThemeChange, THEME } from './shared';
+import { getAccentColor, onThemeChange, THEME } from '../shared';
 
 // 3 size tiers for varied rock debris
 const GEO_S = new THREE.BoxGeometry(0.06, 0.06, 0.06);

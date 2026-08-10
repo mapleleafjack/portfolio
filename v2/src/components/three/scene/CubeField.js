@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { getAccentColor, getThemeColor, THEME, onThemeChange } from './shared';
+import { getAccentColor, getThemeColor, THEME, onThemeChange } from '../shared';
 
 const NUM_CUBES = 18;
 const CLEAR_ZONE_X = 6.0;

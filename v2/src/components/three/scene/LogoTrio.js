@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { onThemeChange, THEME } from './shared';
+import { onThemeChange, THEME } from '../shared';
 
 const SPIN_DECAY = 0.94;       // per-frame decay factor for hit spin
 const GLOW_DECAY = 0.92;       // per-frame decay for hit glow

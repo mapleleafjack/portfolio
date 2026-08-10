@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { PRESETS } from './three/TorusKnotData';
+import { PRESETS } from '../three/torus/TorusKnotData';
 
 export default function TorusInfoPanel({ params = {}, activePreset = -1 }) {
   const [hidden, setHidden] = useState(false);

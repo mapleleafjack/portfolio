@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { onThemeChange } from './shared';
+import { onThemeChange } from '../shared';
 
 const SPHERE_RADIUS = 0.16;
 // Fixed world-space position in the sceneGroup (top-right area)

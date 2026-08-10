@@ -17,7 +17,7 @@ export default class HoverManager {
    * @param {import('./TorusKnot').default} torusKnot
    * @param {import('./FlyingSaucer').default} saucer
    * @param {import('./ThemeToggle').default} [themeToggle]
-   * @param {import('./PlanetSystemV2').default} [planetSystem]
+   * @param {import('./PlanetSystem').default} [planetSystem]
    */
   constructor(raycaster, cubeField, torusKnot, saucer, themeToggle = null, planetSystem = null) {
     this._raycaster = raycaster;

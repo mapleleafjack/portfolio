@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { getAccentColor } from './shared';
-import config from '../../data/planets.json';
+import { getAccentColor } from '../shared';
+import config from '../../../data/planets.json';
 
 // ── Shared geometry for orbiting moons ────────────────
 const MOON_GEO = new THREE.SphereGeometry(1, 8, 8);

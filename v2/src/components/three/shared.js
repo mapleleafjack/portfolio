@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import colors from '../../data/colors.json';
 
 // ── Accent colour cache ───────────────────────────────
 // getComputedStyle() forces a style recalculation — extremely
@@ -12,6 +13,7 @@ const COLOR_CACHE_MS = 500;
  * Read the current accent colour from CSS custom properties (--accent).
  * Cached: calls getComputedStyle at most once every 500ms.
  * Shared across all Three.js scene modules.
+ * Falls back to colors.defaultAccent from the canonical JSON palette.
  */
 export function getAccentColor() {
   const now = performance.now();
@@ -19,7 +21,7 @@ export function getAccentColor() {
     return _cachedColor.clone();
   }
   const style = getComputedStyle(document.documentElement);
-  const hex = style.getPropertyValue('--accent').trim() || '#f0c830';
+  const hex = style.getPropertyValue('--accent').trim() || colors.defaultAccent;
   _cachedColor = new THREE.Color(hex);
   _lastColorRead = now;
   return _cachedColor.clone();

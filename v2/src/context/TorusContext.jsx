@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
-import { PRESETS } from './components/three/TorusKnotData';
+import { PRESETS } from '../components/three/torus/TorusKnotData';
 
 // ── Random preset on each page load ────────────────────
 const PRESET_LIST = PRESETS || [];

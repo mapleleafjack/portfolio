@@ -13,7 +13,7 @@
  */
 import * as THREE from 'three';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import { getAccentColor, isDarkMode, onThemeChange } from './shared';
+import { getAccentColor, isDarkMode, onThemeChange } from '../shared';
 
 // ── Per-label configuration ──────────────────────────────
 const H_OFFSET = 0.25;       // horizontal nudge (world-space X) before vertical drop

@@ -22,7 +22,7 @@ import {
 } from './TorusKnotMath';
 import TorusKnotParticles from './TorusKnotParticles';
 import TorusKnotMarker from './TorusKnotMarker';
-import { getAccentColor, isDarkMode, onThemeChange } from './shared';
+import { getAccentColor, isDarkMode, onThemeChange } from '../shared';
 
 export default class TorusKnot {
   /**

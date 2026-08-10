@@ -1,16 +1,7 @@
 import { useEffect } from 'react';
+import colors from '../../data/colors.json';
 
 /* Sets a bold accent colour randomly on each page load. */
-
-const COLORS = [
-  '#f0c830', // yellow
-  '#e05a2b', // orange-red
-  '#d946ef', // magenta
-  '#3b82f6', // blue
-  '#10b981', // emerald
-  '#8b5cf6', // purple
-  '#ef4444', // red
-];
 
 function hexToRgb(hex) {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -21,7 +12,8 @@ function hexToRgb(hex) {
 
 export default function ColorShift() {
   useEffect(() => {
-    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    const palette = colors.accentPalette;
+    const color = palette[Math.floor(Math.random() * palette.length)];
     const [r, g, b] = hexToRgb(color);
     const root = document.documentElement;
     root.style.setProperty('--accent', color);

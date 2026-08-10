@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { PRESETS, DEFAULT_STATE } from './three/TorusKnotData';
+import { PRESETS, DEFAULT_STATE } from '../three/torus/TorusKnotData';
 
 /**
  * Bottom control bar — light glassmorphic, matches app aesthetic.

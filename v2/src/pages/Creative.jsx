@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ALBUMS, HARDWARE_ITEMS, SIDE_PROJECTS } from '../data';
 import { Music, Fire, Cpu, Star } from 'pixelarticons/react';
-import { useTorus } from '../TorusContext';
+import { useTorus } from '../context/TorusContext';
 
 export default function Creative() {
   const { openTorus } = useTorus();
